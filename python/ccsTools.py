@@ -1,0 +1,88 @@
+import os
+import glob
+import subprocess
+from collections import OrderedDict
+import lcatr.schema
+from PythonBinding import CcsJythonInterpreter
+import hdrtools
+import siteUtils
+
+class CcsSetup(OrderedDict):
+    """
+    The context-specific setup commands for executing a CCS script
+    written in jython.  These commands set variables and paths that
+    are known in the calling python code and which are needed by the
+    jython script.
+    """
+    def __init__(self, configFile):
+        """
+        configFile contains the names of the site-specific
+        configuration files.  File basenames are provided in
+        configFile, and the full paths are constructed in the
+        _read(...) method.
+        """
+        super(CcsSetup, self).__init__()
+        self['tsCWD'] = os.getcwd()
+        self['labname'] = siteUtils.getSiteName()
+        self._read(configFile)
+        self['CCDID'] = os.environ["LCATR_UNIT_ID"]
+    def _read(self, configFile):
+        if configFile is None:
+            return
+        configDir = siteUtils.configDir()
+        for line in open(configFile, 'r'):
+            key, value = line.strip().split("=")
+            self[key.strip()] = os.path.join(configDir, value.strip())
+    def __call__(self):
+        """
+        Return the setup commands for the CCS script.
+        """
+        # Set the local variables.
+        commands = ['%s = %s' % item for item in self.items()]
+        # Append path to the modules used by the jython code.
+        commands.append('import sys')
+        commands.append('sys.path.append(%s)' % siteUtils.pythonDir())
+        return '\n'.join(commands)
+
+def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
+    if makeBiasDir:
+        os.mkdir("bias")
+
+    ccs = CcsJythonInterpreter()
+    setup = CcsSetup('%s.cfg' % jobName)
+    result = ccs.syncScriptExecution(siteUtils.jobDirPath(ccsScript), setup(),
+                                     verbose=verbose)
+    output = open("%s.log" % jobName, "w")
+    output.write(result.getOutput())
+    output.close()
+    
+def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
+    hdrtools.updateFitsHeaders(acqfilelist)
+
+    # @todo Implement trending plot generation using python instead of
+    # using gnuplot
+    sitedir = os.path.join(os.environ['VIRTUAL_ENV'], "TS3_JH_acq", "site")
+    subprocess.call(os.path.join(sitedir, "dotemppressplots.sh"), shell=True)
+
+    results = []
+
+    statusFile = open("status.out")
+    statusAssignments = []
+    for flag in statusFlags:
+        value = statusFile.readline().strip()
+        statusAssignments.append('%(flag)s=%(value)s' % locals())
+    
+    results.append(lcatr.schema.valid(lcatr.schema.get(jobName), 
+                                      eval(','.join(statusAssignments))))
+
+    # @todo Fix this. Copying these files should not be necessary.
+    jobdir = siteUtils.getJobDir()
+    os.system("cp -vp %s/*.fits ." % jobdir)   
+
+    # @todo Sort out which files really need to be curated.
+    files = glob.glob('*.fits,*values*,*log*,*summary*,*.dat,*.png,bias/*.fits')
+    data_products = [lcatr.schema.fileref.make(item) for item in files]
+    results.extend(data_products)
+
+    lcatr.schema.write_file(results)
+    lcatr.schema.validate_file()

@@ -44,4 +44,4 @@ def configDir():
     Return the full path to the directory containing the site-specific
     configuration files.
     """
-    return os.path.join(os.environ['HARNESSEDJOBSDIR'], 'config', getLabName())
+    return os.path.join(os.environ['HARNESSEDJOBSDIR'], 'config', getSiteName())
