@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 from ccsValidation import ccsValidation
 
-ccsValidation('fe55_acq', 'acqfilelist')
+ccsValidation('dark_acq', 'acqfilelist')

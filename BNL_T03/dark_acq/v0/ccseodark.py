@@ -9,7 +9,7 @@ from java.lang import Exception
 import sys
 import time
 
-sys.path.append(libdir);
+#sys.path.append(libdir);
 #import eolib
 
 CCS.setThrowExceptions(True);
