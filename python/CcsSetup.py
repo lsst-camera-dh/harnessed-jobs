@@ -7,7 +7,6 @@ class CcsSetup(OrderedDict):
         super(CcsSetup, self).__init__()
         self['tsCWD'] = os.getcwd()
         self['labname'] = siteUtils.getSiteName()
-        self['libdir'] = siteUtils.getJobDir()
         self._read(configFile)
         self['CCDID'] = os.environ["LCATR_UNIT_ID"]
     def _read(self, configFile):
@@ -23,10 +22,9 @@ class CcsSetup(OrderedDict):
         """
         # Set local variables.
         commands = ['%s = %s' % item for item in self.items()]
-        # Set path to jython modules.
+        # Append path to python libraries used by the jython code
         commands.append('import sys')
-        jythonDir = os.path.join(os.environ['BASE_DIR'], 'ccs-tools', 'jython')
-        commands.append('sys.path.append(%s)' % jythonDir)
+        commands.append('sys.path.append(%s)' % siteUtils.pythonDir())
         return '\n'.join(commands)
 
 if __name__ == '__main__':

@@ -33,6 +33,12 @@ def getSiteName():
     """
     return return os.environ['SITENAME']
 
+def pythonDir():
+    """
+    Return directory containing the python scripts for this package.
+    """
+    return os.path.join(os.environ['HARNESSEDJOBSDIR'], 'python')
+
 def configDir():
     """
     Return the full path to the directory containing the site-specific
