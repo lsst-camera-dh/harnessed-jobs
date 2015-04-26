@@ -1,15 +1,4 @@
 #!/usr/bin/env python
-import os
-from PythonBinding import CcsJythonInterpreter
-from CcsSetup import CcsSetup
-from siteUtils import jobDirPath, jobName
+from ccsProduction import ccsProduction
 
-os.mkdir("bias");
-
-ccs = CcsJythonInterpreter()
-setup = CcsSetup('dark_acq.cfg')
-result = ccs.syncScriptExecution(jobDirPath('ccseodark.py'), setup(),
-                                 verbose=True)
-output = open("%s.log" % jobName(), "w")
-output.write(result.getOutput())
-output.close()
+ccsProduction('dark_acq', 'ccseodark.py', makeBiasDir=True)
