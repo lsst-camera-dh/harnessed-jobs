@@ -2,10 +2,10 @@ import os
 import glob
 import subprocess
 from collections import OrderedDict
-import lcatr.schema
 from PythonBinding import CcsJythonInterpreter
-import hdrtools
 import siteUtils
+import hdrtools
+import lcatr.schema
 
 class CcsSetup(OrderedDict):
     """
@@ -24,13 +24,13 @@ class CcsSetup(OrderedDict):
         super(CcsSetup, self).__init__()
         self['tsCWD'] = os.getcwd()
         self['labname'] = siteUtils.getSiteName()
+        self['CCDID'] = siteUtils.getUnitId()
         self._read(configFile)
-        self['CCDID'] = os.environ["LCATR_UNIT_ID"]
     def _read(self, configFile):
         if configFile is None:
             return
         configDir = siteUtils.configDir()
-        for line in open(configFile, 'r'):
+        for line in open(configFile):
             key, value = line.strip().split("=")
             self[key.strip()] = os.path.join(configDir, value.strip())
     def __call__(self):
@@ -45,6 +45,9 @@ class CcsSetup(OrderedDict):
         return '\n'.join(commands)
 
 def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
+    """
+    Run the CCS data acquistion script under the CCS jython interpreter.
+    """
     if makeBiasDir:
         os.mkdir("bias")
 
@@ -60,7 +63,7 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
     hdrtools.updateFitsHeaders(acqfilelist)
 
     # @todo Implement trending plot generation using python instead of
-    # using gnuplot
+    # gnuplot
     sitedir = os.path.join(os.environ['VIRTUAL_ENV'], "TS3_JH_acq", "site")
     subprocess.call(os.path.join(sitedir, "dotemppressplots.sh"), shell=True)
 

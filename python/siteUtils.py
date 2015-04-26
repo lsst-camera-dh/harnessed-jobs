@@ -1,6 +1,9 @@
 import os
 import sys
 
+def getUnitId():
+    return os.environ['LCATR_UNIT_ID']
+
 def getJobName():
     """
     Extract the name of the harnessed job assuming standard format for
