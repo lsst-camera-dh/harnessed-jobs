@@ -1,4 +1,5 @@
 #!/usr/bin/env python
-from ccsValidation import ccsValidation
+from ccsTools import ccsValidator
 
-ccsValidation('dark_acq', 'acqfilelist')
+ccsValidator('dark_acq')
+

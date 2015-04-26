@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsProduction import ccsProduction
+from ccsTools import ccsProducer
 
-ccsProduction('flat_acq', 'ccseoflat.py')
+ccsProducer('flat_acq', 'ccseoflat.py')

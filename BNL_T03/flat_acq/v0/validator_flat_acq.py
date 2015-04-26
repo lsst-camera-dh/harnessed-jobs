@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsValidation immport ccsValidation
+from ccsTools import ccsValidator
 
-ccsValidation('flat_acq')
+ccsValidator('flat_acq')

@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsProduction import ccsProduction
+from ccsTools import ccsProducer
 
-ccsProduction('fluxcal_acq', 'ccseofluxcal.py')
+ccsProducer('fluxcal_acq', 'ccseofluxcal.py')

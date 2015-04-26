@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsProduction import ccsProduction
+from ccsTools import ccsProducer
 
-ccsProduction('fe55_acq', 'ccseofe55.py', makeBiasDir=True)
+ccsProducer('fe55_acq', 'ccseofe55.py')

@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsProduction import ccsProduction
+from ccsTools import ccsProducer
 
-ccsProduction('sflat_acq', 'ccseosflat.py', makeBiasDir=True)
+ccsProducer('sflat_acq', 'ccseosflat.py')

@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsValidation import ccsValidation
+from ccsTools import ccsValidator
 
-ccsValidation('sflat_acq', 'acqfilelist')
+ccsValidator('sflat_acq')

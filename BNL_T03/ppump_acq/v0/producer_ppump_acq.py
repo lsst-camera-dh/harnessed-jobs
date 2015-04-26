@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsProduction import ccsProduction
+from ccsTools import ccsProducer
 
-ccsProduction('ppump_acq', 'ccseoppump.py')
+ccsProducer('ppump_acq', 'ccseoppump.py')

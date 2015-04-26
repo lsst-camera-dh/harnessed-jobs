@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsProduction import ccsProduction
+from ccsTools import ccsProducer
 
-ccsProduction('dark_acq', 'ccseodark.py', makeBiasDir=True)
+ccsProducer('dark_acq', 'ccseodark.py')

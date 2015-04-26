@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsValidation import ccsValidation
+from ccsTools import ccsValidator
 
-ccsValidation('fluxcal_acq', statusFlags='stat volt curr pres temp'.split())
+ccsValidator('fluxcal_acq', statusFlags='stat volt curr pres temp'.split())

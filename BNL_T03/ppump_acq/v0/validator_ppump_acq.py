@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-from ccsValidation import ccsValidation
+from ccsTools import ccsValidator
 
-ccsValidation('ppump_acq')
+ccsValidator('ppump_acq')
