@@ -1,50 +1,47 @@
 #!/usr/bin/env python
+import os
 import glob
+import subprocess
 import lcatr.schema
 import hdrtools as ht
-import os
+import siteUtils
     
-results = []
-
-jobname = "TS3_fe55"
-
-jobdir = "%sshare/%s/%s/" % (os.environ["INST_DIR"], jobname, os.environ["LCATR_VERSION"])
-sitedir = "%s/TS3_JH_acq/site" % os.environ["VIRTUAL_ENV"]
-
-fpfiles = open("%s/acqfilelist" % os.getcwd(), "r");
-for line in fpfiles :
+#
+# Update FITS file headers.
+#
+for line in open("acqfilelist", "r"):
     tokens = str.split(line)
     fitsfile = tokens[0]
     pdfile = tokens[1]
     tstamp = tokens[2]
     try:
-        ht.addPDvals(fitsfile,pdfile,"AMP0.MEAS_TIMES","AMP0",tstamp)
+        ht.addPDvals(fitsfile, pdfile, "AMP0.MEAS_TIMES", "AMP0", tstamp)
     except:
-        print "Problem in addPDvals: Check that %s was actually created: " % fitsfile
+        raise RuntimeError("Problem in addPDvals. Check that %s was created. " % fitsfile)
     try:
         print ht.fitsAverage(fitsfile)
     except:
-        print "Problem in fitsAverage: Check that %s was actually created: " % fitsfile
+        raise RuntimeError("Problem in fitsAverage. Check that %s was created. " % fitsfile)
     try:
-        ht.hdrsummary(fitsfile,"summary.txt")
+        ht.hdrsummary(fitsfile, "summary.txt")
     except:
-        print "Problem in hdrsummary: Check that %s was actually created: " % fitsfile
-fpfiles.close()
+        raise RuntimeError("Problem in hdrsummary. Check that %s was created. " % fitsfile)
 
+#
+# @todo Implement trending plot generation using python instead of using gnuplot
+#
+sitedir = os.path.join(os.environ['VIRTUAL_ENV'], "TS3_JH_acq", "site")
+subprocess.call(os.path.join(sitedir, "dotemppressplots.sh"), shell=True)
 
+results = []
+tsstat = open("status.out").readline()
+results.append(lcatr.schema.valid(lcatr.schema.get('fe55_acq'), stat=tsstat))
 
-fo = open("%s/status.out" % os.getcwd(), "r");
-tsstat = fo.readline();
-fo.close();
+jobdir = siteUtils.getJobDir()
+os.system("cp -vp %s/*.fits ." % jobdir)   # @todo Fix this. Copying should not be necessary.
 
-results.append(lcatr.schema.valid(lcatr.schema.get('TS3_fe55'),stat=tsstat))
-
-os.system("%s/dotemppressplots.sh" % sitedir)
-
-#copy all the lcatr job files too
-os.system("cp -vp %s/{*.py,*.fits} ." % jobdir)
-
-files = glob.glob('%s/*.fits,*values*,*log*,*summary*,*.dat,*.png,*.py,bias/*.fits' % os.getcwd())
+# @todo Sort out which files really need to be curated.
+files = glob.glob('%s/*.fits,*values*,*log*,*summary*,*.dat,*.png,bias/*.fits' % os.getcwd())
 data_products = [lcatr.schema.fileref.make(item) for item in files]
 results.extend(data_products)
 
