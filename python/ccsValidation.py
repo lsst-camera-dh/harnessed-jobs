@@ -5,7 +5,7 @@ import lcatr.schema
 from hdrtools import updateFitsHeaders
 import siteUtils
     
-def ccsValidation(jobName, acqfilelist='acqfilelist'):
+def ccsValidation(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
     updateFitsHeaders(acqfilelist)
 
     # @todo Implement trending plot generation using python instead of
@@ -14,8 +14,15 @@ def ccsValidation(jobName, acqfilelist='acqfilelist'):
     subprocess.call(os.path.join(sitedir, "dotemppressplots.sh"), shell=True)
 
     results = []
-    tsstat = open("status.out").readline()
-    results.append(lcatr.schema.valid(lcatr.schema.get(jobName), stat=tsstat))
+
+    statusFile = open("status.out")
+    statusAssignments = []
+    for flag in statusFlags:
+        value = statusFile.readline().strip()
+        statusAssignments.append('%(flag)s=%(value)s' % locals())
+    
+    results.append(lcatr.schema.valid(lcatr.schema.get(jobName), 
+                                      eval(','.join(statusAssignments))))
 
     # @todo Fix this. Copying these files should not be necessary.
     jobdir = siteUtils.getJobDir()
