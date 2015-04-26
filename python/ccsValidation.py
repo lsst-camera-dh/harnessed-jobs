@@ -5,7 +5,7 @@ import lcatr.schema
 from hdrtools import updateFitsHeaders
 import siteUtils
     
-def ccsValidation(jobName, acqfilelist):
+def ccsValidation(jobName, acqfilelist='acqfilelist'):
     updateFitsHeaders(acqfilelist)
 
     # @todo Implement trending plot generation using python instead of

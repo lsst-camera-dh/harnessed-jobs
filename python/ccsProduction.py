@@ -3,7 +3,7 @@ from PythonBinding import CcsJythonInterpreter
 from CcsSetup import CcsSetup
 from siteUtils import jobDirPath
 
-def ccsProduction(jobName, ccsScript, makeBiasDir=False, verbose=True):
+def ccsProduction(jobName, ccsScript, makeBiasDir=True, verbose=True):
     if makeBiasDir:
         os.mkdir("bias")
 
