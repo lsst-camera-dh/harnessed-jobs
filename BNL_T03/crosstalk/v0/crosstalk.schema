@@ -1,0 +1,5 @@
+# -*- python -*-
+{
+    'schema_name' : 'crosstalk',
+    'schema_version' : 0,
+}
