@@ -1,0 +1,7 @@
+# -*- python -*-
+{
+    'schema_name' : 'read_noise',
+    'schema_version' : 0,
+    'amp' : int,
+    'read_noise' : float
+}
