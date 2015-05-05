@@ -1,0 +1,8 @@
+# -*- python -*-
+{
+    'schema_name' : 'cte',
+    'schema_version' : 0,
+    'amp' : int,
+    'cti_serial' : float,
+    'cti_parallel' : float
+}

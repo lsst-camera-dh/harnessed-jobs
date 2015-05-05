@@ -2,6 +2,6 @@
 {
     'schema_name' : 'traps',
     'schema_version' : 0,
-    'amp' : 'int',
-    'num_traps' : 'int'
+    'amp' : int,
+    'num_traps' : int
 }
