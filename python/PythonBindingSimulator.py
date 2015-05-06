@@ -8,12 +8,14 @@ import os
 import subprocess
 
 class AcqSim(object):
+    datasets = 'fe55 dark flat qe sflat ppump xtalk fluxcal'.split()
     def __init__(self, rootdir):
         self.rootdir = rootdir
-        datasets = 'fe55 dark flat qe sflat ppump xtalk fluxcal'.split()
-        for dataset in datasets:
-            source_path = os.path.join(self.rootdir, dataset, '*')
-            exec('self.%(dataset)s_acq = lambda : subprocess.call("cp %(source_path)s .", shell=True)' % locals())
+    def getData(self, dataset):
+        if dataset not in self.datasets:
+            raise RuntimeError("Invalid dataset name.")
+        command = "cp %s ." % os.path.join(self.rootdir, dataset, '*')
+        subprocess.call(command, shell=True)
 
 class CcsResult(object):
     def __init__(self, scriptname):
@@ -26,7 +28,7 @@ class CcsJythonInterpreter(object):
         self.acq = AcqSim(os.environ['SIMDIR'])
     def syncScriptExecution(self, filename, setup_commands=(), verbose=False):
         dataset = filename[len('ccseo'):-3]
-        exec('self.acq.%(dataset)s_acq()' % locals())
+        self.acq.getData(dataset)
         return CcsResult(filename)
 
 if __name__ is '__main__':
