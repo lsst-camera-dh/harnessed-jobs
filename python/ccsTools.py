@@ -2,7 +2,10 @@ import os
 import glob
 import subprocess
 from collections import OrderedDict
-from PythonBinding import CcsJythonInterpreter
+if os.environ.has_key('SIMDIR'):
+    from PythonBindingSimulator import CcsJythonInterpreter
+else:
+    from PythonBinding import CcsJythonInterpreter
 import siteUtils
 import hdrtools
 import lcatr.schema
