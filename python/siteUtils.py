@@ -6,13 +6,9 @@ def getUnitId():
 
 def getJobName():
     """
-    Extract the name of the harnessed job assuming standard format for
-    the name of the calling script, i.e.,
-    [producer,validator]_<jobName>.py.
+    The name of the harnessed job.
     """
-    # @todo: Use an LCATR env var with this info instead.
-    jobName = '_'.join(sys.argv[0].split('_')[1:])[:-3]
-    return jobName
+    return os.environ['LCATR_JOB']
 
 def getJobDir(jobName=None):
     """
@@ -20,7 +16,7 @@ def getJobDir(jobName=None):
     """
     if jobName is None:
         jobName = getJobName()
-    return os.path.join(os.environ['INST_DIR'], jobName,
+    return os.path.join(os.environ['LCATR_INSTALL_AREA'], jobName,
                         os.environ['LCATR_VERSION'])
 
 def jobDirPath(fileName, jobName=None):
@@ -34,7 +30,7 @@ def getSiteName():
     """
     Return the site or laboratory name
     """
-    return return os.environ['SITENAME']
+    return os.environ['SITENAME']
 
 def pythonDir():
     """

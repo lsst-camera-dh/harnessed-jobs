@@ -21,7 +21,7 @@ sys.stdout.flush()
 
 sensor_id = siteUtils.getUnitId()
 
-gains = eotestUtils.getSensorGains()
+gains = eotestUtils.getSensorGains(sensor_id)
 
 task = sensorTest.QeTask()
 task.run(sensor_id, lambda_files, ccd_cal_file, sph_cal_file,

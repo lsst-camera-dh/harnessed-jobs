@@ -13,7 +13,7 @@ class AcqSim(object):
         self.rootdir = rootdir
     def getData(self, dataset):
         if dataset not in self.datasets:
-            raise RuntimeError("Invalid dataset name.")
+            raise RuntimeError("Invalid dataset name: " + dataset)
         command = "cp %s ." % os.path.join(self.rootdir, dataset, '*')
         subprocess.call(command, shell=True)
 
@@ -27,8 +27,12 @@ class CcsJythonInterpreter(object):
     def __init__(self, name=None, host=None, port=4444):
         self.acq = AcqSim(os.environ['SIMDIR'])
     def syncScriptExecution(self, filename, setup_commands=(), verbose=False):
-        dataset = filename[len('ccseo'):-3]
+        dataset = os.path.basename(filename)[len('ccseo'):-3]
         self.acq.getData(dataset)
+        status_output = open('status.out', 'w')
+        for flag in 'stat volt curr pres temp'.split():
+            status_output.write('0\n')
+        status_output.close()
         return CcsResult(filename)
 
 if __name__ is '__main__':

@@ -9,6 +9,9 @@ bias_files = dependency_glob('*_fe55_bias_*.fits', jobname='fe55_acq')
 system_noise_files = dependency_glob('noise_*.fits', jobname='system_noise')
 mask_files = dependency_glob('*_mask.fits')
 
+if not system_noise_files:
+    system_noise_files = None
+
 print bias_files
 print system_noise_files
 print mask_files

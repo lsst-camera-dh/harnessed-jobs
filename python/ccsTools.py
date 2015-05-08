@@ -28,7 +28,7 @@ class CcsSetup(OrderedDict):
         self['tsCWD'] = os.getcwd()
         self['labname'] = siteUtils.getSiteName()
         self['CCDID'] = siteUtils.getUnitId()
-        self._read(configFile)
+        self._read(os.path.join(siteUtils.getJobDir(), configFile))
     def _read(self, configFile):
         if configFile is None:
             return
@@ -63,23 +63,28 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
     output.close()
     
 def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
-    hdrtools.updateFitsHeaders(acqfilelist)
+    try:
+        hdrtools.updateFitsHeaders(acqfilelist)
+    except IOError:
+        pass
 
     # @todo Implement trending plot generation using python instead of
     # gnuplot
     sitedir = os.path.join(os.environ['VIRTUAL_ENV'], "TS3_JH_acq", "site")
-    subprocess.call(os.path.join(sitedir, "dotemppressplots.sh"), shell=True)
+    plotter = os.path.join(sitedir, "dotemppressplots.sh")
+    if os.path.isfile(plotter):
+        subprocess.call(plotter, shell=True)
 
     results = []
 
     statusFile = open("status.out")
-    statusAssignments = []
+    statusAssignments = {}
     for flag in statusFlags:
-        value = statusFile.readline().strip()
-        statusAssignments.append('%(flag)s=%(value)s' % locals())
+        value = int(statusFile.readline().strip())
+        statusAssignments[flag] = value
     
     results.append(lcatr.schema.valid(lcatr.schema.get(jobName), 
-                                      eval(','.join(statusAssignments))))
+                                      **statusAssignments))
 
     # @todo Fix this. Copying these files should not be necessary.
     jobdir = siteUtils.getJobDir()

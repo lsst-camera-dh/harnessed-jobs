@@ -13,7 +13,7 @@ sys.stdout.flush()
 
 sensor_id = siteUtils.getUnitId()
 
-gains = eotestUtils.getSensorGains()
+gains = eotestUtils.getSensorGains(sensor_id)
 
 task = sensorTest.PtcTask()
 task.run(sensor_id, flat_files, mask_files, gains)
