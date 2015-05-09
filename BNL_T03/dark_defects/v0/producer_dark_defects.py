@@ -11,7 +11,7 @@ print sflat_files
 print mask_files
 sys.stdout.flush()
 
-sensor_id = siteUtils.getJobId()
+sensor_id = siteUtils.getUnitId()
 
 task = sensorTest.DarkPixelsTask()
 task.run(sensor_id, sflat_files, mask_files)

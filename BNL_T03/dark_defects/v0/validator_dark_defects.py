@@ -3,7 +3,7 @@ import lsst.eotest.sensor as sensorTest
 import lcatr.schema
 import siteUtils
 
-sensor_id = siteUtils.getJobId()
+sensor_id = siteUtils.getUnitId()
 
 mask_file = '%s_dark_pixel_mask.fits' % sensor_id
 results = [lcatr.schema.fileref.make(mask_file)]
