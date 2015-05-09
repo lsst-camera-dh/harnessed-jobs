@@ -4,7 +4,7 @@ import lcatr.schema
 
 qe_files = glob.glob('*QE.*')
 
-results = [lcatr.schema.valid(lcatr.schema.get('QE'))]
+results = [lcatr.schema.valid(lcatr.schema.get('qe_analysis'))]
 results.extend([lcatr.schema.fileref.make(item) for item in qe_files])
 
 lcatr.schema.write_file(results)

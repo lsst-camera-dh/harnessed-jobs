@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import shutil
 
 #  This is needed so that pylab can write to .matplotlib
 os.environ['MPLCONFIGDIR'] = os.curdir
@@ -10,6 +11,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 import json
+import pyfits
 import pylab
 import lsst.eotest.sensor as sensorTest
 from lcatr.harness.helpers import dependency_glob
@@ -19,6 +21,8 @@ class JsonRepackager(object):
     _key_map = dict((('gain', 'GAIN'),
                      ('psf_sigma', 'PSF_SIGMA'),
                      ('read_noise', 'READ_NOISE'),
+                     ('system_noise', 'SYSTEM_NOISE'),
+                     ('total_noise', 'TOTAL_NOISE'),
                      ('bright_pixels', 'NUM_BRIGHT_PIXELS'),
                      ('bright_columns', 'NUM_BRIGHT_COLUMNS'),
                      ('dark_pixels', 'NUM_DARK_PIXELS'),
@@ -49,17 +53,34 @@ class JsonRepackager(object):
                                                        value)
     def write(self, outfile=None, clobber=True):
         self.eotest_results.write(outfile=outfile, clobber=clobber)
+    def process_files(self, summary_files):
+        for item in summary_files:
+            print "processing", item
+            self.process_file(item)
+
+def append_prnu(results_file, prnu_file):
+    """
+    Copy the PRNU_RESULTS extension from the prnu job to the final
+    results file.
+    """
+    results = pyfits.open(results_file)
+    prnu = pyfits.open(prnu_file)
+    results.append(prnu['PRNU_RESULTS'])
+    results.writeto(results_file, clobber=True)
 
 sensor_id = siteUtils.getUnitId()
+results_file = '%s_eotest_results.fits' % sensor_id
 
 # Aggregate information from summary.lims files into
 # a final EOTestResults output file.
 repackager = JsonRepackager()
-summary_files = dependency_glob('summary.lims')
-for item in summary_files:
-    repackager.process_file(item)
-results_file = '%s_eotest_results.fits' % sensor_id
+repackager.process_files(dependency_glob('summary.lims'))
 repackager.write(results_file)
+
+append_prnu(results_file, dependency_glob(results_file, jobname='prnu')[0])
+
+qe_file = dependency_glob('*%s_QE.fits' % sensor_id, jobname='qe_analysis')[0]
+shutil.copy(qe_file, ".")
 
 plots = sensorTest.EOTestPlots(sensor_id, results_file=results_file)
 
@@ -93,7 +114,6 @@ plots.noise()
 pylab.savefig('%s_noise.png' % sensor_id)
 
 # Quantum Efficiency
-qe_file = dependency_glob('*%s_QE.fits' % sensor_id, jobname='qe_analysis')[0]
 plots.qe(qe_file=qe_file)
 pylab.savefig('%s_qe.png' % sensor_id)
 

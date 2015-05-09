@@ -12,9 +12,15 @@ read_noise_file = '%s_eotest_results.fits' % sensor_id
 data = sensorTest.EOTestResults(read_noise_file)
 amps = data['AMP']
 read_noise_data = data['READ_NOISE']
-for amp, read_noise in zip(amps, read_noise_data):
+system_noise_data = data['SYSTEM_NOISE']
+total_noise_data = data['TOTAL_NOISE']
+for amp, read_noise, system_noise, total_noise in zip(amps, read_noise_data,
+                                                      system_noise_data,
+                                                      total_noise_data):
     results.append(lcatr.schema.valid(lcatr.schema.get('read_noise'),
-                                      amp=amp, read_noise=read_noise))
+                                      amp=amp, read_noise=read_noise,
+                                      system_noise=system_noise,
+                                      total_noise=total_noise))
 
 files = glob.glob('*read_noise?*.fits')
 files.append(read_noise_file)

@@ -2,6 +2,7 @@
 {
     'schema_name' : 'flat_pairs',
     'schema_version' : 0,
+    'amp' : int,
     'full_well' : float,
     'max_frac_dev' : float
 }
