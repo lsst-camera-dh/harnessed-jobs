@@ -82,7 +82,14 @@ append_prnu(results_file, dependency_glob(results_file, jobname='prnu')[0])
 qe_file = dependency_glob('*%s_QE.fits' % sensor_id, jobname='qe_analysis')[0]
 shutil.copy(qe_file, ".")
 
-plots = sensorTest.EOTestPlots(sensor_id, results_file=results_file)
+try:
+    xtalk_file = dependency_glob('*%s_xtalk_matrix.fits' % sensor_id,
+                                 jobname='crosstalk')[0]
+except IndexError:
+    xtalk_file = None
+
+plots = sensorTest.EOTestPlots(sensor_id, results_file=results_file,
+                               xtalk_file=xtalk_file)
 
 # Fe55 flux distribution fits
 fe55_file = dependency_glob('%s_psf_results*.fits' % sensor_id,
@@ -118,10 +125,8 @@ plots.qe(qe_file=qe_file)
 pylab.savefig('%s_qe.png' % sensor_id)
 
 # Crosstalk matrix
-xtalk_file = dependency_glob('*%s_xtalk_matrix.fits' % sensor_id,
-                             jobname='crosstalk')[0]
 plots.crosstalk_matrix(xtalk_file=xtalk_file)
-pylab.savefig('%s_xtalk.png' % sensor_id)
+pylab.savefig('%s_crosstalk_matrix.png' % sensor_id)
 
 # Flat fields at wavelengths nearest the centers of the standard bands
 wl_files = dependency_glob('*_lambda_*.fits', jobname='qe_acq')
