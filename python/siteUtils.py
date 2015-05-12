@@ -10,6 +10,16 @@ def getJobName():
     """
     return os.environ['LCATR_JOB']
 
+def getProcessName(jobName=None):
+    if jobName is None:
+        myJobName = getJobName()
+    else:
+        myJobName = jobName
+    if os.environ.has_key('ET_PROCESS_NAME_PREFIX'):
+        return '_'.join((os.environ['ET_PROCESS_NAME_PREFIX'], myJobName))
+    else:
+        return myJobName
+
 def getJobDir(jobName=None):
     """
     Full path of the harnessed job scripts.

@@ -5,7 +5,8 @@ from lcatr.harness.helpers import dependency_glob
 import siteUtils
 import eotestUtils
 
-dark_files = dependency_glob('*_dark_dark_*.fits', jobname='dark_acq')
+dark_files = dependency_glob('*_dark_dark_*.fits',
+                             jobname=siteUtils.getProcessName('dark_acq'))
 mask_files = dependency_glob('*_mask.fits')
 
 print dark_files

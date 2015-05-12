@@ -5,7 +5,8 @@ from lcatr.harness.helpers import dependency_glob
 import siteUtils
 import eotestUtils
 
-flat_files = dependency_glob('*_flat*flat?_*.fits', jobname='flat_acq')
+flat_files = dependency_glob('*_flat*flat?_*.fits',
+                             jobname=siteUtils.getProcessName('flat_acq'))
 mask_files = dependency_glob('*_mask.fits')
 print flat_files
 print mask_files

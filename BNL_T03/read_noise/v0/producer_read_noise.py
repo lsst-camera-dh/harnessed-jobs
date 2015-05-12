@@ -5,8 +5,10 @@ from lcatr.harness.helpers import dependency_glob
 import siteUtils
 import eotestUtils
 
-bias_files = dependency_glob('*_fe55_bias_*.fits', jobname='fe55_acq')
-system_noise_files = dependency_glob('noise_*.fits', jobname='system_noise')
+bias_files = dependency_glob('*_fe55_bias_*.fits',
+                             jobname=siteUtils.getProcessName('fe55_acq'))
+system_noise_files = dependency_glob('noise_*.fits',
+                                     jobname=siteUtils.getProcessName('system_noise'))
 mask_files = dependency_glob('*_mask.fits')
 
 if not system_noise_files:

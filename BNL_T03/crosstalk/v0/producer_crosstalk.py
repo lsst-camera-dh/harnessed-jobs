@@ -4,7 +4,8 @@ import lsst.eotest.sensor as sensorTest
 from lcatr.harness.helpers import dependency_glob
 import siteUtils
 
-spot_files = dependency_glob('*_spot_*.fits', jobname='xtalk_acq')
+spot_files = dependency_glob('*_spot_*.fits',
+                             jobname=siteUtils.getProcessName('xtalk_acq'))
 mask_files = dependency_glob('*_mask.fits')
 print spot_files
 print mask_files

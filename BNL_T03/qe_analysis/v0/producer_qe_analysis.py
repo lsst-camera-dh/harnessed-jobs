@@ -12,7 +12,8 @@ ccd_cal_file = os.path.join(sensorTestDir, 'qe', 'OD142.csv')
 sph_cal_file = os.path.join(sensorTestDir, 'qe', 'OD143.csv')
 wlscan_file = os.path.join(sensorTestDir, 'qe', 'WLscan.txt')
 
-lambda_files = dependency_glob('*_lambda_*.fits', jobname='qe_acq')
+lambda_files = dependency_glob('*_lambda_*.fits',
+                               jobname=siteUtils.getProcessName('qe_acq'))
 mask_files = dependency_glob('*_mask.fits')
 
 print lambda_files

@@ -5,7 +5,8 @@ import lsst.eotest.sensor as sensorTest
 from lcatr.harness.helpers import dependency_glob
 import siteUtils
 
-fe55_files = dependency_glob('*fe55_fe55*.fits', jobname='fe55_acq')
+fe55_files = dependency_glob('*fe55_fe55*.fits',
+                             jobname=siteUtils.getProcessName('fe55_acq'))
 
 print fe55_files
 sys.stdout.flush()

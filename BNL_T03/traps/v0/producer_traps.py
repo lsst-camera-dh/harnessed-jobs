@@ -5,7 +5,8 @@ from lcatr.harness.helpers import dependency_glob
 import siteUtils
 import eotestUtils
 
-trap_file = dependency_glob('*_trap_ppump*.fits', jobname='ppump_acq')[0]
+trap_file = dependency_glob('*_trap_ppump*.fits',
+                            jobname=siteUtils.getProcessName('ppump_acq'))[0]
 mask_files = dependency_glob('*_mask.fits')
 
 print trap_file

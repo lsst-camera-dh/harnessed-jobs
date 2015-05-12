@@ -17,6 +17,11 @@ import lsst.eotest.sensor as sensorTest
 from lcatr.harness.helpers import dependency_glob
 import siteUtils
 
+def processName_dependencyGlob(*args, **kwds):
+    if kwds.has_key('jobname'):
+        kwds['jobname'] = siteUtils.getProcessName(kwds['jobname'])
+    return dependency_glob(*args, **kwds)
+
 class JsonRepackager(object):
     _key_map = dict((('gain', 'GAIN'),
                      ('psf_sigma', 'PSF_SIGMA'),
@@ -74,17 +79,19 @@ results_file = '%s_eotest_results.fits' % sensor_id
 # Aggregate information from summary.lims files into
 # a final EOTestResults output file.
 repackager = JsonRepackager()
-repackager.process_files(dependency_glob('summary.lims'))
+repackager.process_files(processName_dependencyGlob('summary.lims'))
 repackager.write(results_file)
 
-append_prnu(results_file, dependency_glob(results_file, jobname='prnu')[0])
+append_prnu(results_file, processName_dependencyGlob(results_file,
+                                                     jobname='prnu')[0])
 
-qe_file = dependency_glob('*%s_QE.fits' % sensor_id, jobname='qe_analysis')[0]
+qe_file = processName_dependencyGlob('*%s_QE.fits' % sensor_id,
+                                     jobname='qe_analysis')[0]
 shutil.copy(qe_file, ".")
 
 try:
-    xtalk_file = dependency_glob('*%s_xtalk_matrix.fits' % sensor_id,
-                                 jobname='crosstalk')[0]
+    xtalk_file = processName_dependencyGlob('*%s_xtalk_matrix.fits' % sensor_id,
+                                            jobname='crosstalk')[0]
 except IndexError:
     xtalk_file = None
 
@@ -92,8 +99,8 @@ plots = sensorTest.EOTestPlots(sensor_id, results_file=results_file,
                                xtalk_file=xtalk_file)
 
 # Fe55 flux distribution fits
-fe55_file = dependency_glob('%s_psf_results*.fits' % sensor_id,
-                            jobname='fe55_analysis')[0]
+fe55_file = processName_dependencyGlob('%s_psf_results*.fits' % sensor_id,
+                                       jobname='fe55_analysis')[0]
 plots.fe55_dists(fe55_file=fe55_file)
 pylab.savefig('%s_fe55_dists.png' % sensor_id)
 
@@ -102,13 +109,14 @@ plots.psf_dists(fe55_file=fe55_file)
 pylab.savefig('%s_psf_dists.png' % sensor_id)
 
 # Photon Transfer Curves
-ptc_file = dependency_glob('%s_ptc.fits' % sensor_id, jobname='ptc')[0]
+ptc_file = processName_dependencyGlob('%s_ptc.fits' % sensor_id,
+                                      jobname='ptc')[0]
 plots.ptcs(ptc_file=ptc_file)
 pylab.savefig('%s_ptcs.png' % sensor_id)
 
 # Linearity plots
-detresp_file = dependency_glob('%s_det_response.fits' % sensor_id,
-                               jobname='flat_pairs')[0]
+detresp_file = processName_dependencyGlob('%s_det_response.fits' % sensor_id,
+                                          jobname='flat_pairs')[0]
 plots.linearity(ptc_file=ptc_file, detresp_file=detresp_file)
 pylab.savefig('%s_linearity.png' % sensor_id)
 
@@ -129,7 +137,7 @@ plots.crosstalk_matrix(xtalk_file=xtalk_file)
 pylab.savefig('%s_crosstalk_matrix.png' % sensor_id)
 
 # Flat fields at wavelengths nearest the centers of the standard bands
-wl_files = dependency_glob('*_lambda_*.fits', jobname='qe_acq')
+wl_files = processName_dependencyGlob('*_lambda_*.fits', jobname='qe_acq')
 print wl_files
 wl_file_path = os.path.split(wl_files[0])[0]
 plots.flat_fields(wl_file_path)

@@ -4,7 +4,8 @@ import lsst.eotest.sensor as sensorTest
 from lcatr.harness.helpers import dependency_glob
 import siteUtils
 
-superflat_files = dependency_glob('*_superflat*.fits', jobname='sflat_acq')
+superflat_files = dependency_glob('*_superflat*.fits',
+                                  jobname=siteUtils.getProcessName('sflat_acq'))
 mask_files = dependency_glob('*_mask.fits')
 
 print superflat_files

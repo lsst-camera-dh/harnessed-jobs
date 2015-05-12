@@ -5,7 +5,8 @@ from lcatr.harness.helpers import dependency_glob
 import siteUtils
 import eotestUtils
 
-lambda_files = dependency_glob('*_lambda_*.fits', jobname='qe_acq')
+lambda_files = dependency_glob('*_lambda_*.fits',
+                               jobname=siteUtils.getProcessName('qe_acq'))
 correction_image = None
 mask_files = dependency_glob('*_mask.fits')
 
