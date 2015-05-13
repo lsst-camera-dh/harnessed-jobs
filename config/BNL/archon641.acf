@@ -638,7 +638,7 @@ PARAMETER19="WaiTime=500      #wait time before readout starts (to park Fe55, fo
 PARAMETER2="Nclear=2002   # number of fast clears 2050"
 PARAMETER20="Nexpo=100000"
 PARAMETER21=
-PARAMETER22="Light =1       # light or  dark "
+PARAMETER22="Light=1       # light or  dark "
 PARAMETER23=
 PARAMETER24=# Timing:
 PARAMETER25=
