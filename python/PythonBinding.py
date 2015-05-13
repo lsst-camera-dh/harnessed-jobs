@@ -86,7 +86,6 @@ class CcsJythonInterpreter:
         for command in setup_commands:
             if verbose:
                 print command
-#            self.sendInterpreterServer(command)
             self.syncExecution(command)
 
         if verbose:
