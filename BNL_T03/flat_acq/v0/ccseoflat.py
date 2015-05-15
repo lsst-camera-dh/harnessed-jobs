@@ -22,32 +22,21 @@ CCS.setThrowExceptions(True);
 try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
-    tssub  = CCS.attachSubsystem("ts");
-    print "attaching Bias subsystem"
-    biassub = CCS.attachSubsystem("ts/Bias");
+    tssub  = CCS.attachSubsystem("%s" % ts);
     print "attaching PD subsystem"
-    pdsub   = CCS.attachSubsystem("ts/PhotoDiode");
-    print "attaching Cryo subsystem"
-    cryosub = CCS.attachSubsystem("ts/Cryo");
-    print "attaching Vac subsystem"
-    vacsub  = CCS.attachSubsystem("ts/VacuumGauge");
-    print "attaching Lamp subsystem"
-    lampsub = CCS.attachSubsystem("ts/Lamp");
+    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
-    monosub = CCS.attachSubsystem("ts/Monochromator");
-    monosub.synchCommand(10,"setHandshake",0);
-
+    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "Attaching archon subsystem"
-    arcsub  = CCS.attachSubsystem("archon");
+    arcsub  = CCS.attachSubsystem("%s" % archon);
 
-    serno = 1   # in the future this will be passed in
+    time.sleep(3.)
 
     cdir = tsCWD
 
 # Initialization
     print "doing initialization"
-    print "resetting PD device"
-    pdsub.synchCommand(20,"reset")
+
     print "initializing archon controller with file %s" % acffile
     arcsub.synchCommand(10,"setConfigFromFile",acffile);
     arcsub.synchCommand(20,"applyConfig");
@@ -57,7 +46,7 @@ try:
     
 # move to TS acquisition state
     print "setting acquisition state"
-    result = tssub.synchCommand(10,"setTSTEST");
+    result = tssub.synchCommand(60,"setTSTEST");
     rply = result.getResult();
 
 #check state of ts devices
@@ -68,7 +57,7 @@ try:
         print "checking for test stand to be ready for acq";
         result = tssub.synchCommand(10,"isTestStandReady");
         tsstate = result.getResult();
-    # the following line is just for test situations so that there would be no waiting
+# the following line is just for test situations so that there would be no waiting
         tsstate=1;
         if ((time.time()-starttim)>240):
             print "Something is wrong ... we will never make it to a runnable state"
@@ -93,7 +82,7 @@ try:
 
     seq = 0  # image pair number in sequence
 
-    monosub.synchCommand(10,"setFilter",1);
+    monosub.synchCommand(30,"setFilter",1);
 
 
     ccd = CCDID
@@ -120,13 +109,13 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime","0");
  
             print "setting location of bias fits directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s/bias" % (cdir));
+            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
             print "starting acquisition step for lambda = %8.2f with exptime %8.2f s" % (wl, exptime)
  
             print "setting the monochromator wavelength"
             if (exptime > lo_lim):
-                monosub.synchCommand(30,"setWave",wl);
+                monosub.synchCommand(30,"setWaveAndFilter",wl);
 
             print "start bias exposure loop"
 
@@ -149,14 +138,19 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
+# prepare to readout diodes
+            nreads = exptime*60/nplc + 200
+            if (nreads > 3000):
+                nreads = 3000
+                nplc = exptime*60/(nreads-200)
+                print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+                
             for i in range(imcount):
 
-# prepare to readout diodes
-                nreads = exptime*60/nplc + 200
-                if (nreads > 3000):
-                    nreads = 3000
-                    nplc = exptime*60/(nreads-200)
-                    print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+# adjust timeout because we will be waiting for the data to become ready
+                mywait = nplc/60.*nreads*1.10 ;
+                print "Setting timeout to %f s" % mywait
+                pdsub.synchCommand(1000,"setTimeout",mywait);
 
                 print "nreads set to %d and nplc set to %f" % (int(nreads),float(nplc))
                 pdresult = pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
@@ -180,16 +174,11 @@ try:
 
                 pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),seq,i+1)
 
-# the primary purpose of this is to guarantee that the accumBuffer method has completed                                                       print "starting the wait for an accumBuffer done status message at %f" % time.time()
+# the primary purpose of this is to guarantee that the accumBuffer method has completed
                 tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
                 time.sleep(5.)
-# adjust timeout because we will be waiting for the data to become ready
-                mywait = nplc/60.*nreads*1.10 ;
-                print "Setting timeout to %f s" % mywait
-                pdsub.synchCommand(1000,"setTimeout",mywait);
-
  
                 print "executing readBuffer"
                 try:
@@ -223,12 +212,10 @@ try:
 
 # move TS to idle state
                     
-    tssub.synchCommand(10,"setTSIdle");
+    tssub.synchCommand(60,"setTSReady");
 
-#except CcsException as ex:
-except:
+except Exception, ex:
 
-#    print "There was ean exception in the acquisition of type %s" % ex
-    print "There was an exception in the acquisition"
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "FLAT: END"

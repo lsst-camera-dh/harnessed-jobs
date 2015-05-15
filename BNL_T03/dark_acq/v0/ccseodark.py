@@ -14,35 +14,24 @@ CCS.setThrowExceptions(True);
 try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
-    tssub  = CCS.attachSubsystem("ts");
-    print "attaching Bias subsystem"
-    biassub = CCS.attachSubsystem("ts/Bias");
+    tssub  = CCS.attachSubsystem("%s" % ts);
     print "attaching PD subsystem"
-    pdsub   = CCS.attachSubsystem("ts/PhotoDiode");
-    print "attaching Cryo subsystem"
-    cryosub = CCS.attachSubsystem("ts/Cryo");
-    print "attaching Vac subsystem"
-    vacsub  = CCS.attachSubsystem("ts/VacuumGauge");
-    print "attaching Lamp subsystem"
-    lampsub = CCS.attachSubsystem("ts/Lamp");
+    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
-    monosub = CCS.attachSubsystem("ts/Monochromator");
-    monosub.synchCommand(10,"setHandshake",0);
-    
+    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "Attaching archon subsystem"
-    arcsub  = CCS.attachSubsystem("archon");
+    arcsub  = CCS.attachSubsystem("%s" % archon);
     
     cdir = tsCWD
     
 # Initialization
     print "doing initialization"
-    pdsub.synchCommand(10,"reset");
-    
+
     arcsub.synchCommand(10,"setConfigFromFile",acffile);
     arcsub.synchCommand(20,"applyConfig");
     
     arcsub.synchCommand(10,"powerOnCCD");
-    
+
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
     
@@ -67,13 +56,13 @@ try:
         if tsstate!=0 :
             break
         time.sleep(5.)
+
 #put in acquisition state
     print "go teststand go"
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
 
-    
-    # go through config file looking for 'dark' instructions, take the darks
+# go through config file looking for 'dark' instructions, take the darks
     
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
@@ -94,7 +83,7 @@ try:
         if ((len(tokens) > 0) and (tokens[0] == 'dark')):
             exptime = float(tokens[1])
             imcount = int(tokens[2])
-    
+
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
     
 # prepare to readout diodes
@@ -105,6 +94,12 @@ try:
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             for i in range(imcount):
+
+# adjust timeout because we will be waiting for the data to become ready both
+# at the accumbuffer stage and the readbuffer stage
+                mywait = nplc/60.*nreads*1.10 ;
+                print "Setting timeout to %f s" % mywait
+                pdsub.synchCommand(1000,"setTimeout",mywait);
 
                 print "call accumBuffer to start PD recording at %f" % time.time()
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
@@ -119,7 +114,7 @@ try:
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
     
                 print "Ready to take image. time = %f" % time.time()
-                result = arcsub.synchCommand(2000,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
     
@@ -135,11 +130,6 @@ try:
 # make sure the sample of the photo diode is complete
                 time.sleep(5.)
     
-# adjust timeout because we will be waiting for the data to become ready
-                mywait = nplc/60.*nreads*1.10 ;
-                print "Setting timeout to %f s" % mywait
-                pdsub.synchCommand(1000,"setTimeout",mywait);
-
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
                 result = pdsub.synchCommand(900,"readBuffer","%s/%s" % (cdir,pdfilename));
                 buff = result.getResult()
@@ -167,12 +157,11 @@ try:
     
 # move TS to idle state
                         
-    tssub.synchCommand(10,"setTSIdle");
-#except CcsException as ex:                                                     
-except:
+    tssub.synchCommand(10,"setTSReady");
 
-#    print "There was ean exception in the acquisition of type %s" % ex         
-    print "There was an exception in the acquisition at time %f" % time.time()
+except Exception, ex:                                                     
 
+
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "DARK: END"

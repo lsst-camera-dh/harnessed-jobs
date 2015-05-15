@@ -15,36 +15,25 @@ CCS.setThrowExceptions(True);
 try:
     #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
-    tssub  = CCS.attachSubsystem("ts");
-    print "attaching Bias subsystem"
-    biassub = CCS.attachSubsystem("ts/Bias");
+    tssub  = CCS.attachSubsystem("%s" % ts);
     print "attaching PD subsystem"
-    pdsub   = CCS.attachSubsystem("ts/PhotoDiode");
-    print "attaching Cryo subsystem"
-    cryosub = CCS.attachSubsystem("ts/Cryo");
-    print "attaching Vac subsystem"
-    vacsub  = CCS.attachSubsystem("ts/VacuumGauge");
-    print "attaching Lamp subsystem"
-    lampsub = CCS.attachSubsystem("ts/Lamp");
+    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching XED subsystem"
-    xedsub = CCS.attachSubsystem("ts/XED");
+    xedsub   = CCS.attachSubsystem("%s/XED" % ts);
     print "attaching Mono subsystem"
-    monosub = CCS.attachSubsystem("ts/Monochromator");
-    monosub.synchCommand(10,"setHandshake",0);
-
+    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "Attaching archon subsystem"
-    arcsub  = CCS.attachSubsystem("archon");
+    arcsub  = CCS.attachSubsystem("%s" % archon);
     
+    time.sleep(3.)
+
     cdir = tsCWD
     
     # Initialization
     print "doing initialization"
     
-    print "resetting PD device"
-    pdsub.synchCommand(20,"reset")
-
     print "load CCD controller config file"
-    arcsub.synchCommand(10,"setConfigFromFile",acffile);
+    arcsub.synchCommand(20,"setConfigFromFile",acffile);
     arcsub.synchCommand(20,"applyConfig");
     arcsub.synchCommand(10,"powerOnCCD");
     
@@ -54,11 +43,7 @@ try:
     
 #    monosub.synchCommand(10,"closeShutter");
     print "set filter wheel to position 1"
-    monosub.synchCommand(10,"setFilter",1); # open position
-    
-    # extend the Fe55 arm
-    print "extend the Fe55 arm"
-    xedsub.synchCommand(30,"extendFe55");
+    monosub.synchCommand(30,"setFilter",1); # open position
     
     #result = arcsub.synchCommand(10,"clearCCD");
     
@@ -97,11 +82,6 @@ try:
     ccd = CCDID
     print "Working on CCD %s" % ccd
 
-    print "set filter position"
-    monosub.synchCommand(10,"setFilter",1); # open position
-    
-    
-    
 # go through config file looking for 'fe55' instructions, take the fe55s
     print "Scanning config file for fe55 specifications";
     
@@ -118,15 +98,21 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
+            nreads = exptime*60/nplc + 200
+            if (nreads > 3000):
+                nreads = 3000
+                nplc = exptime*60/(nreads-200)
+                print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+
             for i in range(imcount):
 # prepare to readout diodes                                                                              
-                nreads = exptime*60/nplc + 200
-                if (nreads > 3000):
-                    nreads = 3000
-                    nplc = exptime*60/(nreads-200)
-                    print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
-    
-                pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
+# adjust timeout because we will be waiting for the data to become ready
+                mywait = nplc/60.*nreads*1.10 ;
+                print "Setting timeout to %f s" % mywait
+                pdsub.synchCommand(1000,"setTimeout",mywait);
+
+#                pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
+                pdresult =  pdsub.synchCommand(10,"accumBuffer",int(nreads),float(nplc),False);
                 print "recording should now be in progress and the time is %f" % time.time()
 # start acquisition
 
@@ -140,24 +126,27 @@ try:
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
     
                 print "Ready to take image. time = %f" % time.time()
+
+# extend the Fe55 arm
+                print "extend the Fe55 arm"
+                xedsub.synchCommand(30,"extendFe55");
+    
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
-   
+
+# retract the Fe55 arm
+                xedsub.synchCommand(30,"retractFe55");
+    
                 print "done with exposure # %d" % i
                 print "getting photodiode readings at time = %f" % time.time();
     
                 pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (timestamp,seq,i+1)
                 print "starting the wait for an accumBuffer done status message at %f" % time.time()
-                tottime = pdresult.get();
+#                tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
                 time.sleep(5.)
-
-# adjust timeout because we will be waiting for the data to become ready
-                mywait = nplc/60.*nreads*1.10 ;
-                print "Setting timeout to %f s" % mywait
-                pdsub.synchCommand(1000,"setTimeout",mywait);
 
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
                 result = pdsub.synchCommand(500,"readBuffer","%s/%s" % (cdir,pdfilename));
@@ -172,9 +161,6 @@ try:
     fp.close();
     
     
-    # retract the Fe55 arm
-    xedsub.synchCommand(30,"retractFe55");
-    
     fp = open("%s/status.out" % (cdir),"w");
     
     istate=0;
@@ -185,12 +171,10 @@ try:
     
 # move TS to idle state
                         
-    tssub.synchCommand(10,"setTSIdle");
+    tssub.synchCommand(60,"setTSReady");
 
-#except CcsException as ex:                                                     
-except:
+except Exception, ex:                                                     
 
-#    print "There was ean exception in the acquisition of type %s" % ex         
-    print "There was an exception in the acquisition at time %f" % time.time()
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "FE55: END"

@@ -15,31 +15,28 @@ CCS.setThrowExceptions(True);
 try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
-    tssub  = CCS.attachSubsystem("ts");
+    tssub  = CCS.attachSubsystem("%s" % ts);
     print "attaching Bias subsystem"
-    biassub = CCS.attachSubsystem("ts/Bias");
+    biassub = CCS.attachSubsystem("%s/Bias" % ts);
     print "attaching PD subsystem"
-    pdsub   = CCS.attachSubsystem("ts/PhotoDiode");
-    print "attaching Cryo subsystem"
-    cryosub = CCS.attachSubsystem("ts/Cryo");
-    print "attaching Vac subsystem"
-    vacsub  = CCS.attachSubsystem("ts/VacuumGauge");
-    print "attaching Lamp subsystem"
-    lampsub = CCS.attachSubsystem("ts/Lamp");
+    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
-    monosub = CCS.attachSubsystem("ts/Monochromator");
-    monosub.synchCommand(10,"setHandshake",0);
-    
+    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "Attaching archon subsystem"
-    arcsub  = CCS.attachSubsystem("archon");
+    arcsub  = CCS.attachSubsystem("%s" % archon);
 
+    time.sleep(3.)
 
     cdir = tsCWD
 
 # Initialization
     print "doing initialization"
+
     print "resetting PD device"
-    pdsub.synchCommand(20,"reset")
+#    result = pdsub.synchCommand(20,"reset")
+#    reply = result.getResult();
+#    time.sleep(5.)
+
     arcsub.synchCommand(10,"setConfigFromFile",acffile);
     arcsub.synchCommand(20,"applyConfig");
     arcsub.synchCommand(10,"powerOnCCD");
@@ -51,7 +48,7 @@ try:
 
 # move to TS acquisition state
     print "setting acquisition state"
-    result = tssub.synchCommand(10,"setTSTEST");
+    result = tssub.synchCommand(60,"setTSTEST");
     rply = result.getResult();
 
 #check state of ts devices
@@ -90,7 +87,7 @@ try:
     print "Working on CCD %s" % ccd
 
     print "set filter position"
-    monosub.synchCommand(10,"setFilter",1); # open position
+    monosub.synchCommand(30,"setFilter",1); # open position
 
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
@@ -113,7 +110,7 @@ try:
             arcsub.synchCommand(10,"setParameter","Light","0");
 
             print "setting location of bias fits directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s/bias" % (cdir));
+            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
             for i in range(bcount):
                 timestamp = time.time()
@@ -143,7 +140,12 @@ try:
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
 
-                monosub.synchCommand(30,"setWave",wl);
+                monosub.synchCommand(30,"setWaveAndFilter",wl);
+
+# adjust timeout because we will be waiting for the data to become ready
+                mywait = nplc/60.*nreads*1.10 ;
+                print "Setting timeout to %f s" % mywait
+                pdsub.synchCommand(1000,"setTimeout",mywait);
 
                 print "call accumBuffer to start PD recording at %f" % time.time()
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
@@ -175,11 +177,6 @@ try:
 # make sure the sample of the photo diode is complete
                 time.sleep(10.)
 
-# adjust timeout because we will be waiting for the data to become ready
-                mywait = nplc/60.*nreads*1.10 ;
-                print "Setting timeout to %f s" % mywait
-                pdsub.synchCommand(1000,"setTimeout",mywait);
-
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
                 result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
                 buff = result.getResult()
@@ -206,13 +203,11 @@ try:
 
 # move TS to idle state
                     
-    tssub.synchCommand(10,"setTSIdle");
+    tssub.synchCommand(60,"setTSReady");
 
-#except CcsException as ex:                                                     
-except:
+except Exception, ex:
 
-#    print "There was ean exception in the acquisition of type %s" % ex         
-    print "There was an exception in the acquisition at time %f" % time.time()
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 
 print "QE: END"

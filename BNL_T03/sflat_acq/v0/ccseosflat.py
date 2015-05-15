@@ -15,30 +15,22 @@ CCS.setThrowExceptions(True);
 try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
-    tssub  = CCS.attachSubsystem("ts");
-    print "attaching Bias subsystem"
-    biassub = CCS.attachSubsystem("ts/Bias");
+    tssub  = CCS.attachSubsystem("%s" % ts);
     print "attaching PD subsystem"
-    pdsub   = CCS.attachSubsystem("ts/PhotoDiode");
-    print "attaching Cryo subsystem"
-    cryosub = CCS.attachSubsystem("ts/Cryo");
-    print "attaching Vac subsystem"
-    vacsub  = CCS.attachSubsystem("ts/VacuumGauge");
-    print "attaching Lamp subsystem"
-    lampsub = CCS.attachSubsystem("ts/Lamp");
+    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
-    monosub = CCS.attachSubsystem("ts/Monochromator");
-    monosub.synchCommand(10,"setHandshake",0);
-
+    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "Attaching archon subsystem"
-    arcsub  = CCS.attachSubsystem("archon");
-    
+    arcsub  = CCS.attachSubsystem("%s" % archon);
+
+    time.sleep(3.)
+
     cdir = tsCWD
     
 # Initialization
     print "doing initialization"
     print "resetting PD device"
-    pdsub.synchCommand(20,"reset")
+
     arcsub.synchCommand(10,"setConfigFromFile",acffile);
     arcsub.synchCommand(20,"applyConfig");
     arcsub.synchCommand(10,"powerOnCCD");
@@ -107,7 +99,11 @@ try:
             result = arcsub.synchCommand(10,"setParameter","Light","0");
 
             print "setting location of bias fits directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s/bias" % (cdir));
+            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
+            print "set filter position"
+            result = monosub.synchCommand(60,"setFilter",1); # open position
+            reply = result.getResult();
 
             for i in range(bcount):
                 timestamp = time.time()
@@ -126,19 +122,23 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
+# prepare to readout diodes                                                                              
+            nreads = exptime*60/nplc + 200
+            if (nreads > 3000):
+                nreads = 3000
+                nplc = exptime*60/(nreads-200)
+                print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
     
-                result = monosub.synchCommand(30,"setWave",wl);
+                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                reply = result.getResult();
     
-                result = monosub.synchCommand(10,"setFilter",1); # open position
-    
-# prepare to readout diodes                                                                              
-                nreads = exptime*60/nplc + 200
-                if (nreads > 3000):
-                    nreads = 3000
-                    nplc = exptime*60/(nreads-200)
-                    print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+# adjust timeout because we will be waiting for the data to become ready
+                mywait = nplc/60.*nreads*1.10 ;
+                print "Setting timeout to %f s" % mywait
+                pdsub.synchCommand(1000,"setTimeout",mywait);
 
                 print "call accumBuffer to start PD recording at %f" % time.time()
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
@@ -173,11 +173,6 @@ try:
 # make sure the sample of the photo diode is complete
                 time.sleep(5.)
     
-# adjust timeout because we will be waiting for the data to become ready
-                mywait = nplc/60.*nreads*1.10 ;
-                print "Setting timeout to %f s" % mywait
-                pdsub.synchCommand(1000,"setTimeout",mywait);
-
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
                 result = pdsub.synchCommand(500,"readBuffer","%s/%s" % (cdir,pdfilename));
                 buff = result.getResult()
@@ -204,12 +199,11 @@ try:
     
 # move TS to idle state
                         
-    tssub.synchCommand(10,"setTSIdle");
+    tssub.synchCommand(10,"setTSReady");
 
 #except CcsException as ex:                                                     
-except:
+except Exception, ex:
 
-#    print "There was ean exception in the acquisition of type %s" % ex         
-    print "There was an exception in the acquisition at time %f" % time.time()
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "SFLAT: END"
