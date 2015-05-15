@@ -32,6 +32,8 @@ class CcsSetup(OrderedDict):
         _read(...) method.
         """
         super(CcsSetup, self).__init__()
+        self['ts'] = 'ts'
+        self['archon'] = 'archon'
         self['tsCWD'] = _quote(os.getcwd())
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
@@ -62,6 +64,8 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
         os.mkdir("bias")
 
     ccs = CcsJythonInterpreter()
+    ccs.syncExecution("ts = 'ts'");
+    ccs.syncExecution("archon = 'archon'");
     setup = CcsSetup('%s.cfg' % jobName)
     result = ccs.syncScriptExecution(siteUtils.jobDirPath(ccsScript), setup(),
                                      verbose=verbose)
@@ -109,8 +113,8 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
     except IOError:
         pass
 
-    ccsTrendingPlots(('ts/ccdtemperature', 'ts/dewarpressure'), jobName,
-                     os.path.join(siteUtils.configDir(), 'ccs_trending.cfg'))
+#    ccsTrendingPlots(('ts/ccdtemperature', 'ts/dewarpressure'), jobName,
+#                     os.path.join(siteUtils.configDir(), 'ccs_trending.cfg'))
 
     results = []
 
