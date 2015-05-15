@@ -133,8 +133,9 @@ plots.qe(qe_file=qe_file)
 pylab.savefig('%s_qe.png' % sensor_id)
 
 # Crosstalk matrix
-plots.crosstalk_matrix(xtalk_file=xtalk_file)
-pylab.savefig('%s_crosstalk_matrix.png' % sensor_id)
+if xtalk_file is not None:
+    plots.crosstalk_matrix(xtalk_file=xtalk_file)
+    pylab.savefig('%s_crosstalk_matrix.png' % sensor_id)
 
 # Flat fields at wavelengths nearest the centers of the standard bands
 wl_files = processName_dependencyGlob('*_lambda_*.fits', jobname='qe_acq')
