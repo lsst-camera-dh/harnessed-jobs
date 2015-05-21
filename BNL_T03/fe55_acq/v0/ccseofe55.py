@@ -19,7 +19,7 @@ try:
     print "attaching PD subsystem"
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching XED subsystem"
-    xedsub   = CCS.attachSubsystem("%s/XED" % ts);
+    xedsub   = CCS.attachSubsystem("%s/Fe55" % ts);
     print "attaching Mono subsystem"
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "Attaching archon subsystem"

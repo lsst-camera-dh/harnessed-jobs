@@ -1,4 +1,4 @@
-import os
+iintermport os
 import glob
 import subprocess
 from collections import OrderedDict
@@ -63,8 +63,8 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
     if makeBiasDir:
         os.mkdir("bias")
 
-    ccs = CcsJythonInterpreter("ts")
-    ccs.syncExecution("ts = 'ts2'");
+    ccs = CcsJythonInterpreter()
+    ccs.syncExecution("ts = 'ts'");
     ccs.syncExecution("archon = 'archon'");
     setup = CcsSetup('%s.cfg' % jobName)
     result = ccs.syncScriptExecution(siteUtils.jobDirPath(ccsScript), setup(),

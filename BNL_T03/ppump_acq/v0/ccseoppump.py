@@ -90,8 +90,8 @@ try:
         tokens = str.split(line)
         if ((len(tokens) > 0) and (tokens[0] == 'ppump')):
     
-            wl      = float(tokens[1])
-            exptime = float(tokens[2])
+            exptime = float(tokens[1])
+            imcount = float(tokens[2])
             nshifts  = float(tokens[3])
     
             print "starting acquisition step for lambda = %8.2f with exptime %8.2f s" % (wl, exptime)
