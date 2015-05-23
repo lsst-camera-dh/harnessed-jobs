@@ -63,8 +63,8 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
     if makeBiasDir:
         os.mkdir("bias")
 
-    ccs = CcsJythonInterpreter()
-    ccs.syncExecution("ts = 'ts'");
+    ccs = CcsJythonInterpreter("ts")
+    ccs.syncExecution("ts = 'ts2'");
     ccs.syncExecution("archon = 'archon'");
     setup = CcsSetup('%s.cfg' % jobName)
     result = ccs.syncScriptExecution(siteUtils.jobDirPath(ccsScript), setup(),
@@ -128,11 +128,17 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
                                       **statusAssignments))
 
     # @todo Fix this. Copying these files should not be necessary.
-    jobdir = siteUtils.getJobDir()
-    os.system("cp -vp %s/*.fits ." % jobdir)   
+#    jobdir = siteUtils.getJobDir()
+#    os.system("cp -vp %s/*.fits ." % jobdir)   
 
     # @todo Sort out which files really need to be curated.
-    files = glob.glob('*.fits,*values*,*log*,*summary*,*.dat,*.png,bias/*.fits')
+    files = glob.glob('*.fits')
+    files = files+glob.glob('*log*')
+    files = files+glob.glob('*summary*')
+    files = files+glob.glob('*.png')
+    print "The files that will be registered in lims from %s are:" % os.getcwd()
+    for line in files :
+        print "%s" % line
     data_products = [lcatr.schema.fileref.make(item) for item in files]
     results.extend(data_products)
 
