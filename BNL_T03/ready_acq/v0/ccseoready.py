@@ -22,6 +22,8 @@ try:
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
+    print "attaching PDU subsystem"
+    pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
 
@@ -75,6 +77,10 @@ try:
     print "Since this is just a readiness check, we will NOT ramp the bias "
 #    result = tssub.synchCommand(120,"goTestStand");
 #    rply = result.getResult();
+
+# get the glowing vacuum gauge off
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
+    rply = result.getResult();
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
@@ -145,10 +151,10 @@ try:
                 print "Setting the monochrmator wavelength and filter"
                 print "You should HEAR some movement"
                 monosub.synchCommand(30,"setWaveAndFilter",wl);
-                time.sleep(0.5);
+                time.sleep(1.5);
                 print "Verifying wavelength setting of the monochrmator"
                 result = monosub.synchCommand(20,"getWave");
-                time.sleep(0.5);
+                time.sleep(1.5);
                 rwl = result.getResult()
                 print "getting filter wheel setting"
                 result = monosub.synchCommand(20,"getFilter");
@@ -222,6 +228,9 @@ try:
 # move TS to ready state
                     
     tssub.synchCommand(60,"setTSReady");
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
 
 except Exception, ex:
 
