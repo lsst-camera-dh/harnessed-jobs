@@ -27,6 +27,8 @@ try:
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
 
+    vac_outlet = 3
+
     time.sleep(3.)
 
     cdir = tsCWD
@@ -44,6 +46,10 @@ try:
     arcsub.synchCommand(20,"applyConfig");
     print "Powering on the CCD"
     arcsub.synchCommand(10,"powerOnCCD");
+    time.sleep(3.)
+# the first image is usually bad so throw it away
+    arcsub.synchCommand(60,"acquireImage");
+    reply = result.getResult();
 
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
