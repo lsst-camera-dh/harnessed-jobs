@@ -26,6 +26,8 @@ class CcsResult(object):
 class CcsJythonInterpreter(object):
     def __init__(self, name=None, host=None, port=4444):
         self.acq = AcqSim(os.environ['SIMDIR'])
+    def syncExecution(self, command):
+        pass
     def syncScriptExecution(self, filename, setup_commands=(), verbose=False):
         dataset = os.path.basename(filename)[len('ccseo'):-3]
         self.acq.getData(dataset)
