@@ -141,6 +141,7 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
         print "%s" % line
     data_products = [lcatr.schema.fileref.make(item) for item in files]
     results.extend(data_products)
+    results.append(siteUtils.packageVersions())
 
     lcatr.schema.write_file(results)
     lcatr.schema.validate_file()

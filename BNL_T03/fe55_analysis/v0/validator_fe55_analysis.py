@@ -22,6 +22,8 @@ for amp, gain_value, sigma in zip(amps, gain_data, sigmas):
                                       amp=amp, gain=gain_value,
                                       psf_sigma=sigma))
 
+results.append(siteUtils.packageVersions())
+
 results.extend([lcatr.schema.fileref.make(x) for x in 
                 (psf_results, gain_file, rolloff_mask)])
 

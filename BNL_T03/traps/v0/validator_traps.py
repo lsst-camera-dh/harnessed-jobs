@@ -15,7 +15,9 @@ num_traps = data['NUM_TRAPS']
 
 for amp, ntrap in zip(amps, num_traps):
     results.append(lcatr.schema.valid(lcatr.schema.get('traps'),
-                                      amp=amp, num_traps=ntrap))
+                                      amp=amp, num_traps=ntrap)), 
+
+results.append(siteUtils.packageVersions())
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

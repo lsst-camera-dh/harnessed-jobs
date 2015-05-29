@@ -14,6 +14,7 @@ for amp, scti, pcti in zip(amps, cti_serial_data, cti_parallel_data):
     results.append(lcatr.schema.valid(lcatr.schema.get('cte'),
                                       amp=amp, cti_serial=scti,
                                       cti_parallel=pcti))
+results.append(siteUtils.packageVersions())
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

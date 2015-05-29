@@ -6,7 +6,7 @@ def getVersion():
     Return harnessed-jobs package version, either from git tag or from
     tarball install directory name.
     """
-    import lsst.harnessedJobs as hj
+    import harnessedJobs as hj
     try:
         package_dir = os.path.split(hj.__file__)[0]
         command = 'cd %s; git describe --tags' % package_dir

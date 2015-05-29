@@ -22,6 +22,8 @@ for amp, read_noise, system_noise, total_noise in zip(amps, read_noise_data,
                                       system_noise=system_noise,
                                       total_noise=total_noise))
 
+results.append(siteUtils.packageVersions())
+
 files = glob.glob('*read_noise?*.fits')
 files.append(read_noise_file)
 data_products = [lcatr.schema.fileref.make(item) for item in files]

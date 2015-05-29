@@ -18,6 +18,7 @@ for amp, npix, ncol in zip(amps, npixels, ncolumns):
                                       amp=amp,
                                       dark_pixels=npix,
                                       dark_columns=ncol))
+results.append(siteUtils.packageVerions())
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

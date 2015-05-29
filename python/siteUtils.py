@@ -1,5 +1,7 @@
 import os
 import sys
+import lcatr.schema
+import harnessedJobs as hj
 
 def getUnitId():
     return os.environ['LCATR_UNIT_ID']
@@ -54,3 +56,17 @@ def configDir():
     configuration files.
     """
     return os.path.join(os.environ['HARNESSEDJOBSDIR'], 'config', getSiteName())
+
+def packageVersions():
+    # Not all harnessed jobs will use eotest, so set 'none' as the
+    # default.
+    eotest_version = 'none'
+    try:
+        import lsst.eotest
+        eotest_version = lsst.eotest.getVersion()
+    except ImportError:
+        pass
+    result = lcatr.schema.valid(lcatr.schema.get('package_versions'),
+                                eotest_version=eotest_version,
+                                harnessedJobs_version=hj.getVersion())
+    return result
