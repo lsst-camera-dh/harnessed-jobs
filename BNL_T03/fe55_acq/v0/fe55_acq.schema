@@ -1,7 +1,0 @@
-# -*- python -*-
-{
-    'schema_name' : 'fe55_acq',
-    'schema_version' : 0,
-    'stat' : int
-}
-
