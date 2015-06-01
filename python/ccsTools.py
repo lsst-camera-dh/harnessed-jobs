@@ -74,8 +74,8 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
         os.mkdir("bias")
 
     ccs = CcsJythonInterpreter("ts")
-    ccs.syncExecution("ts = 'ts2'");
-    ccs.syncExecution("archon = 'archon'");
+#    ccs.syncExecution("ts = 'ts2'");
+#    ccs.syncExecution("archon = 'archon'");
     setup = CcsSetup('%s.cfg' % jobName)
     result = ccs.syncScriptExecution(siteUtils.jobDirPath(ccsScript), setup(),
                                      verbose=verbose)
