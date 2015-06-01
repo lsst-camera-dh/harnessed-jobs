@@ -35,11 +35,11 @@ class CcsSetup(OrderedDict):
         if os.environ.has_key('CCS_TS'):
             self['ts']=os.getenv('CCS_TS')
         else:
-            self['ts'] = 'ts'
+            self['ts'] = _quote('ts')
         if os.environ.has_key('CCS_ARCHON'):
             self['archon']=os.getenv('CCS_ARCHON')
         else:
-            self['archon'] = 'archon'
+            self['archon'] = _quote('archon')
         if os.environ.has_key('CCS_VAC_OUTLET'):
             self['vac_outlet']=os.getenv('CCS_VAC_OUTLET')
 # there is no default for vac_outlet - if there is a script that needs
@@ -74,8 +74,6 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
         os.mkdir("bias")
 
     ccs = CcsJythonInterpreter("ts")
-#    ccs.syncExecution("ts = 'ts2'");
-#    ccs.syncExecution("archon = 'archon'");
     setup = CcsSetup('%s.cfg' % jobName)
     result = ccs.syncScriptExecution(siteUtils.jobDirPath(ccsScript), setup(),
                                      verbose=verbose)
