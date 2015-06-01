@@ -24,10 +24,8 @@ try:
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "attaching PDU subsystem"
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
-    print "Attaching archon subsystem"
+    Print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
-
-    vac_outlet = 3
 
     time.sleep(3.)
 
@@ -41,13 +39,17 @@ try:
     time.sleep(5.)
 
     print "Loading configuration file into the Archon controller"
-    arcsub.synchCommand(10,"setConfigFromFile",acffile);
+    result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
+    reply = result.getResult();
     print "Applying configuration"
-    arcsub.synchCommand(20,"applyConfig");
+    result = arcsub.synchCommand(25,"applyConfig");
+    reply = result.getResult();
     print "Powering on the CCD"
-    arcsub.synchCommand(10,"powerOnCCD");
-    time.sleep(3.)
+    result = arcsub.synchCommand(30,"powerOnCCD");
+    reply = result.getResult();
+    time.sleep(3.);
 # the first image is usually bad so throw it away
+    print "Throwing away the first image"
     arcsub.synchCommand(60,"acquireImage");
     reply = result.getResult();
 
@@ -81,8 +83,8 @@ try:
 
 #put in acquisition state
     print "Since this is just a readiness check, we will NOT ramp the bias "
-#    result = tssub.synchCommand(120,"goTestStand");
-#    rply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
 
 # get the glowing vacuum gauge off
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
@@ -159,13 +161,14 @@ try:
                 monosub.synchCommand(30,"setWaveAndFilter",wl);
                 time.sleep(1.5);
                 print "Verifying wavelength setting of the monochrmator"
-                result = monosub.synchCommand(20,"getWave");
-                time.sleep(1.5);
+                result = monosub.synchCommand(60,"getWave");
+                time.sleep(4.);
                 rwl = result.getResult()
                 print "getting filter wheel setting"
-                result = monosub.synchCommand(20,"getFilter");
+                result = monosub.synchCommand(60,"getFilter");
                 ifl = result.getResult()
                 print "The wavelength is at %f and the filter wheel is at %f " % (rwl,ifl)
+                time.sleep(4.);
                 
 
 # adjust timeout because we will be waiting for the data to become ready
@@ -228,15 +231,15 @@ try:
     fp.write(`istate`+"\n");
     fp.close();
 
-    print "            TEST STAND APPEARS TO BE READY"
-    print "          PLEASE PROCEED WITH THE EO TESTING"
-
-# move TS to ready state
-                    
+# move TS to ready state                    
     tssub.synchCommand(60,"setTSReady");
+
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
+
+    print "            TEST STAND APPEARS TO BE READY"
+    print "          PLEASE PROCEED WITH THE EO TESTING"
 
 except Exception, ex:
 

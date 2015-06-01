@@ -20,6 +20,8 @@ try:
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
+    print "attaching PDU subsystem"
+    pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
     
@@ -30,12 +32,21 @@ try:
 # Initialization
     print "doing initialization"
     
+    print "Loading configuration file into the Archon controller"
     result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
     reply = result.getResult();
+    print "Applying configuration"
     result = arcsub.synchCommand(25,"applyConfig");
     reply = result.getResult();
-    arcsub.synchCommand(10,"powerOnCCD");
-    
+    print "Powering on the CCD"
+    result = arcsub.synchCommand(30,"powerOnCCD");
+    reply = result.getResult();
+    time.sleep(3.);
+# the first image is usually bad so throw it away
+    print "Throwing away the first image"
+    arcsub.synchCommand(60,"acquireImage");
+    reply = result.getResult();
+
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
     
@@ -65,6 +76,10 @@ try:
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
     
+# get the glowing vacuum gauge off
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
+    rply = result.getResult();
+
     wl     = float(eolib.getCfgVal(acqcfgfile, 'PPUMP_WL', default = "550.0"))
     pcount = float(eolib.getCfgVal(acqcfgfile, 'PPUMP_BCOUNT', default = "25"))
     imcount = 2
@@ -199,8 +214,11 @@ try:
     fp.close();
     
 # move TS to idle state
-                        
     tssub.synchCommand(60,"setTSIdle");
+
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
 
 except Exception, ex:                                                     
 

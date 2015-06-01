@@ -27,6 +27,8 @@ try:
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
+    print "attaching PDU subsystem"
+    pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
 
@@ -38,9 +40,20 @@ try:
     print "doing initialization"
 
     print "initializing archon controller with file %s" % acffile
-    arcsub.synchCommand(10,"setConfigFromFile",acffile);
-    arcsub.synchCommand(20,"applyConfig");
-    arcsub.synchCommand(10,"powerOnCCD");
+    print "Loading configuration file into the Archon controller"
+    result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
+    reply = result.getResult();
+    print "Applying configuration"
+    result = arcsub.synchCommand(25,"applyConfig");
+    reply = result.getResult();
+    print "Powering on the CCD"
+    result = arcsub.synchCommand(30,"powerOnCCD");
+    reply = result.getResult();
+    time.sleep(3.);
+# the first image is usually bad so throw it away
+    print "Throwing away the first image"
+    arcsub.synchCommand(60,"acquireImage");
+    reply = result.getResult();
     
     arcsub.synchCommand(10,"setParameter","Expo","1");
     
@@ -68,6 +81,10 @@ try:
 #put in acquisition state
     print "We are ready to go! Ramping the BP bias voltage now."
     result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
+
+# get the glowing vacuum gauge off
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
     rply = result.getResult();
 
     print "Now collect some parameters from the config file"
@@ -213,6 +230,9 @@ try:
 # move TS to idle state
                     
     tssub.synchCommand(60,"setTSReady");
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
 
 except Exception, ex:
 

@@ -32,8 +32,18 @@ class CcsSetup(OrderedDict):
         _read(...) method.
         """
         super(CcsSetup, self).__init__()
-        self['ts'] = 'ts'
-        self['archon'] = 'archon'
+        if os.environ.has_key('CCS_TS'):
+            self['ts']=os.getenv('CCS_TS')
+        else:
+            self['ts'] = 'ts'
+        if os.environ.has_key('CCS_ARCHON'):
+            self['archon']=os.getenv('CCS_ARCHON')
+        else:
+            self['archon'] = 'archon'
+        if os.environ.has_key('CCS_VAC_OUTLET'):
+            self['vac_outlet']=os.getenv('CCS_VAC_OUTLET')
+# there is no default for vac_outlet - if there is a script that needs
+# it and it has not been defined then I want it to crash
         self['tsCWD'] = _quote(os.getcwd())
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
