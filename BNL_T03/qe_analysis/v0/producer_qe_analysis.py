@@ -6,11 +6,9 @@ from lcatr.harness.helpers import dependency_glob
 import siteUtils
 import eotestUtils
 
-# @todo replace all this with locations of PD calibration data.
-sensorTestDir = os.path.split(sensorTest.__file__)[0]
-ccd_cal_file = os.path.join(sensorTestDir, 'qe', 'OD142.csv')
-sph_cal_file = os.path.join(sensorTestDir, 'qe', 'OD143.csv')
-wlscan_file = os.path.join(sensorTestDir, 'qe', 'WLscan.txt')
+# The photodiode calibration file for BNL data.
+pd_cal_file = os.path.join(os.environ['EOTEST_DIR'], 'data', 'qe',
+                           'BNL', 'pd_Cal_mar2013.txt')
 
 lambda_files = dependency_glob('*_lambda_*.fits',
                                jobname=siteUtils.getProcessName('qe_acq'))
@@ -25,5 +23,5 @@ sensor_id = siteUtils.getUnitId()
 gains = eotestUtils.getSensorGains(sensor_id)
 
 task = sensorTest.QeTask()
-task.run(sensor_id, lambda_files, ccd_cal_file, sph_cal_file,
-         wlscan_file, mask_files, gains)
+task.run(sensor_id, lambda_files, None, None, None, mask_files, gains,
+         pd_cal_file=pd_cal_file)
