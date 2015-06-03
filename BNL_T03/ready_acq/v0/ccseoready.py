@@ -48,12 +48,13 @@ try:
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
     time.sleep(3.);
+    arcsub.synchCommand(10,"setParameter","Expo","1");
+
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
-    arcsub.synchCommand(60,"acquireImage");
+    arcsub.synchCommand(10,"setFitsFilename","");
+    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
-
-    arcsub.synchCommand(10,"setParameter","Expo","1");
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
