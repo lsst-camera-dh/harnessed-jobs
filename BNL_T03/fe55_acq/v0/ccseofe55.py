@@ -44,15 +44,17 @@ try:
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
     time.sleep(3.);
-# the first image is usually bad so throw it away
-    print "Throwing away the first image"
-    arcsub.synchCommand(60,"acquireImage");
-    reply = result.getResult();
-    
     print "set controller parameters for an exposure with the shutter closed"
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
     
+
+# the first image is usually bad so throw it away
+    print "Throwing away the first image"
+    arcsub.synchCommand(10,"setFitsFilename","");
+    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+    reply = result.getResult();
+
 #    monosub.synchCommand(10,"closeShutter");
     print "set filter wheel to position 1"
     monosub.synchCommand(30,"setFilter",1); # open position
