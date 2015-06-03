@@ -33,11 +33,11 @@ class CcsSetup(OrderedDict):
         """
         super(CcsSetup, self).__init__()
         if os.environ.has_key('CCS_TS'):
-            self['ts']=os.getenv('CCS_TS')
+            self['ts']=_quote(os.getenv('CCS_TS'))
         else:
             self['ts'] = _quote('ts')
         if os.environ.has_key('CCS_ARCHON'):
-            self['archon']=os.getenv('CCS_ARCHON')
+            self['archon']=_quote(os.getenv('CCS_ARCHON'))
         else:
             self['archon'] = _quote('archon')
         if os.environ.has_key('CCS_VAC_OUTLET'):
