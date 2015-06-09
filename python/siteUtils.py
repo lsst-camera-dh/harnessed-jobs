@@ -65,15 +65,22 @@ def configDir():
     return os.path.join(os.environ['HARNESSEDJOBSDIR'], 'config', getSiteName())
 
 def packageVersions():
-    # Not all harnessed jobs will use eotest, so set 'none' as the
-    # default.
-    eotest_version = 'none'
+    # Not all harnessed jobs will use eotest and/or the LSST Stack, so
+    # set 'none' as the default for each.
     try:
         import lsst.eotest
         eotest_version = lsst.eotest.getVersion()
     except ImportError:
-        pass
+        eotest_version = 'none'
+
+    try:
+        import lsst.afw
+        LSST_stack_version = lsst.afw.__version__
+    except ImportError:
+        LSST_stack_version = 'none'
+
     result = lcatr.schema.valid(lcatr.schema.get('package_versions'),
                                 eotest_version=eotest_version,
+                                LSST_stack_version=LSST_stack_version,
                                 harnessedJobs_version=hj.getVersion())
     return result
