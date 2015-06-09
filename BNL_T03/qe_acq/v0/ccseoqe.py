@@ -49,6 +49,8 @@ try:
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
     time.sleep(3.);
+
+
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
     arcsub.synchCommand(60,"acquireImage");
