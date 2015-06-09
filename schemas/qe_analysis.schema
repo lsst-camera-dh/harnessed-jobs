@@ -2,4 +2,6 @@
 {
     'schema_name' : 'qe_analysis',
     'schema_version' : 0,
+    'band' : str,
+    'QE' : float
 }

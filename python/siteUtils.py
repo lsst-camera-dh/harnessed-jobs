@@ -6,6 +6,13 @@ import harnessedJobs as hj
 def getUnitId():
     return os.environ['LCATR_UNIT_ID']
 
+def getCcdVendor():
+    unit_id = getUnitId()
+    vendor = unit_id.split('-')[0]
+    if vendor not in ('ITL', 'E2V', 'e2v'):
+        raise RuntimeError("Unrecognized CCD vendor for unit id %s" % unit_id)
+    return vendor
+
 def getJobName():
     """
     The name of the harnessed job.
