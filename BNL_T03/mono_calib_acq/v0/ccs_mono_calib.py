@@ -121,6 +121,7 @@ try:
 #            target = float(tokens[1])
 #            print "target wl = %f" % target;
 
+        exptime = 12.
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
 
 
