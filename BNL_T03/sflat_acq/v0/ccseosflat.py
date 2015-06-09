@@ -42,12 +42,14 @@ try:
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
     time.sleep(3.);
+    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+    arcsub.synchCommand(10,"setParameter","Expo","1");
+    
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
-    arcsub.synchCommand(60,"acquireImage");
+    arcsub.synchCommand(10,"setFitsFilename","");
+    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
-    
-    arcsub.synchCommand(10,"setParameter","Expo","1");
     
 # move to TS acquisition state
     print "setting acquisition state"
