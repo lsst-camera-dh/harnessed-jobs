@@ -50,7 +50,7 @@ try:
     reply = result.getResult();
     time.sleep(3.);
 
-   print "Throwing away the first image"
+    print "Throwing away the first image"
     arcsub.synchCommand(10,"setFitsFilename","");
     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
