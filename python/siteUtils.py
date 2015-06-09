@@ -64,6 +64,15 @@ def configDir():
     """
     return os.path.join(os.environ['HARNESSEDJOBSDIR'], 'config', getSiteName())
 
+def datacatalog_query(query, folder=None, site=None):
+    from DataCatalog import DataCatalog
+    if folder is None:
+        folder = os.environ['LCATR_DATACATALOG_FOLDER']
+    if site is None:
+        site = getSiteName()
+    datacat = DataCatalog(folder=folder, site=site)
+    return datacat.find_datasets(query)
+
 def packageVersions():
     # Not all harnessed jobs will use eotest and/or the LSST Stack, so
     # set 'none' as the default for each.
