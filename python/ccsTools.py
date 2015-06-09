@@ -134,6 +134,7 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
     
     results.append(lcatr.schema.valid(lcatr.schema.get(jobName), 
                                       **statusAssignments))
+    results.append(siteUtils.packageVersions())
 
     # @todo Fix this. Copying these files should not be necessary.
 #    jobdir = siteUtils.getJobDir()
@@ -149,7 +150,6 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
         print "%s" % line
     data_products = [lcatr.schema.fileref.make(item) for item in files]
     results.extend(data_products)
-    results.append(siteUtils.packageVersions())
 
     lcatr.schema.write_file(results)
     lcatr.schema.validate_file()

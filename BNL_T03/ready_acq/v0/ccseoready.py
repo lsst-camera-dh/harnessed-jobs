@@ -24,7 +24,7 @@ try:
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "attaching PDU subsystem"
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
-    Print "Attaching archon subsystem"
+    print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
 
     time.sleep(3.)

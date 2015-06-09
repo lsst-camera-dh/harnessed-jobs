@@ -55,7 +55,7 @@ try:
     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
 
-    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
     biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -113,7 +113,7 @@ try:
     fp = open(acqcfgfile,"r");
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
-    for wl in range(300,1100,5):
+    for wl in range(300,310,5):
 #     for line in fp:
 #        tokens = str.split(line)
 #        if ((len(tokens) > 0) and (tokens[0] == 'lambda')):
@@ -152,13 +152,14 @@ try:
         arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
 # prepare to readout diodes
-        nreads = exptime*60/nplc + 200
-        if (nreads > 3000):
-            nreads = 3000
-            nplc = exptime*60/(nreads-200)
-            print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+#        nreads = exptime*60/nplc + 200
+#        if (nreads > 3000):
+#            nreads = 3000
+#            nplc = exptime*60/(nreads-200)
+#            print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+        nreads = 3000
 
-        for i in range(1,1):
+        for i in range(1,2):
             print "starting acquisition step for lambda = %8.2f" % wl
 
             monosub.synchCommand(30,"setWaveAndFilter",wl);
