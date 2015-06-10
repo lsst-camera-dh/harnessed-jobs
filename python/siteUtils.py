@@ -1,5 +1,6 @@
 import os
 import sys
+import fnmatch
 import lcatr.schema
 import harnessedJobs as hj
 
@@ -72,6 +73,17 @@ def datacatalog_query(query, folder=None, site=None):
         site = getSiteName()
     datacat = DataCatalog(folder=folder, site=site)
     return datacat.find_datasets(query)
+
+def datacatalog_glob(sensor_id, imgtype, testtype, pattern='*'):
+    query = ' && '.join(('LSST_NUM=="%(sensor_id)s"',
+                         'IMGTYPE=="%(imgtype)s"',
+                         'TESTTYPE=="%(testtype)s"')) % locals()
+    datasets = datacatalog_query(query)
+    output_list = []
+    for item in datasets.full_paths():
+        if fnmatch.fnmatch(os.path.basename(item), pattern):
+            output_list.append(item)
+    return output_list
 
 def packageVersions():
     # Not all harnessed jobs will use eotest and/or the LSST Stack, so
