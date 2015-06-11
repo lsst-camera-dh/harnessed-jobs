@@ -87,7 +87,7 @@ try:
     fp = open(acqcfgfile,"r");
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
-    for wl in range(300,310,5):
+    for wl in range(300,305,5):
 
         exptime = 12.
 
@@ -100,10 +100,11 @@ try:
 
         nreads = 3000
 
+        monosub.synchCommand(30,"setWaveAndFilter",wl);
+
         for i in range(1,2):
             print "starting acquisition step for lambda = %8.2f" % wl
 
-            monosub.synchCommand(30,"setWaveAndFilter",wl);
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
