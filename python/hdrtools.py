@@ -306,7 +306,7 @@ def updateFitsHeaders(acqfilelist, summaryFile="summary.txt"):
         nelem = len(line.split())
         if (nelem==3):
             fitsfile, pdfile, tstamp = line.split()[:3]
-        else
+        else:
             fitsfile, pdfile, bsfile, tstamp = line.split()[:4]
         try:
             addPDvals(fitsfile, pdfile, "AMP0.MEAS_TIMES", "AMP0", tstamp)
