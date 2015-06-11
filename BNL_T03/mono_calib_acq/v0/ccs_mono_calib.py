@@ -170,13 +170,13 @@ try:
             time.sleep(10.)
 
             print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdbiasfilename)
-            result = pdbiassub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdbiasfilename));
+            result = biassub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdbiasfilename));
             buff = result.getResult()
             print "Finished getting readings at %f" % time.time()
 
 # reset timeout to something reasonable for a regular command
             pdsub.synchCommand(1000,"setTimeout",10.);
-            pdbiassub.synchCommand(1000,"setTimeout",10.);
+            biassub.synchCommand(1000,"setTimeout",10.);
 
 
             fpfiles.write("%s %s/%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,cdir,pdbiasfilename,timestamp))
