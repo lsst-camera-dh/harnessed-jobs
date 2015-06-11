@@ -52,7 +52,7 @@ try:
     time.sleep(3.);
 
     print "set controller parameters for an exposure with the shutter closed"
-    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
 # the first image is usually bad so throw it away
