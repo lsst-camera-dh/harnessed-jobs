@@ -146,6 +146,8 @@ try:
                 print "set fits filename"
                 fitsfilename = "%s_flat_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
 
                 print "Ready to take bias image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -183,7 +185,9 @@ try:
 # start acquisition
                 print "set fits filename"
                 fitsfilename = "%s_flat_%3.3d_%3.3d_flat%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
-                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
                 print "Ready to take image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");

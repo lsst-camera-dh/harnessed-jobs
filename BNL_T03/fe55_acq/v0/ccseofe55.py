@@ -117,6 +117,32 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
+# take bias images
+            print "set controller for bias exposure"
+            arcsub.synchCommand(10,"setParameter","Light","0");
+            arcsub.synchCommand(10,"setParameter","ExpTime","0");
+ 
+            print "setting location of bias fits directory"
+            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
+            print "start bias exposure loop"
+
+            bcount = 2
+            for i in range(bcount):
+                timestamp = time.time()
+
+                print "set fits filename"
+                fitsfilename = "%s_fe55_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+                result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","FE55")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+
+                print "Ready to take bias image. time = %f" % time.time()
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                fitsfilename = result.getResult();
+                print "after click click at %f" % time.time()
+                time.sleep(0.2)
+
             nreads = exptime*60/nplc + 200
             if (nreads > 3000):
                 nreads = 3000
@@ -142,7 +168,9 @@ try:
 
 # start acquisition
                 fitsfilename = "%s_fe55_fe55%d_${TIMESTAMP}.fits" % (ccd,i+1)
-                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","FE55")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","FE55")
     
                 print "Ready to take image. time = %f" % time.time()
 

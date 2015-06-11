@@ -105,6 +105,24 @@ try:
 
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
     
+            print "start bias exposure loop"
+
+            bcount = 2
+            for i in range(bcount):
+                timestamp = time.time()
+
+                print "set fits filename"
+                fitsfilename = "%s_dark_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+                result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","DARK")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+
+                print "Ready to take bias image. time = %f" % time.time()
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                fitsfilename = result.getResult();
+                print "after click click at %f" % time.time()
+                time.sleep(0.2)
+
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
             if (nreads > 3000):
@@ -131,6 +149,8 @@ try:
 
                 fitsfilename = "%s_dark_dark%d_${TIMESTAMP}.fits" % (ccd,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","DARK")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","DARK")
     
                 print "Ready to take image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
