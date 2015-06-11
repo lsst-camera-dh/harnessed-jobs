@@ -103,9 +103,9 @@ try:
             exptime = float(tokens[1])
             imcount = int(tokens[2])
 
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
     
-            print "start bias exposure loop"
+            print "start bias image exposure loop"
+            arcsub.synchCommand(10,"setParameter","ExpTime","0");
 
             bcount = 2
             for i in range(bcount):
@@ -123,6 +123,9 @@ try:
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
 
+
+            print "start dark image exposure loop"
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
             if (nreads > 3000):

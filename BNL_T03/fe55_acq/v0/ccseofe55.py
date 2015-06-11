@@ -113,7 +113,6 @@ try:
             exptime  = float(tokens[1])
             imcount = int(tokens[2])
     
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
@@ -126,6 +125,7 @@ try:
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
             print "start bias exposure loop"
+            arcsub.synchCommand(10,"setParameter","ExpTime","0");
 
             bcount = 2
             for i in range(bcount):
@@ -143,6 +143,8 @@ try:
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
 
+            print "start fe55 exposures"
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             nreads = exptime*60/nplc + 200
             if (nreads > 3000):
                 nreads = 3000
