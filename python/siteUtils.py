@@ -2,6 +2,7 @@ import os
 import sys
 import fnmatch
 import lcatr.schema
+import lcatr.harness.helpers
 import harnessedJobs as hj
 
 def getUnitId():
@@ -74,16 +75,36 @@ def datacatalog_query(query, folder=None, site=None):
     datacat = DataCatalog(folder=folder, site=site)
     return datacat.find_datasets(query)
 
-def datacatalog_glob(sensor_id, imgtype, testtype, pattern='*'):
+def print_file_list(description, file_list, use_basename=False):
+    if description is not None:
+        print description
+    for item in file_list:
+        if use_basename:
+            print "  ", os.path.basename(item)
+        else:
+            print "  ", item
+    sys.stdout.flush()
+
+def datacatalog_glob(pattern, testtype=None, imgtype=None, description=None):
+    sensor_id = getUnitId()
+    if testtype is None or imgtype is None:
+        raise RuntimeError("Both testtype and imgtype values must be provided.")
     query = ' && '.join(('LSST_NUM=="%(sensor_id)s"',
-                         'IMGTYPE=="%(imgtype)s"',
-                         'TESTTYPE=="%(testtype)s"')) % locals()
+                         'TESTTYPE=="%(testtype)s"',
+                         'IMGTYPE=="%(imgtype)s"')) % locals()
     datasets = datacatalog_query(query)
-    output_list = []
+    file_list = []
     for item in datasets.full_paths():
         if fnmatch.fnmatch(os.path.basename(item), pattern):
-            output_list.append(item)
-    return output_list
+            file_list.append(item)
+    print_file_list(description, file_list)
+    return file_list
+
+def dependency_glob(pattern, jobname=None, paths=None, description=None):
+    file_list = lcatr.harness.helpers.dependency_glob(pattern, jobname=jobname,
+                                                      paths=paths)
+    print_file_list(description, file_list)
+    return file_list
 
 def packageVersions():
     # Not all harnessed jobs will use eotest and/or the LSST Stack, so
@@ -105,3 +126,4 @@ def packageVersions():
                                 LSST_stack_version=LSST_stack_version,
                                 harnessedJobs_version=hj.getVersion())
     return result
+

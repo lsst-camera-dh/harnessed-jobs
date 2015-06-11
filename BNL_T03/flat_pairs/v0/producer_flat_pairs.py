@@ -1,20 +1,14 @@
 #!/usr/bin/env python
-import sys
 import lsst.eotest.sensor as sensorTest
-from lcatr.harness.helpers import dependency_glob
 import siteUtils
 import eotestUtils
 
-flat_files = dependency_glob('*_flat*flat?_*.fits',
-                             jobname=siteUtils.getProcessName('flat_acq'))
-mask_files = dependency_glob('*_mask.fits')
-print flat_files
-print mask_files
-sys.stdout.flush()
-
 sensor_id = siteUtils.getUnitId()
-
-gains = eotestUtils.getSensorGains(sensor_id)
+flat_files = siteUtils.dependency_glob('*_flat*flat?_*.fits',
+                                       jobname=siteUtils.getProcessName('flat_acq'),
+                                       description='Flat files:')
+mask_files = eotestUtils.glob_mask_files()
+gains = eotestUtils.getSensorGains()
 
 task = sensorTest.FlatPairTask()
 task.run(sensor_id, flat_files, mask_files, gains)

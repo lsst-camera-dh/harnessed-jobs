@@ -8,14 +8,21 @@ import os
 import subprocess
 
 class AcqSim(object):
-    datasets = 'fe55 dark flat qe sflat ppump xtalk fluxcal'.split()
+    dataset_mapping = dict([('dark', 'dark'),
+                            ('fe55', 'fe55'),
+                            ('flat', 'flat'),
+                            ('qe', 'lambda'),
+                            ('sflat', 'sflat_500'),
+                            ('xtalk', 'spot'),
+                            ('ppump', 'trap')])
     def __init__(self, rootdir):
         self.rootdir = rootdir
     def getData(self, dataset):
-        if dataset not in self.datasets:
+        if dataset not in self.dataset_mapping:
             raise RuntimeError("Invalid dataset name: " + dataset)
-        command = "cp %s ." % os.path.join(self.rootdir, dataset, '*')
-        subprocess.call(command, shell=True)
+        testtype = self.dataset_mapping[dataset]
+        command = "cp %s ." % os.path.join(self.rootdir, testtype, '*')
+        subprocess.check_call(command, shell=True)
 
 class CcsResult(object):
     def __init__(self, scriptname):

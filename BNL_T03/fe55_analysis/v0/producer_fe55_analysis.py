@@ -1,17 +1,12 @@
 #!/usr/bin/env python
 import os
-import sys
 import lsst.eotest.sensor as sensorTest
-from lcatr.harness.helpers import dependency_glob
 import siteUtils
 
-fe55_files = dependency_glob('*fe55_fe55*.fits',
-                             jobname=siteUtils.getProcessName('fe55_acq'))
-
-print fe55_files
-sys.stdout.flush()
-
 sensor_id = siteUtils.getUnitId()
+fe55_files = siteUtils.dependency_glob('*_fe55_fe55_*.fits',
+                                       jobname=siteUtils.getProcessName('fe55_acq'),
+                                       description='Fe55 files:')
 
 # Roll-off defects mask needs an input file to get the vendor
 # geometry, and will be used for all analyses.
