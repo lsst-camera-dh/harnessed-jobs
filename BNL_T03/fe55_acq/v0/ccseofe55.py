@@ -169,7 +169,7 @@ try:
                 time.sleep(0.2);
 
 # start acquisition
-                fitsfilename = "%s_fe55_fe55%d_${TIMESTAMP}.fits" % (ccd,i+1)
+                fitsfilename = "%s_fe55_fe55_%3.3d_${TIMESTAMP}.fits" % (ccd,i+1)
                 result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                 result = arcsub.synchCommand(10,"setHeader","TestType","FE55")
                 result = arcsub.synchCommand(10,"setHeader","ImageType","FE55")
