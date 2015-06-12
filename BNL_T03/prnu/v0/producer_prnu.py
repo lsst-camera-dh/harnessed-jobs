@@ -1,23 +1,15 @@
 #!/usr/bin/env python
-import sys
 import lsst.eotest.sensor as sensorTest
-from lcatr.harness.helpers import dependency_glob
 import siteUtils
 import eotestUtils
 
-lambda_files = dependency_glob('*_lambda_*.fits',
-                               jobname=siteUtils.getProcessName('qe_acq'))
-correction_image = None
-mask_files = dependency_glob('*_mask.fits')
-
-print lambda_files
-print correction_image
-print mask_files
-sys.stdout.flush()
-
 sensor_id = siteUtils.getUnitId()
-
-gains = eotestUtils.getSensorGains(sensor_id)
+lambda_files = siteUtils.dependency_glob('*_lambda_*.fits',
+                                         jobname=siteUtils.getProcessName('qe_acq'),
+                                         description='Lambda files:')
+mask_files = eotestUtils.glob_mask_files()
+gains = eotestUtils.getSensorGains()
+correction_image = None
 
 task = sensorTest.PrnuTask()
 task.run(sensor_id, lambda_files, mask_files, gains, correction_image)

@@ -11,5 +11,5 @@ flat_files = siteUtils.datacatalog_glob('*_flat*flat?_*.fits',
 mask_files = eotestUtils.glob_mask_files()
 gains = eotestUtils.getSensorGains(jobname='fe55_offline')
 
-task = sensorTest.FlatPairTask()
+task = sensorTest.PtcTask()
 task.run(sensor_id, flat_files, mask_files, gains)
