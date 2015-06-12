@@ -150,7 +150,7 @@ try:
 
                 timestamp = time.time()
 
-                fitsfilename = "%s_dark_dark%d_${TIMESTAMP}.fits" % (ccd,i+1)
+                fitsfilename = "%s_dark_dark_%d_${TIMESTAMP}.fits" % (ccd,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                 result = arcsub.synchCommand(10,"setHeader","TestType","DARK")
                 result = arcsub.synchCommand(10,"setHeader","ImageType","DARK")
