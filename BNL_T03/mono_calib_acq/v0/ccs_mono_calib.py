@@ -87,29 +87,26 @@ try:
     fp = open(acqcfgfile,"r");
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
-    for wl in range(300,305,5):
-
-        exptime = 12.
-
-
 # take light exposures
-        arcsub.synchCommand(10,"setParameter","Light","1");
-        arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
-        print "setting location of fits exposure directory"
-        arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+    arcsub.synchCommand(10,"setParameter","Light","1");
+    print "setting location of fits exposure directory"
+    arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
+    for wl in range(403,1100,1):
+
+        exptime = 25.
         nreads = 3000
-
-        monosub.synchCommand(30,"setWaveAndFilter",wl);
-
-        for i in range(1,2):
-            print "starting acquisition step for lambda = %8.2f" % wl
-
+        arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # adjust timeout because we will be waiting for the data to become ready
-            mywait = nplc/60.*nreads*1.10 ;
-            print "Setting timeout to %f s" % mywait
+        mywait = nplc/60.*nreads*1.10 ;
+        print "Setting timeout to %f s" % mywait
 
+#        monosub.synchCommand(30,"setWaveAndFilter",wl);
+        monosub.synchCommand(30,"setWave",wl);
+
+        for i in range(1):
+            print "starting acquisition step for lambda = %8.2f" % wl
 # PD from PD setup
             print "Setup regular PD readout"
             pdsub.synchCommand(1000,"setTimeout",mywait);
@@ -136,7 +133,6 @@ try:
 # make sure to get some readings before the state of the shutter changes       
             time.sleep(0.2);
  
-
             print "Ready to take image. time = %f" % time.time()
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             fitsfilename = result.getResult();
@@ -152,7 +148,7 @@ try:
             tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
-            time.sleep(10.)
+            time.sleep(30.)
 
             print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
             result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
@@ -168,7 +164,7 @@ try:
             tottime = pdbiasresult.get();
 
 # make sure the sample of the photo diode is complete
-            time.sleep(10.)
+            time.sleep(30.)
 
             print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdbiasfilename)
             result = biassub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdbiasfilename));
@@ -176,11 +172,12 @@ try:
             print "Finished getting readings at %f" % time.time()
 
 # reset timeout to something reasonable for a regular command
-            pdsub.synchCommand(1000,"setTimeout",10.);
-            biassub.synchCommand(1000,"setTimeout",10.);
+#            pdsub.synchCommand(1000,"setTimeout",10.);
+#            biassub.synchCommand(1000,"setTimeout",10.);
 
 
             fpfiles.write("%s %s/%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,cdir,pdbiasfilename,timestamp))
+            time.sleep(15.)
 
         seq = seq + 1
 
