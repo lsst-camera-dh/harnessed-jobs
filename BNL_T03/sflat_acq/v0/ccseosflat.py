@@ -140,7 +140,8 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
-# prepare to readout diodes                                                                              
+# prepare to readout diodes
+
             nreads = exptime*60/nplc + 200
             if (nreads > 3000):
                 nreads = 3000
