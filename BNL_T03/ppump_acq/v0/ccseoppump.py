@@ -199,6 +199,7 @@ try:
                 print "Finished getting readings at %f" % time.time()
 
 
+                result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0.MEAS_TIMES","AMP0.A_CURRENT",timestamp)
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
     
             seq = seq + 1
