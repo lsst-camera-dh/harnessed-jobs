@@ -304,19 +304,19 @@ def fitsExptime(filename):
 def updateFitsHeaders(acqfilelist, summaryFile="summary.txt"):
     for line in open(acqfilelist):
         nelem = len(line.split())
-        if (nelem==3):
-            fitsfile, pdfile, tstamp = line.split()[:3]
-        else:
-            fitsfile, pdfile, bsfile, tstamp = line.split()[:4]
-        try:
-            addPDvals(fitsfile, pdfile, "AMP0.MEAS_TIMES", "AMP0", tstamp)
-        except:
-            raise RuntimeError("Problem running addDPvals on %s for %s" % (pdfile,fitsfile))
-        if (nelem==4):
-            try:
-                addPDvals(fitsfile, bsfile, "AMP1.MEAS_TIMES", "AMP1", tstamp)
-            except:
-                raise RuntimeError("Problem running addDPvals on %s for %s" % (bsfile,fitsfile))
+#       if (nelem==3):
+#           fitsfile, pdfile, tstamp = line.split()[:3]
+#       else:
+#           fitsfile, pdfile, bsfile, tstamp = line.split()[:4]
+#       try:
+#           addPDvals(fitsfile, pdfile, "AMP0.MEAS_TIMES", "AMP0", tstamp)
+#       except:
+#           raise RuntimeError("Problem running addDPvals on %s for %s" % (pdfile,fitsfile))
+#       if (nelem==4):
+#           try:
+#               addPDvals(fitsfile, bsfile, "AMP1.MEAS_TIMES", "AMP1", tstamp)
+#           except:
+#               raise RuntimeError("Problem running addDPvals on %s for %s" % (bsfile,fitsfile))
         try:
             print fitsAverage(fitsfile)
         except:
