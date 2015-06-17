@@ -92,7 +92,7 @@ try:
     print "setting location of fits exposure directory"
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-    for wl in range(403,1100,1):
+    for wl in range(300,1100,1):
 
         exptime = 25.
         nreads = 3000
@@ -129,6 +129,7 @@ try:
             timestamp = time.time()
             fitsfilename = "%s_lambda_%3.3d_%3.3d_lambda_%d_${TIMESTAMP}.fits" % ("mono_calib",int(wl),seq,i+1)
             arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+            result = arcsub.synchCommand(10,"setHeader","TestType","MonoCalib")
 
 # make sure to get some readings before the state of the shutter changes       
             time.sleep(0.2);
@@ -148,11 +149,11 @@ try:
             tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
-            time.sleep(30.)
+            time.sleep(20.)
 
             print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-            result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
-            buff = result.getResult()
+            pdrresult = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
+            buff = pdrresult.getResult()
             print "Finished getting readings at %f" % time.time()
 
 # readings from PD device
@@ -164,7 +165,7 @@ try:
             tottime = pdbiasresult.get();
 
 # make sure the sample of the photo diode is complete
-            time.sleep(30.)
+#            time.sleep(30.)
 
             print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdbiasfilename)
             result = biassub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdbiasfilename));
@@ -175,9 +176,12 @@ try:
 #            pdsub.synchCommand(1000,"setTimeout",10.);
 #            biassub.synchCommand(1000,"setTimeout",10.);
 
+            result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0.MEAS_TIMES","AMP0.A_CURRENT",timestamp)
+            result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdbiasfilename),fitsfilename,"AMP2","AMP2.MEAS_TIMES","AMP2.A_CURRENT",timestamp)
 
             fpfiles.write("%s %s/%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,cdir,pdbiasfilename,timestamp))
-            time.sleep(15.)
+
+#            time.sleep(15.)
 
         seq = seq + 1
 
