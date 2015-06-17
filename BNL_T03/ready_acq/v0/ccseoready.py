@@ -134,6 +134,7 @@ try:
                 timestamp = time.time()
                 fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
 
                 print "Ready to take bias image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -217,7 +218,8 @@ try:
 # reset timeout to something reasonable for a regular command
                 pdsub.synchCommand(1000,"setTimeout",10.);
 
-
+                result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+#/home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/pd-values_1434501729-for-seq-0-exp-1.txt /home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/NoCCD1_lambda_400_000_lambda_1_20150616204212.fits MP time pd 123.00
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
             seq = seq + 1
