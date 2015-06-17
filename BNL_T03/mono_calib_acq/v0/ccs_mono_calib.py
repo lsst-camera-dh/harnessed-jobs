@@ -53,8 +53,8 @@ try:
 #    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
-    biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.0002)
+    biassub.synchCommand(10,"setCurrentRange",.00000001)
+    pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
 # move to TS acquisition state
     print "setting acquisition state"
@@ -80,7 +80,7 @@ try:
     print "Working on CCD %s" % ccd
 
     print "set filter position"
-    monosub.synchCommand(30,"setFilter",1); # open position
+    monosub.synchCommand(30,"setFilter",2);
 
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
@@ -92,7 +92,8 @@ try:
     print "setting location of fits exposure directory"
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-    for wl in range(300,1100,1):
+#    for wl in range(800,900,1):
+    for wl in range(400,500,1):
 
         exptime = 25.
         nreads = 3000
@@ -125,6 +126,8 @@ try:
 
             print "PD recording from Bias device should now be in progress and the time is %f" % time.time()
 
+            time.sleep(10.)
+
 # start acquisition
             timestamp = time.time()
             fitsfilename = "%s_lambda_%3.3d_%3.3d_lambda_%d_${TIMESTAMP}.fits" % ("mono_calib",int(wl),seq,i+1)
@@ -149,12 +152,12 @@ try:
             tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
-            time.sleep(20.)
+            time.sleep(10.)
 
             print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-            pdrresult = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
-            buff = pdrresult.getResult()
-            print "Finished getting readings at %f" % time.time()
+#            pdrresult = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
+            pdrresult = pdsub.asynchCommand("readBuffer","%s/%s" % (cdir,pdfilename));
+#            buff = pdrresult.getResult()
 
 # readings from PD device
             print "getting photodiode readings from Bias device at time = %f" % time.time();
@@ -172,12 +175,14 @@ try:
             buff = result.getResult()
             print "Finished getting readings at %f" % time.time()
 
+            buff = pdrresult.get()
+            print "Finished getting readings at %f" % time.time()
 # reset timeout to something reasonable for a regular command
 #            pdsub.synchCommand(1000,"setTimeout",10.);
 #            biassub.synchCommand(1000,"setTimeout",10.);
 
-            result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0.MEAS_TIMES","AMP0.A_CURRENT",timestamp)
-            result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdbiasfilename),fitsfilename,"AMP2","AMP2.MEAS_TIMES","AMP2.A_CURRENT",timestamp)
+            result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+            result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdbiasfilename),fitsfilename,"AMP2","AMP2_MEAS_TIMES","AMP2_A_CURRENT",timestamp)
 
             fpfiles.write("%s %s/%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,cdir,pdbiasfilename,timestamp))
 
