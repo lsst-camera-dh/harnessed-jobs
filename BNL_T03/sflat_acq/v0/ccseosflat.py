@@ -127,7 +127,9 @@ try:
                 timestamp = time.time()
                 fitsfilename = "%s_sflat_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-    
+                result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+
                 print "Ready to take bias image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
@@ -162,15 +164,14 @@ try:
                 print "call accumBuffer to start PD recording at %f" % time.time()
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
 
-
-                result = pdsub.asynchCommand("accumBuffer",int(nreads),nplc,True);
                 print "recording should now be in progress and the time is %f" % time.time()
 # start acquisition
 
                 timestamp = time.time()
                 fitsfilename = "%s_sflat_%3.3d_%3.3d_sflat%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-    
+                result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
