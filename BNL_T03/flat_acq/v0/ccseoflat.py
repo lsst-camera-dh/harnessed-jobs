@@ -94,9 +94,9 @@ try:
     print "Now collect some parameters from the config file"
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_HILIM', default='120.0'))
-    imcount = float(eolib.getCfgVal(acqcfgfile, 'FLAT_BCOUNT', default = "2"))
+    bcount = float(eolib.getCfgVal(acqcfgfile, 'FLAT_BCOUNT', default = "2"))
     wl     = float(eolib.getCfgVal(acqcfgfile, 'FLAT_WL', default = "550.0"))
-    bcount = 1
+    imcount = 2
 
 #number of PLCs between readings
     nplc = 1

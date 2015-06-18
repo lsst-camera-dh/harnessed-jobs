@@ -216,7 +216,7 @@ try:
     
     fp.close();
     
-# move TS to idle state
+# move TS to ready state
     tssub.synchCommand(60,"setTSReady");
 
 # get the glowing vacuum gauge back on
