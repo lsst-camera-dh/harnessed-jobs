@@ -75,7 +75,12 @@ class e2vFitsTranslator(VendorFitsTranslator):
         super(e2vFitsTranslator, self).__init__(rootdir, outputBaseDir)
     def translate(self, infile, test_type, image_type, seqno, time_stamp=None,
                   verbose=True):
-        hdulist = pyfits.open(infile)
+        try:
+            hdulist = pyfits.open(infile)
+        except IOError, eobj:
+            print eobj
+            print "skipping"
+            return
         sensor_id = hdulist[0].header['DEV_ID']
         exptime = hdulist[0].header['EXPOSURE']
         hdulist[0].header['EXPTIME'] = exptime
@@ -84,30 +89,30 @@ class e2vFitsTranslator(VendorFitsTranslator):
         hdulist[0].header['CCDTEMP'] = hdulist[0].header['TEMP_MEA']
         self._setAmpGeom(hdulist)
         self._writeFile(hdulist, locals(), verbose=verbose)
-    def fe55(self, pattern='Xray Gain and PSF/*.fits', time_stamp=None,
+    def fe55(self, pattern='Images/*_xray_xray_*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('fe55', 'fe55', pattern, 
                                   time_stamp=time_stamp, verbose=verbose)
-    def bias(self, pattern='Noise - Zero frames/*.fits', time_stamp=None,
+    def bias(self, pattern='Images/*_noims_nois_*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('fe55', 'bias', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def dark(self, pattern='Dark 3 images/*dark_dark*.fits', time_stamp=None,
+    def dark(self, pattern='Images/*_dark_dark_*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('dark', 'dark', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def trap(self, pattern='Traps/*cycl*.fits', time_stamp=None, verbose=True):
+    def trap(self, pattern='Images/*cycl*.fits', time_stamp=None, verbose=True):
         return self._processFiles('trap', 'flat', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def sflat_500(self, pattern='superflat low/*.fits', time_stamp=None,
+    def sflat_500(self, pattern='Images/*_sflatl_*.fits', time_stamp=None,
                   verbose=True):
         return self._processFiles('sflat_500', 'flat', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def spot(self, pattern='Crosstalk/*xtalk*.fits', time_stamp=None,
+    def spot(self, pattern='Images/*_xtalk_*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('spot', 'flat', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def flat(self, pattern='satlin - multi/*.fits', time_stamp=None,
+    def flat(self, pattern='Images/*_ifwm_illu_*.fits', time_stamp=None,
              verbose=True):
         if time_stamp is None:
             time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -120,7 +125,7 @@ class e2vFitsTranslator(VendorFitsTranslator):
             self.translate(infile, 'flat', 'flat', seqno, time_stamp=time_stamp,
                            verbose=verbose)
         return time_stamp
-    def lambda_scan(self, pattern='QE and PRNU/*qe*.fits', time_stamp=None,
+    def lambda_scan(self, pattern='Images/*_flat_*_illu_*.fits', time_stamp=None,
                verbose=True):
         if time_stamp is None:
             time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -133,10 +138,10 @@ class e2vFitsTranslator(VendorFitsTranslator):
             self.translate(infile, 'lambda', 'flat', seqno,
                            time_stamp=time_stamp, verbose=verbose)
         return time_stamp
-    def dark_defects_data(self, pattern='superflat high/PRDefs/*.fits',
-                          time_stamp=None, verbose=True):
-        return self._processFiles('sflat_500', 'dark_flat', pattern,
-                                  time_stamp=time_stamp, verbose=verbose)
+#    def dark_defects_data(self, pattern='superflat high/PRDefs/*.fits',
+#                          time_stamp=None, verbose=True):
+#        return self._processFiles('sflat_500', 'dark_flat', pattern,
+#                                  time_stamp=time_stamp, verbose=verbose)
     def run_all(self):
         time_stamp = self.fe55()
         self.bias(time_stamp=time_stamp)
@@ -146,4 +151,4 @@ class e2vFitsTranslator(VendorFitsTranslator):
         self.spot()
         self.flat()
         self.lambda_scan()
-        self.dark_defects_data(time_stamp=time_stamp)
+#        self.dark_defects_data(time_stamp=time_stamp)
