@@ -153,7 +153,7 @@ try:
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
     
-                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                result = monosub.synchCommand(60,"setWaveAndFilter",wl);
                 reply = result.getResult();
     
 # adjust timeout because we will be waiting for the data to become ready

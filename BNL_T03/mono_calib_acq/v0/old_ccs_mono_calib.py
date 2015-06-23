@@ -45,8 +45,6 @@ try:
     reply = result.getResult();
     time.sleep(3.);
 
-    print "past powering on the CCD"
-
 #    print "Throwing away the first image"
 #    arcsub.synchCommand(10,"setFitsFilename","");
 #    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -55,8 +53,8 @@ try:
 #    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
-    biassub.synchCommand(10,"setCurrentRange",0.000000002)
-    pdsub.synchCommand(10,"setCurrentRange",0.000002)
+    biassub.synchCommand(10,"setCurrentRange",.00000001)
+    pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
 # move to TS acquisition state
     print "setting acquisition state"
@@ -82,7 +80,7 @@ try:
     print "Working on CCD %s" % ccd
 
     print "set filter position"
-    monosub.synchCommand(60,"setFilter",2);
+    monosub.synchCommand(30,"setFilter",2);
 
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
@@ -94,11 +92,8 @@ try:
     print "setting location of fits exposure directory"
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-    wlstep = 0.5
-    wl=400. - wlstep
-    for idx in range(100):
-        wl = wl + wlstep
-#    for wl in range(455,500,1):
+#    for wl in range(800,900,1):
+    for wl in range(400,500,1):
 
         exptime = 25.
         nreads = 3000
@@ -109,17 +104,7 @@ try:
         print "Setting timeout to %f s" % mywait
 
 #        monosub.synchCommand(30,"setWaveAndFilter",wl);
-        result = monosub.synchCommand(60,"setWave",wl);
-        rply = result.getResult()
-        time.sleep(4.0)
-        result = monosub.synchCommand(200,"getWave");
-        rwl = result.getResult()
-
-        print "the wavelength read back is %f for seq %d" % (rwl,seq)
-        print "publishing state"
-        result = tssub.synchCommand(60,"getstate");
-        stt = result.getResult()
-        result = tssub.synchCommand(60,"setstate",stt);
+        monosub.synchCommand(30,"setWave",wl);
 
         for i in range(1):
             print "starting acquisition step for lambda = %8.2f" % wl
