@@ -82,18 +82,6 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
     rply = result.getResult();
 
-# set the wavelngth
-    wl = 823.
-    result =monosub.synchCommand(30,"setWaveAndFilter",wl);
-#    result = monosub.synchCommand(60,"setWave",wl);
-    rply = result.getResult()
-    time.sleep(4.0)
-
-# publish the state of the system so that the header data will be current
-    print "publishing state"
-    result = tssub.synchCommand(60,"publishstate");
-    stt = result.getResult()
-
 # go through config file looking for  instructions, execute
  
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
@@ -144,11 +132,25 @@ try:
                 print "start image exposure loop"
                 if (acqtype==1) :
 # take light exposures
-                    target = float(tokens[3])
+                    target = float(tokens[2])
                     print "target exposure = %d" % (target);
                     exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='FLAT', use_nd=False)
                     arcsub.synchCommand(10,"setParameter","Light","1");
                     imcount = int(tokens[3])
+
+# set the wavelngth
+                    wl = 0.
+                    if (len(tokens)>4) :
+                        wl = float(tokens[4])
+                    result =monosub.synchCommand(30,"setWaveAndFilter",wl);
+#    result = monosub.synchCommand(60,"setWave",wl);
+                    rply = result.getResult()
+                    time.sleep(4.0)
+
+# publish the state of the system so that the header data will be current
+                    print "publishing state"
+                    result = tssub.synchCommand(60,"publishstate");
+                    stt = result.getResult()
 
                 else :
 # take exposures

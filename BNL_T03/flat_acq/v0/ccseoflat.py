@@ -134,10 +134,6 @@ try:
 
             print "starting acquisition step for lambda = %8.2f with exptime %8.2f s" % (wl, exptime)
  
-            print "setting the monochromator wavelength"
-            if (exptime > lo_lim):
-                monosub.synchCommand(30,"setWaveAndFilter",wl);
-
             print "start bias exposure loop"
 
             for i in range(bcount):
@@ -160,6 +156,16 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
+            print "setting the monochromator wavelength"
+            if (exptime > lo_lim):
+                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                rply = result.getresult()
+                time.sleep(4.)
+                result = monosub.synchCommand(30,"getWave");
+                rwl = result.getresult()
+                print "publishing state"
+                result = tssub.synchCommand(60,"publishstate");
 
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200

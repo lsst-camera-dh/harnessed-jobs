@@ -126,6 +126,9 @@ try:
 
             print "start dark image exposure loop"
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+            print "publishing state"
+            result = tssub.synchCommand(60,"publishstate");
+
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
             if (nreads > 3000):
