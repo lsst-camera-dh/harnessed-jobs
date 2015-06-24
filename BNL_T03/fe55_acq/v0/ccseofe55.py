@@ -152,6 +152,12 @@ try:
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             for i in range(imcount):
+                print "Throwing away the first image"
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                reply = result.getResult();
+
+
 # prepare to readout diodes                                                                              
 # adjust timeout because we will be waiting for the data to become ready
                 mywait = nplc/60.*nreads*1.10 ;
