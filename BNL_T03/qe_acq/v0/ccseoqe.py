@@ -151,7 +151,7 @@ try:
 
             print "setting the monochromator wavelength"
             if (exptime > lo_lim):
-                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                result = monosub.synchCommand(60,"setWaveAndFilter",wl);
                 rply = result.getresult()
                 time.sleep(4.)
                 result = monosub.synchCommand(30,"getWave");
