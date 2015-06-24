@@ -149,6 +149,16 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
+            print "setting the monochromator wavelength"
+            if (exptime > lo_lim):
+                result = monosub.synchCommand(60,"setWaveAndFilter",wl);
+                rply = result.getResult()
+                time.sleep(4.)
+                result = monosub.synchCommand(30,"getWave");
+                rwl = result.getResult()
+                print "publishing state"
+                result = tssub.synchCommand(60,"publishState");
+
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
             if (nreads > 3000):
@@ -158,8 +168,11 @@ try:
 
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
+                print "Throwing away the first image"
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                reply = result.getResult();
 
-                monosub.synchCommand(30,"setWaveAndFilter",wl);
 
 # adjust timeout because we will be waiting for the data to become ready
                 mywait = nplc/60.*nreads*1.10 ;

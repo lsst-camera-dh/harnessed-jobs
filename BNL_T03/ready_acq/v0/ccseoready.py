@@ -158,15 +158,23 @@ try:
 
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
+                print "Throwing away the first image"
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                reply = result.getResult();
+
 
                 print "Setting the monochrmator wavelength and filter"
                 print "You should HEAR some movement"
-                monosub.synchCommand(30,"setWaveAndFilter",wl);
-                time.sleep(1.5);
-                print "Verifying wavelength setting of the monochrmator"
-                result = monosub.synchCommand(60,"getWave");
-                time.sleep(4.);
+                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                rply = result.getResult()
+                time.sleep(4.)
+                print "Verifying wavelength setting of the monochromator"
+                result = monosub.synchCommand(30,"getWave");
                 rwl = result.getResult()
+                print "publishing state"
+                result = tssub.synchCommand(60,"publishState");
+
                 print "getting filter wheel setting"
                 result = monosub.synchCommand(60,"getFilter");
                 ifl = result.getResult()

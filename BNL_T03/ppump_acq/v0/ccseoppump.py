@@ -119,8 +119,6 @@ try:
             arcsub.synchCommand(10,"setParameter","Npump",str(nshifts));
             print "set pocket depth"
             arcsub.synchCommand(10,"setParameter","Pdepth","1");
-            print "set wavelength to %f" % wl
-            monosub.synchCommand(30,"setWaveAndFilter",wl);
     
 # pump with some darks then do a light exposure
 # 2sec for the bias
@@ -148,6 +146,17 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
+            print "setting the monochromator wavelength"
+            if (exptime > lo_lim):
+                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                rply = result.getResult()
+                time.sleep(4.)
+                result = monosub.synchCommand(30,"getWave");
+                rwl = result.getResult()
+                print "publishing state"
+                result = tssub.synchCommand(60,"publishState");
+
     
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
@@ -157,6 +166,11 @@ try:
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             for i in range(imcount):
+                print "Throwing away the first image"
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                reply = result.getResult();
+
 
 # adjust timeout because we will be waiting for the data to become ready
                 mywait = nplc/60.*nreads*1.10 ;
