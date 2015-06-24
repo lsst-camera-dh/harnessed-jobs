@@ -8,6 +8,7 @@ from org.lsst.ccs.scripting import *
 from java.lang import Exception
 import sys
 import time
+import eolib
 
 CCS.setThrowExceptions(True);
 
@@ -136,7 +137,9 @@ try:
     
     
                 print "start image exposure loop"
+                lightdark = "undef"
                 if (acqtype==1) :
+                    lightdark = "light"
                     print "Received instruction for doing some Light exposures"
 # take light exposures
                     target = float(tokens[2])
@@ -160,6 +163,7 @@ try:
                     stt = result.getResult()
 
                 else :
+                    lightdark = "dark"
                     print "Received instruction for doing some Dark exposures"
 # take exposures
                     arcsub.synchCommand(10,"setParameter","Light","0")
@@ -192,7 +196,7 @@ try:
                     timestamp = time.time()
     
 
-                    fitsfilename = "%s_%s_dark_%d_${TIMESTAMP}.fits" % (ccd,acqname,i+1)
+                    fitsfilename = "%s_%s_%s_%d_${TIMESTAMP}.fits" % (ccd,acqname,lightdark,i+1)
                     arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                     result = arcsub.synchCommand(10,"setHeader","TestType",acqname)
                     result = arcsub.synchCommand(10,"setHeader","ImageType",acqname)
