@@ -90,7 +90,13 @@ class e2vFitsTranslator(VendorFitsTranslator):
         hdulist[0].header['CCD_SERN'] = hdulist[0].header['DEV_ID']
         hdulist[0].header['EXPTIME'] = exptime
         hdulist[0].header['MONOWL'] = hdulist[0].header['WAVELEN']
-        hdulist[0].header['MONDIODE'] = hdulist[0].header['LIGHTPOW']
+        if hdulist[0].header['LIGHTPOW'] != 0:
+            hdulist[0].header['MONDIODE'] = hdulist[0].header['LIGHTPOW']
+        else:
+            # This is so that the flat pairs analysis can proceed
+            # using the exposure time as a proxy for the incident
+            # flux.
+            hdulist[0].header['MONDIODE'] = 1.  
         hdulist[0].header['CCDTEMP'] = hdulist[0].header['TEMP_MEA']
         hdulist[0].header['TESTTYPE'] = test_type.upper()
         hdulist[0].header['IMGTYPE'] = image_type.upper()
