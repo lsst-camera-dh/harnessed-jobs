@@ -159,7 +159,7 @@ try:
 
 # publish the state of the system so that the header data will be current
                     print "publishing state"
-                    result = tssub.synchCommand(60,"publishstate");
+                    result = tssub.synchCommand(60,"publishState");
                     stt = result.getResult()
 
                 else :

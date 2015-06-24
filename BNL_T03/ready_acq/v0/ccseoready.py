@@ -162,13 +162,13 @@ try:
                 print "Setting the monochrmator wavelength and filter"
                 print "You should HEAR some movement"
                 result = monosub.synchCommand(30,"setWaveAndFilter",wl);
-                rply = result.getresult()
+                rply = result.getResult()
                 time.sleep(4.)
-                print "Verifying wavelength setting of the monochrmator"
+                print "Verifying wavelength setting of the monochromator"
                 result = monosub.synchCommand(30,"getWave");
-                rwl = result.getresult()
+                rwl = result.getResult()
                 print "publishing state"
-                result = tssub.synchCommand(60,"publishstate");
+                result = tssub.synchCommand(60,"publishState");
 
                 print "getting filter wheel setting"
                 result = monosub.synchCommand(60,"getFilter");

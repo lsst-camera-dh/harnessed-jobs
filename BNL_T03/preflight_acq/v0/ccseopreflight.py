@@ -1,6 +1,6 @@
 ###############################################################################
 # preflight_acq
-# test the test stand auxiliary equipment
+# test the test stand for readiness
 #
 ###############################################################################
 
@@ -58,8 +58,8 @@ try:
     reply = result.getResult();
 
     print "Setting the current ranges on the Bias and PD devices"
-    biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.0002)
+    biassub.synchCommand(10,"setCurrentRange",0.00002)
+    pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
 # move to TS acquisition state
     print "setting acquisition state"
@@ -114,7 +114,7 @@ try:
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
     print "Scan at a low and a high wavelength to test monochromator and filter wheel"
-    for wl in range(400,900,500) :
+    for wl in [446.,823.] :
 
             target = float(wl)
             print "target wl = %f" % target;
@@ -134,6 +134,7 @@ try:
                 timestamp = time.time()
                 fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
 
                 print "Ready to take bias image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -160,12 +161,15 @@ try:
 
                 print "Setting the monochrmator wavelength and filter"
                 print "You should HEAR some movement"
-                monosub.synchCommand(30,"setWaveAndFilter",wl);
-                time.sleep(1.5);
-                print "Verifying wavelength setting of the monochrmator"
-                result = monosub.synchCommand(60,"getWave");
-                time.sleep(4.);
+                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                rply = result.getResult()
+                time.sleep(4.)
+                print "Verifying wavelength setting of the monochromator"
+                result = monosub.synchCommand(30,"getWave");
                 rwl = result.getResult()
+                print "publishing state"
+                result = tssub.synchCommand(60,"publishState");
+
                 print "getting filter wheel setting"
                 result = monosub.synchCommand(60,"getFilter");
                 ifl = result.getResult()
@@ -188,6 +192,7 @@ try:
                 timestamp = time.time()
                 fitsfilename = "%s_lambda_%3.3d_%3.3d_lambda_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
 
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
@@ -217,7 +222,8 @@ try:
 # reset timeout to something reasonable for a regular command
                 pdsub.synchCommand(1000,"setTimeout",10.);
 
-
+                result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+#/home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/pd-values_1434501729-for-seq-0-exp-1.txt /home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/NoCCD1_lambda_400_000_lambda_1_20150616204212.fits MP time pd 123.00
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
             seq = seq + 1
@@ -248,4 +254,4 @@ except Exception, ex:
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 
-print "TS3_preflight: COMPLETED"
+print "preflight_acq: COMPLETED"

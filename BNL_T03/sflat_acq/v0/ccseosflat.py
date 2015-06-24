@@ -150,7 +150,7 @@ try:
                 result = monosub.synchCommand(30,"getWave");
                 rwl = result.getresult()
                 print "publishing state"
-                result = tssub.synchCommand(60,"publishstate");
+                result = tssub.synchCommand(60,"publishState");
 
 # prepare to readout diodes
 
