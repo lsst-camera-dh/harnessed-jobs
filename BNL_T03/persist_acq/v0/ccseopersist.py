@@ -103,19 +103,25 @@ try:
     for line in fp:
         tokens = str.split(line)
         if ((len(tokens) > 0) and (tokens[0] == 'persist')):
-            acqtype = tokens[1]
+            acqtype = int(tokens[1])
+            print "line = %s" % line
+            print "number of tokens = %d" % len(tokens)
             if (acqtype==0) :
                 bcount = int(tokens[2])
+                dowrite = 1
+                if len(tokens)>3 :
+                    dowrite = int(tokens[3])
 
                 print "start bias image exposure loop"
                 arcsub.synchCommand(10,"setParameter","ExpTime","0");
     
-                bcount = 2
                 for i in range(bcount):
                     timestamp = time.time()
     
                     print "set fits filename"
-                    fitsfilename = "%s_%s_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,acqname,seq)
+                    fitsfilename = ""
+                    if dowrite==1 :
+                        fitsfilename = "%s_%s_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,acqname,seq)
                     result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                     result = arcsub.synchCommand(10,"setHeader","TestType",acqname)
                     result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
@@ -126,11 +132,12 @@ try:
                     print "after click click at %f" % time.time()
                     time.sleep(0.2)
 
-            if (acqtype==2 || acqtype==3) :
+            if (acqtype==1 or acqtype==2) :
     
     
                 print "start image exposure loop"
                 if (acqtype==1) :
+                    print "Received instruction for doing some Light exposures"
 # take light exposures
                     target = float(tokens[2])
                     print "target exposure = %d" % (target);
@@ -153,6 +160,7 @@ try:
                     stt = result.getResult()
 
                 else :
+                    print "Received instruction for doing some Dark exposures"
 # take exposures
                     arcsub.synchCommand(10,"setParameter","Light","0")
                     exptime = float(tokens[2])
