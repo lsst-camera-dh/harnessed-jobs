@@ -53,7 +53,7 @@ try:
 #        reply = result.getResult();
 
     print "Setting the current ranges on the Bias and PD devices so they don't overflow when the full power of the lamp is bearing down on the diodes"
-    biassub.synchCommand(10,"setCurrentRange",0.0002)
+#    biassub.synchCommand(10,"setCurrentRange",0.0002)
     pdsub.synchCommand(10,"setCurrentRange",0.0002)
 
 # nominal setup
@@ -126,6 +126,8 @@ try:
                 print "start bias image exposure loop"
                 arcsub.synchCommand(10,"setParameter","ExpTime","0");
     
+                result = arcsub.synchCommand(10,"setHeader","TestType",acqname)
+                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
                 for i in range(bcount):
                     timestamp = time.time()
     
@@ -134,8 +136,6 @@ try:
                     if dowrite==1 :
                         fitsfilename = "%s_%s_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,acqname,seq)
                     result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-                    result = arcsub.synchCommand(10,"setHeader","TestType",acqname)
-                    result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
     
                     print "Ready to take bias image. time = %f" % time.time()
                     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -154,17 +154,17 @@ try:
 # take light exposures
                     target = float(tokens[2])
                     print "target exposure = %d" % (target);
+                    wl = 0.
+                    if (len(tokens)>4) :
+                        wl = float(tokens[4])
                     exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='FLAT', use_nd=False)
                     arcsub.synchCommand(10,"setParameter","Light","1");
                     imcount = int(tokens[3])
 
 # set the wavelngth
-                    wl = 0.
                     if (len(tokens)>4) :
-                        wl = float(tokens[4])
 #                    result =monosub.synchCommand(30,"setWaveAndFilter",wl);
                         result =monosub.synchCommand(60,"setWave",wl);
-#    result = monosub.synchCommand(60,"setWave",wl);
                         rply = result.getResult()
                         time.sleep(4.0)
 
@@ -189,13 +189,18 @@ try:
                     nplc = exptime*60/(nreads-200)
                     print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
     
-                for i in range(imcount):
-    
+                result = arcsub.synchCommand(10,"setHeader","TestType",acqname)
+                result = arcsub.synchCommand(10,"setHeader","ImageType",acqname)
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                reply = result.getResult();
 # adjust timeout because we will be waiting for the data to become ready both
 # at the accumbuffer stage and the readbuffer stage
-                    mywait = nplc/60.*nreads*1.10 ;
-                    print "Setting timeout to %f s" % mywait
-                    pdsub.synchCommand(1000,"setTimeout",mywait);
+                mywait = nplc/60.*nreads*1.10 ;
+                print "Setting timeout to %f s" % mywait
+                pdsub.synchCommand(1000,"setTimeout",mywait);
+
+                for i in range(imcount):
     
                     print "call accumBuffer to start PD recording at %f" % time.time()
                     pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
@@ -209,8 +214,6 @@ try:
 
                     fitsfilename = "%s_%s_%s_%d_${TIMESTAMP}.fits" % (ccd,acqname,lightdark,i+1)
                     arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-                    result = arcsub.synchCommand(10,"setHeader","TestType",acqname)
-                    result = arcsub.synchCommand(10,"setHeader","ImageType",acqname)
         
                     print "Ready to take image. time = %f" % time.time()
                     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -234,13 +237,12 @@ try:
                     buff = result.getResult()
                     print "Finished getting readings at %f" % time.time()
     
-# reset timeout to something reasonable for a regular command
-                    pdsub.synchCommand(1000,"setTimeout",10.);
-    
                     result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
                     fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
      
       
+# reset timeout to something reasonable for a regular command
+                pdsub.synchCommand(1000,"setTimeout",10.);
                 seq = seq + 1
     
     fpfiles.close();

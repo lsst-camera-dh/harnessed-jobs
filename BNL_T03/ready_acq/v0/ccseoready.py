@@ -120,7 +120,7 @@ try:
             print "target wl = %f" % target;
 
             exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
-
+            exptime = 10.
 
 # take bias images
 
@@ -172,11 +172,6 @@ try:
 
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
-                print "Throwing away the first image"
-                arcsub.synchCommand(10,"setFitsFilename","");
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                reply = result.getResult();
-
 
                 print "Setting the monochrmator wavelength and filter"
                 print "You should HEAR some movement"
