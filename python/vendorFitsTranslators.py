@@ -14,16 +14,17 @@ class VendorFitsTranslator(object):
     Valid test types, image types, and filename format are
 
     test_types: fe55 dark flat lambda trap sflat_nnn spot
-    image_types: bias dark fe55
-    filenames: <sensor_id>_<test_type>_<image_type>_<seqno>_<time_stamp>.fits
+    image_types: bias dark fe55 flat spot ppump
+    filenames: <lsst_num>_<test_type>_<image_type>_<seqno>_<time_stamp>.fits
     """
-    def __init__(self, rootdir, outputBaseDir='.'):
-        self._infiles = lambda x : sorted(glob.glob(os.path.join(rootdir, x)))
+    def __init__(self, lsst_num, rootdir, outputBaseDir):
+        self.lsst_num = lsst_num
         self.rootdir = rootdir
         self.outputBaseDir = outputBaseDir
+        self._infiles = lambda x : sorted(glob.glob(os.path.join(rootdir, x)))
         self.outfiles = []
     def _writeFile(self, hdulist, local_vars, verbose=True):
-        outfile = "%(sensor_id)s_%(test_type)s_%(image_type)s_%(seqno)s_%(time_stamp)s.fits" % local_vars
+        outfile = "%(lsst_num)s_%(test_type)s_%(image_type)s_%(seqno)s_%(time_stamp)s.fits" % local_vars
         outdir = os.path.join(self.outputBaseDir, local_vars['test_type'],
                               local_vars['time_stamp'])
         try:
@@ -34,7 +35,7 @@ class VendorFitsTranslator(object):
         if verbose:
             print "writing", outfile
         hdulist.writeto(outfile, clobber=True, checksum=True)
-        self.outfiles.append(outfile)
+        self.outfiles.append(os.path.relpath(outfile))
     def _setAmpGeom(self, hdulist):
         detxsize = 8*hdulist[1].header['NAXIS1']
         detysize = 2*hdulist[1].header['NAXIS2']
@@ -64,15 +65,16 @@ class ItlFitsTranslator(VendorFitsTranslator):
     """
     FITS Translator for ITL data.
     """
-    def __init__(self, rootdir, outputBaseDir):
+    def __init__(self, lsst_num, rootdir, outputBaseDir='.'):
         raise NotImplementedError("ITL translator not implemented yet")
 
 class e2vFitsTranslator(VendorFitsTranslator):
     """
     FITS Translator for e2v data based on their TRR package.
     """
-    def __init__(self, rootdir, outputBaseDir):
-        super(e2vFitsTranslator, self).__init__(rootdir, outputBaseDir)
+    def __init__(self, lsst_num, rootdir, outputBaseDir='.'):
+        super(e2vFitsTranslator, self).__init__(lsst_num, rootdir,
+                                                outputBaseDir)
     def translate(self, infile, test_type, image_type, seqno, time_stamp=None,
                   verbose=True):
         try:
@@ -81,12 +83,23 @@ class e2vFitsTranslator(VendorFitsTranslator):
             print eobj
             print "skipping"
             return
-        sensor_id = hdulist[0].header['DEV_ID']
+        lsst_num = self.lsst_num
         exptime = hdulist[0].header['EXPOSURE']
+        hdulist[0].header['LSST_NUM'] = lsst_num
+        hdulist[0].header['CCD_MANU'] = 'E2V'
+        hdulist[0].header['CCD_SERN'] = hdulist[0].header['DEV_ID']
         hdulist[0].header['EXPTIME'] = exptime
         hdulist[0].header['MONOWL'] = hdulist[0].header['WAVELEN']
-        hdulist[0].header['MONDIODE'] = hdulist[0].header['LIGHTPOW']
+        if hdulist[0].header['LIGHTPOW'] != 0:
+            hdulist[0].header['MONDIODE'] = hdulist[0].header['LIGHTPOW']
+        else:
+            # This is so that the flat pairs analysis can proceed
+            # using the exposure time as a proxy for the incident
+            # flux.
+            hdulist[0].header['MONDIODE'] = 1.  
         hdulist[0].header['CCDTEMP'] = hdulist[0].header['TEMP_MEA']
+        hdulist[0].header['TESTTYPE'] = test_type.upper()
+        hdulist[0].header['IMGTYPE'] = image_type.upper()
         self._setAmpGeom(hdulist)
         self._writeFile(hdulist, locals(), verbose=verbose)
     def fe55(self, pattern='Images/*_xray_xray_*.fits', time_stamp=None,
@@ -101,16 +114,17 @@ class e2vFitsTranslator(VendorFitsTranslator):
              verbose=True):
         return self._processFiles('dark', 'dark', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def trap(self, pattern='Images/*cycl*.fits', time_stamp=None, verbose=True):
-        return self._processFiles('trap', 'flat', pattern,
+    def trap(self, pattern='Images/*_trapspp_cycl*.fits', time_stamp=None,
+             verbose=True):
+        return self._processFiles('trap', 'ppump', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def sflat_500(self, pattern='Images/*_sflatl_*.fits', time_stamp=None,
+    def sflat_500(self, pattern='Images/*_sflatl_illu_*.fits', time_stamp=None,
                   verbose=True):
         return self._processFiles('sflat_500', 'flat', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def spot(self, pattern='Images/*_xtalk_*.fits', time_stamp=None,
+    def spot(self, pattern='Images/*_xtalk_illu_*.fits', time_stamp=None,
              verbose=True):
-        return self._processFiles('spot', 'flat', pattern,
+        return self._processFiles('spot', 'spot', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
     def flat(self, pattern='Images/*_ifwm_illu_*.fits', time_stamp=None,
              verbose=True):
