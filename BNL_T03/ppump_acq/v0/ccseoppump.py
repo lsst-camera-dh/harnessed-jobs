@@ -52,6 +52,10 @@ try:
     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
 
+    print "Setting the current ranges on the Bias and PD devices"
+#    biassub.synchCommand(10,"setCurrentRange",0.0002)
+    pdsub.synchCommand(10,"setCurrentRange",0.000002)
+
 # move to TS acquisition state
     print "setting acquisition state"
     result = tssub.synchCommand(60,"setTSTEST");
@@ -148,14 +152,14 @@ try:
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
             print "setting the monochromator wavelength"
-            if (exptime > lo_lim):
-                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
-                rply = result.getresult()
-                time.sleep(4.)
-                result = monosub.synchCommand(30,"getWave");
-                rwl = result.getresult()
-                print "publishing state"
-                result = tssub.synchCommand(60,"publishState");
+#            if (exptime > lo_lim):
+            result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+            rply = result.getResult()
+            time.sleep(4.)
+            result = monosub.synchCommand(30,"getWave");
+            rwl = result.getResult()
+            print "publishing state"
+            result = tssub.synchCommand(60,"publishState");
 
     
 # prepare to readout diodes
@@ -166,6 +170,11 @@ try:
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             for i in range(imcount):
+                print "Throwing away the first image"
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                reply = result.getResult();
+
 
 # adjust timeout because we will be waiting for the data to become ready
                 mywait = nplc/60.*nreads*1.10 ;

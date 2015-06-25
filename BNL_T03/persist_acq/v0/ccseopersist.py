@@ -46,12 +46,22 @@ try:
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
 # the first image is usually bad so throw it away
-    print "Throwing away the first image"
-    arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-    reply = result.getResult();
+#    print "Throwing away the first image"
+#    for i in range(3) :
+#        arcsub.synchCommand(10,"setFitsFilename","");
+#        result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+#        reply = result.getResult();
 
-    
+    print "Setting the current ranges on the Bias and PD devices so they don't overflow when the full power of the lamp is bearing down on the diodes"
+    biassub.synchCommand(10,"setCurrentRange",0.0002)
+    pdsub.synchCommand(10,"setCurrentRange",0.0002)
+
+# nominal setup
+    result =monosub.synchCommand(30,"setFilter",1); # open
+    rply = result.getResult()
+    result =monosub.synchCommand(30,"setWave",0.);  # full spectrum blast
+    rply = result.getResult()
+
 # move to TS acquisition state
     print "setting acquisition state"
     result = tssub.synchCommand(10,"setTSTEST");
@@ -152,10 +162,11 @@ try:
                     wl = 0.
                     if (len(tokens)>4) :
                         wl = float(tokens[4])
-                    result =monosub.synchCommand(30,"setWaveAndFilter",wl);
+#                    result =monosub.synchCommand(30,"setWaveAndFilter",wl);
+                        result =monosub.synchCommand(60,"setWave",wl);
 #    result = monosub.synchCommand(60,"setWave",wl);
-                    rply = result.getResult()
-                    time.sleep(4.0)
+                        rply = result.getResult()
+                        time.sleep(4.0)
 
 # publish the state of the system so that the header data will be current
                     print "publishing state"

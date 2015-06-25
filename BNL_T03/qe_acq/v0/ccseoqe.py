@@ -16,8 +16,8 @@ try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
     tssub  = CCS.attachSubsystem("%s" % ts);
-    print "attaching Bias subsystem"
-    biassub = CCS.attachSubsystem("%s/Bias" % ts);
+#    print "attaching Bias subsystem"
+#    biassub = CCS.attachSubsystem("%s/Bias" % ts);
     print "attaching PD subsystem"
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
@@ -58,8 +58,8 @@ try:
     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
 
-    biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.0002)
+#    biassub.synchCommand(10,"setCurrentRange",0.0002)
+    pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
 # move to TS acquisition state
     print "setting acquisition state"
@@ -131,6 +131,8 @@ try:
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
+            result = arcsub.synchCommand(10,"setHeader","TestType","QE")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(bcount):
                 timestamp = time.time()
                 fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
@@ -152,10 +154,10 @@ try:
             print "setting the monochromator wavelength"
             if (exptime > lo_lim):
                 result = monosub.synchCommand(60,"setWaveAndFilter",wl);
-                rply = result.getresult()
+                rply = result.getResult()
                 time.sleep(4.)
                 result = monosub.synchCommand(30,"getWave");
-                rwl = result.getresult()
+                rwl = result.getResult()
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
 
@@ -166,13 +168,21 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            for i in range(imcount):
-                print "starting acquisition step for lambda = %8.2f" % wl
+            result = arcsub.synchCommand(10,"setHeader","TestType","QE")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","QE")
+
+            print "Throwing away the first image"
+            arcsub.synchCommand(10,"setFitsFilename","");
+            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            reply = result.getResult();
 
 # adjust timeout because we will be waiting for the data to become ready
-                mywait = nplc/60.*nreads*1.10 ;
-                print "Setting timeout to %f s" % mywait
-                pdsub.synchCommand(1000,"setTimeout",mywait);
+            mywait = nplc/60.*nreads*1.10 ;
+            print "Setting timeout to %f s" % mywait
+            pdsub.synchCommand(1000,"setTimeout",mywait);
+
+            for i in range(imcount):
+                print "starting acquisition step for lambda = %8.2f" % wl
 
                 print "call accumBuffer to start PD recording at %f" % time.time()
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
@@ -186,7 +196,6 @@ try:
 
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
- 
 
                 print "Ready to take image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -209,13 +218,13 @@ try:
                 buff = result.getResult()
                 print "Finished getting readings at %f" % time.time()
 
-# reset timeout to something reasonable for a regular command
-                pdsub.synchCommand(1000,"setTimeout",10.);
 
 
                 result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
-
+# ------------------- end of imcount loop --------------------------------
+# reset timeout to something reasonable for a regular command
+            pdsub.synchCommand(1000,"setTimeout",10.);
             seq = seq + 1
 
     fpfiles.close();

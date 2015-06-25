@@ -1,6 +1,6 @@
 ###############################################################################
 # sflat
-# Acquire sflat image pairs
+# Acquire sflat images
 #
 ###############################################################################
 
@@ -50,7 +50,11 @@ try:
     arcsub.synchCommand(10,"setFitsFilename","");
     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
-    
+
+    print "Setting the current ranges on the Bias and PD devices"
+#    biassub.synchCommand(10,"setCurrentRange",0.0002)
+    pdsub.synchCommand(10,"setCurrentRange",0.000002)
+
 # move to TS acquisition state
     print "setting acquisition state"
     result = tssub.synchCommand(10,"setTSTEST");
@@ -88,8 +92,7 @@ try:
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_HILIM', default='120.0'))
-    imcount = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default = "5"))
-    bcount = 1
+    bcount = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default = "5"))
     
 #number of PLCs between readings
     nplc = 1
@@ -123,12 +126,12 @@ try:
             result = monosub.synchCommand(60,"setFilter",1); # open position
             reply = result.getResult();
 
+            result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(bcount):
                 timestamp = time.time()
                 fitsfilename = "%s_sflat_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-                result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
-                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
 
                 print "Ready to take bias image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -143,14 +146,14 @@ try:
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
             print "setting the monochromator wavelength"
-            if (exptime > lo_lim):
-                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
-                rply = result.getresult()
-                time.sleep(4.)
-                result = monosub.synchCommand(30,"getWave");
-                rwl = result.getresult()
-                print "publishing state"
-                result = tssub.synchCommand(60,"publishState");
+#            if (exptime > lo_lim):
+            result = monosub.synchCommand(200,"setWaveAndFilter",wl);
+            rply = result.getResult()
+            time.sleep(4.)
+            result = monosub.synchCommand(200,"getWave");
+            rwl = result.getResult()
+            print "publishing state"
+            result = tssub.synchCommand(60,"publishState");
 
 # prepare to readout diodes
 
@@ -160,13 +163,21 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            for i in range(imcount):
-                print "starting acquisition step for lambda = %8.2f" % wl
+            result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
+
+            print "Throwing away the first image"
+            arcsub.synchCommand(10,"setFitsFilename","");
+            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            reply = result.getResult();
 
 # adjust timeout because we will be waiting for the data to become ready
-                mywait = nplc/60.*nreads*1.10 ;
-                print "Setting timeout to %f s" % mywait
-                pdsub.synchCommand(1000,"setTimeout",mywait);
+            mywait = nplc/60.*nreads*1.10 ;
+            print "Setting timeout to %f s" % mywait
+            pdsub.synchCommand(1000,"setTimeout",mywait);
+
+            for i in range(imcount):
+                print "starting acquisition step for lambda = %8.2f" % wl
 
                 print "call accumBuffer to start PD recording at %f" % time.time()
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
@@ -177,8 +188,6 @@ try:
                 timestamp = time.time()
                 fitsfilename = "%s_sflat_%3.3d_%3.3d_sflat%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-                result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
-                result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
@@ -205,12 +214,11 @@ try:
                 buff = result.getResult()
                 print "Finished getting readings at %f" % time.time()
     
-# reset timeout to something reasonable for a regular command
-                pdsub.synchCommand(1000,"setTimeout",10.);
-
                 result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
-    
+# ---------------- end of loop imcount -------------------------------
+# reset timeout to something reasonable for a regular command
+            pdsub.synchCommand(1000,"setTimeout",10.);
             seq = seq + 1
     
     fpfiles.close();

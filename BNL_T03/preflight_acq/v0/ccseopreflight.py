@@ -54,12 +54,13 @@ try:
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
     arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-    reply = result.getResult();
+    for i in range(3) :
+        result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+        reply = result.getResult();
 
     print "Setting the current ranges on the Bias and PD devices"
-    biassub.synchCommand(10,"setCurrentRange",0.00002)
-    pdsub.synchCommand(10,"setCurrentRange",0.00002)
+    biassub.synchCommand(10,"setCurrentRange",0.0002)
+    pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
 # move to TS acquisition state
     print "setting acquisition state"
@@ -95,7 +96,8 @@ try:
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
     bcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_BCOUNT', default='1'))
-    imcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_IMCOUNT', default='1'))
+#    imcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_IMCOUNT', default='1'))
+    imcount = 2
 
     seq = 0
 
@@ -124,8 +126,8 @@ try:
 
 # take bias images
 
-            arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
-            arcsub.synchCommand(10,"setParameter","Light","0");
+            result = arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
+#            arcsub.synchCommand(10,"setParameter","Light","0");
 
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
@@ -144,8 +146,9 @@ try:
 
 
 # take light exposures
-            arcsub.synchCommand(10,"setParameter","Light","1");
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setParameter","Light","1");
+            result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+            rply = result.getResult()
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
@@ -157,6 +160,11 @@ try:
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             for i in range(imcount):
+                print "Throwing away the first image"
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                reply = result.getResult();
+
                 print "starting acquisition step for lambda = %8.2f" % wl
 
                 print "Setting the monochrmator wavelength and filter"
