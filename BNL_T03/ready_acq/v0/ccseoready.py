@@ -9,6 +9,7 @@ from java.lang import Exception
 import sys
 import time
 import eolib
+import pyfits as pf
 
 CCS.setThrowExceptions(True);
 
@@ -120,7 +121,7 @@ try:
             print "target wl = %f" % target;
 
             exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
-            exptime = 10.
+#            exptime = 10.
 
 # take bias images
 
@@ -146,9 +147,25 @@ try:
 
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
+
+            arcsub.synchCommand(10,"setParameter","ExpTime","2000");
+
+            arcsub.synchCommand(10,"setFitsFilename","");
+            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            rply = result.getResult();
+            arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
+
+            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            flncal = result.getResult();
+            result = arcsub.synchCommand(10,"getFluxStats",flncal);
+            flux = result.getResult();
+
+            exptime = target/flux
+            print "exposure time = %f" % exptime
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
@@ -160,10 +177,10 @@ try:
             result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
             result = arcsub.synchCommand(10,"setHeader","ImageType","PREFLIGHT")
 
-            print "Throwing away the first image"
+            print "throw away first image after all parameters set"
             arcsub.synchCommand(10,"setFitsFilename","");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-            reply = result.getResult();
+            flnthrow = result.getResult();
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;

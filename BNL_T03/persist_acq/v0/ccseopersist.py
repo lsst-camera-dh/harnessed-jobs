@@ -102,10 +102,11 @@ try:
     
     ccd = CCDID
     print "Working on CCD %s" % ccd
-
     seq = 0
-    
-# first start with a 10 min 
+
+    lo_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_LOLIM', default='1.0'))
+    hi_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_HILIM', default='120.0'))
+
 
     print "Scanning config file for persist specifications";
     fp = open(acqcfgfile,"r");
