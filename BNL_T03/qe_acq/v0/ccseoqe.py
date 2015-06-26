@@ -120,7 +120,7 @@ try:
             target = float(tokens[1])
             print "target wl = %f" % target;
 
-            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
+#            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
 
 
 # take bias images
@@ -147,19 +147,36 @@ try:
 
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
             print "setting the monochromator wavelength"
-            if (exptime > lo_lim):
-                result = monosub.synchCommand(60,"setWaveAndFilter",wl);
-                rply = result.getResult()
-                time.sleep(4.)
-                result = monosub.synchCommand(30,"getWave");
-                rwl = result.getResult()
-                print "publishing state"
-                result = tssub.synchCommand(60,"publishState");
+#            if (exptime > lo_lim):
+            result = monosub.synchCommand(60,"setWaveAndFilter",wl);
+            rply = result.getResult()
+            time.sleep(4.)
+            result = monosub.synchCommand(30,"getWave");
+            rwl = result.getResult()
+            print "publishing state"
+            result = tssub.synchCommand(60,"publishState");
+
+# do in-job flux calibration
+            arcsub.synchCommand(10,"setParameter","ExpTime","2000");
+
+            arcsub.synchCommand(10,"setFitsFilename","");
+            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            rply = result.getResult();
+            arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
+
+            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            flncal = result.getResult();
+            result = arcsub.synchCommand(10,"getFluxStats",flncal);
+            flux = float(result.getResult());
+
+            exptime = target/flux
+            print "exposure time = %f" % exptime
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
@@ -175,6 +192,7 @@ try:
             arcsub.synchCommand(10,"setFitsFilename","");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             reply = result.getResult();
+            time.sleep(exptime)
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;

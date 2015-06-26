@@ -119,7 +119,7 @@ try:
             target = float(wl)
             print "target wl = %f" % target;
 
-            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
+#            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
 #            exptime = 10.
 
 # take bias images
@@ -149,7 +149,7 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-
+# do in-job flux cal
             arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
             arcsub.synchCommand(10,"setFitsFilename","");

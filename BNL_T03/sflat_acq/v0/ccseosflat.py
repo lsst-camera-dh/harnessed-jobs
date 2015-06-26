@@ -110,7 +110,7 @@ try:
         if ((len(tokens) > 0) and (tokens[0] == 'sflat')):
             wl = int(tokens[1])
             target = int(tokens[2])
-            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='FLAT', use_nd=False)
+#            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='FLAT', use_nd=False)
     
             imcount = int(tokens[3])
     
@@ -141,7 +141,7 @@ try:
     
 # take light exposures
             result = arcsub.synchCommand(10,"setParameter","Light","1");
-            result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
@@ -155,8 +155,24 @@ try:
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
 
-# prepare to readout diodes
+# do in-job flux calibration
+            arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
+            arcsub.synchCommand(10,"setFitsFilename","");
+            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            rply = result.getResult();
+            arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
+
+            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            flncal = result.getResult();
+            result = arcsub.synchCommand(10,"getFluxStats",flncal);
+            flux = float(result.getResult());
+
+            exptime = target/flux
+            print "exposure time = %f" % exptime
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+
+# prepare to readout diodes
             nreads = exptime*60/nplc + 200
             if (nreads > 3000):
                 nreads = 3000
@@ -170,6 +186,7 @@ try:
             arcsub.synchCommand(10,"setFitsFilename","");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             reply = result.getResult();
+            time.sleep(exptime);
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
