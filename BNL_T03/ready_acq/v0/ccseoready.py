@@ -9,7 +9,6 @@ from java.lang import Exception
 import sys
 import time
 import eolib
-import pyfits as pf
 
 CCS.setThrowExceptions(True);
 
@@ -161,7 +160,7 @@ try:
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             flncal = result.getResult();
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
-            flux = result.getResult();
+            flux = float(result.getResult());
 
             exptime = target/flux
             print "exposure time = %f" % exptime
