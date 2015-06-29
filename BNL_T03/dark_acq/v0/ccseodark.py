@@ -162,9 +162,10 @@ try:
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                 result = arcsub.synchCommand(10,"setHeader","TestType","DARK")
                 result = arcsub.synchCommand(10,"setHeader","ImageType","DARK")
-    
+                result = arcsub.synchCommand(10,"setFetch_timeout",int(int(mywait)*1000))
+
                 print "Ready to take image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(1000,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
     

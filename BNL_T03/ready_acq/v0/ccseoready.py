@@ -115,9 +115,10 @@ try:
 
     print "Scan at a low and a high wavelength to test monochromator and filter wheel"
     for wl in [450.,823.] :
-
-            target = float(wl)
-            print "target wl = %f" % target;
+# use a target signal instead
+            target = 100.
+#            target = float(wl)
+#            print "target wl = %f" % target;
 
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
 #            exptime = 10.
