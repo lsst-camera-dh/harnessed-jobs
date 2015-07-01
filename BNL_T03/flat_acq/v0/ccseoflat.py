@@ -60,6 +60,11 @@ try:
     arcsub.synchCommand(10,"setFitsFilename","");
     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
+
+    print "Setting the current ranges on the Bias and PD devices"
+#    biassub.synchCommand(10,"setCurrentRange",0.0002)
+    pdsub.synchCommand(10,"setCurrentRange",0.000002)
+
     
 # move to TS acquisition state
     print "setting acquisition state"
@@ -210,12 +215,20 @@ try:
                 flncal = result.getResult();
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
                 flux = float(result.getResult());
+# temporary
+                flux = flux * 3.
 
+                print "The flux is determined to be %f" % flux
 
                 owl = wl
 
             exptime = target/flux
-            print "exposure time = %f" % exptime
+            print "needed exposure time = %f" % exptime
+            if (exptime > hi_lim) :
+                exptime = hi_lim
+            if (exptime < lo_lim) :
+                exptime = lo_lim
+            print "adjusted exposure time = %f" % exptime
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
