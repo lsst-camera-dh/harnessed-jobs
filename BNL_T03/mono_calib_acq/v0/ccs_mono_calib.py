@@ -5,6 +5,7 @@
 ###############################################################################
 
 from org.lsst.ccs.scripting import *
+from org.lsst.ccs.bus import CommandRejectedException
 from java.lang import Exception
 import sys
 import time
@@ -55,6 +56,8 @@ try:
 #    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
+#    biassub.synchCommand(10,"setCurrentRange",0.000000002)
+#    pdsub.synchCommand(10,"setCurrentRange",0.000002)
     biassub.synchCommand(10,"setCurrentRange",0.000000002)
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
@@ -81,8 +84,11 @@ try:
     ccd = CCDID
     print "Working on CCD %s" % ccd
 
+    monosub.synchCommand(60,"setTimeout",300.);
+
     print "set filter position"
-    monosub.synchCommand(60,"setFilter",2);
+    result = monosub.synchCommand(60,"setFilter",3);
+    rply = result.getResult()
 
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
@@ -94,9 +100,9 @@ try:
     print "setting location of fits exposure directory"
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-    wlstep = 0.5
-    wl=400. - wlstep
-    for idx in range(100):
+    wlstep = 0.3
+    wl=611.6 - wlstep
+    for idx in range(300):
         wl = wl + wlstep
 #    for wl in range(455,500,1):
 
@@ -108,12 +114,33 @@ try:
         mywait = nplc/60.*nreads*1.10 ;
         print "Setting timeout to %f s" % mywait
 
+        try:
 #        monosub.synchCommand(30,"setWaveAndFilter",wl);
-        result = monosub.synchCommand(60,"setWave",wl);
-        rply = result.getResult()
-        time.sleep(4.0)
-        result = monosub.synchCommand(200,"getWave");
-        rwl = result.getResult()
+            print "Setting monochromator lambda = %8.2f" % wl
+            try:
+                result = monosub.synchCommand(200,"setWave",wl);
+                rply = result.getResult()
+                time.sleep(4.0)
+            except CommandRejectedException, er:
+                print "set wave attempt rejected, try again ..."
+                time.sleep(10.0)
+                try:
+                    result = monosub.synchCommand(300,"setWave",wl);
+                    rply = result.getResult()
+                    time.sleep(4.0)
+                except CommandRejectedException, er:
+                    print "set wave attempt rejected again, one last try after a long wait again ..."
+                    time.sleep(60.0)
+                    print "here we go ... its gotta work this time .... right?"
+                    result = monosub.synchCommand(300,"setWave",wl);
+                    rply = result.getResult()
+                    print "we survived a near crash"
+                    time.sleep(4.0)
+            result = monosub.synchCommand(300,"getWave");
+            rwl = result.getResult()
+        except ScriptingTimeoutException, ex:
+            print "Failed to get monochromator to respond. Skipping to the next wavelength step."
+            continue
 
         print "the wavelength read back is %f for seq %d" % (rwl,seq)
         print "publishing state"
