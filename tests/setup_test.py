@@ -7,11 +7,12 @@ try:
     os.environ['HARNESSEDJOBSDIR']
     try:
         schema_path = os.environ['LCATR_SCHEMA_PATH']
-        if schema_path.find('%s/schemas'%os.environ['HARNESSEDJOBSDIR']) == -1:
+        expected_path = os.path.join(os.environ['HARNESSEDJOBSDIR'], 'schemas')
+        if expected_path not in schema_path.split(os.path.pathsep):
             raise ValueError('Incorrect LCATR_SCHEMA_PATH: ' + schema_path)
     except KeyError:
         print 'Environment variable LCATR_SCHEMA_PATH not found.'
-        print 'Please set or ensure your lcatr.cfg file has the following entry:'
+        print 'Please set this env var or ensure your lcatr.cfg file has the following entry:'
         print 'schema_path = %s/schemas\n' % os.environ['HARNESSEDJOBSDIR']
     #
     # Check for expected modules.
