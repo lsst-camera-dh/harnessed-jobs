@@ -60,11 +60,6 @@ try:
     arcsub.synchCommand(10,"setFitsFilename","");
     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
-
-    print "Setting the current ranges on the Bias and PD devices"
-#    biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.000002)
-
     
 # move to TS acquisition state
     print "setting acquisition state"
@@ -164,47 +159,25 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
+            print "setting the monochromator wavelength"
 #            if (exptime > lo_lim):
-            if (wl!=owl) :
-                try:
-                    print "Setting monochromator lambda = %8.2f" % wl
-                    try:
-                        result = monosub.synchCommand(30,"setWaveAndFilter",wl);
-# result = monosub.synchCommand(200,"setWave",wl);
-                        rply = result.getResult()
-                        time.sleep(4.0)
-                    except CommandRejectedException, er:
-                        print "set wave attempt rejected, try again ..."
-                        time.sleep(10.0)
-                        try:
-                            result = monosub.synchCommand(300,"setWave",wl);
-                            rply = result.getResult()
-                            time.sleep(4.0)
-                        except CommandRejectedException, er:
-                            print "set wave attempt rejected again, one last try after a long wait again ..."
-                            time.sleep(60.0)
-                            print "here we go ... its gotta work this time .... right?"
-                            result = monosub.synchCommand(300,"setWave",wl);
-                            rply = result.getResult()
-                            print "we survived a near crash"
-                            time.sleep(4.0)
-                    result = monosub.synchCommand(300,"getWave");
-                    rwl = result.getResult()
-                except ScriptingTimeoutException, ex:
-                    print "Failed to get monochromator to respond. Try one more time"
-                    try:
-                        time.sleep(30.)
-                        result = monosub.synchCommand(300,"getWave");
-                        rwl = result.getResult()
-                    except ScriptingTimeoutException, ex:
-                        print "Failed to get monochromator to respond. Skipping to the next step."
-                        continue
 
+            if (wl!=owl) :
+                result = monosub.synchCommand(200,"setWaveAndFilter",wl);
+                rply = result.getResult()
+                time.sleep(4.)
+                result = monosub.synchCommand(200,"getWave");
+                rwl = result.getResult()
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
 
 # do in-job flux calibration
-                arcsub.synchCommand(10,"setParameter","ExpTime","2000");
+                exp1 = 1.0
+                exp2 = 2.0
+
+# use two exposures of different exposure times to determine flux
+# first
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exp1*1000)));
 
                 arcsub.synchCommand(10,"setFitsFilename","");
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -214,21 +187,26 @@ try:
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 flncal = result.getResult();
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
-                flux = float(result.getResult());
-# temporary
-                flux = flux * 3.
+                fl1 = float(result.getResult());
+# second
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exp2*1000)));
 
-                print "The flux is determined to be %f" % flux
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                rply = result.getResult();
+                arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
 
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                flncal = result.getResult();
+                result = arcsub.synchCommand(10,"getFluxStats",flncal);
+                fl2 = float(result.getResult());
+
+                flux = ((fl2*exp2)-(fl1*exp1))/(exp2-exp1)
+                print "fluxcalc: exp1 = %f, fl1 = %f, exp2 = %f, fl2 = %f  ==> flux = %f" % (float(exp1),float(fl1),float(exp2),float(fl2),float(flux))
                 owl = wl
 
             exptime = target/flux
-            print "needed exposure time = %f" % exptime
-            if (exptime > hi_lim) :
-                exptime = hi_lim
-            if (exptime < lo_lim) :
-                exptime = lo_lim
-            print "adjusted exposure time = %f" % exptime
+            print "for target signal %f, the exposure time = %f" % (target,exptime)
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
@@ -243,7 +221,7 @@ try:
 
             print "Throwing away the first image"
             arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             reply = result.getResult();
             time.sleep(exptime)
 
@@ -269,7 +247,7 @@ try:
                 result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
                 print "Ready to take image. time = %f" % time.time()
-                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
 
