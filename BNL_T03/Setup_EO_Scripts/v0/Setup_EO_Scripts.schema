@@ -1,0 +1,7 @@
+# -*- python -*-
+{
+    'schema_name' : 'Setup_EO_Scripts',
+    'schema_version' : 0,
+    'stat' : int,
+}
+
