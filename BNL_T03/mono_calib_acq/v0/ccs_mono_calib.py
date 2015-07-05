@@ -87,7 +87,7 @@ try:
     monosub.synchCommand(60,"setTimeout",300.);
 
     print "set filter position"
-    result = monosub.synchCommand(60,"setFilter",3);
+    result = monosub.synchCommand(60,"setFilter",2);
     rply = result.getResult()
 
 # go through config file looking for 'qe' instructions
@@ -101,8 +101,8 @@ try:
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
     wlstep = 0.3
-    wl=611.6 - wlstep
-    for idx in range(300):
+    wl=500. - wlstep
+    for idx in range(200):
         wl = wl + wlstep
 #    for wl in range(455,500,1):
 
@@ -131,11 +131,16 @@ try:
                 except CommandRejectedException, er:
                     print "set wave attempt rejected again, one last try after a long wait again ..."
                     time.sleep(60.0)
-                    print "here we go ... its gotta work this time .... right?"
-                    result = monosub.synchCommand(300,"setWave",wl);
-                    rply = result.getResult()
-                    print "we survived a near crash"
-                    time.sleep(4.0)
+                    try:
+                        print "here we go ... its gotta work this time .... right?"
+                        result = monosub.synchCommand(300,"setWave",wl);
+                        rply = result.getResult()
+                        print "we survived a near crash"
+                        time.sleep(4.0)
+                    except CommandRejectedException, et:
+                        print "crash burn and live another step"
+                        time.sleep(30.0)
+                        continue
             result = monosub.synchCommand(300,"getWave");
             rwl = result.getResult()
         except ScriptingTimeoutException, ex:
@@ -144,9 +149,9 @@ try:
 
         print "the wavelength read back is %f for seq %d" % (rwl,seq)
         print "publishing state"
-        result = tssub.synchCommand(60,"getstate");
+        result = tssub.synchCommand(120,"getstate");
         stt = result.getResult()
-        result = tssub.synchCommand(60,"setstate",stt);
+        result = tssub.synchCommand(120,"setstate",stt);
 
         for i in range(1):
             print "starting acquisition step for lambda = %8.2f" % wl

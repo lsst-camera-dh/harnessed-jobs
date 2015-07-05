@@ -93,6 +93,10 @@ try:
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
     
+# extend the Fe55 arm
+    print "extend the Fe55 arm"
+    xedsub.synchCommand(30,"extendFe55");
+    
     seq = 0
 
 #number of PLCs between readings
@@ -164,8 +168,8 @@ try:
                 print "Setting timeout to %f s" % mywait
                 pdsub.synchCommand(1000,"setTimeout",mywait);
 
-#                pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
-                pdresult =  pdsub.synchCommand(10,"accumBuffer",int(nreads),float(nplc),False);
+                pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
+#                pdresult =  pdsub.synchCommand(10,"accumBuffer",int(nreads),float(nplc),False);
                 print "recording should now be in progress and the time is %f" % time.time()
 # start acquisition
 
@@ -182,23 +186,16 @@ try:
     
                 print "Ready to take image. time = %f" % time.time()
 
-# extend the Fe55 arm
-                print "extend the Fe55 arm"
-                xedsub.synchCommand(30,"extendFe55");
-    
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
 
-# retract the Fe55 arm
-                xedsub.synchCommand(30,"retractFe55");
-    
                 print "done with exposure # %d" % i
                 print "getting photodiode readings at time = %f" % time.time();
     
                 pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (timestamp,seq,i+1)
                 print "starting the wait for an accumBuffer done status message at %f" % time.time()
-#                tottime = pdresult.get();
+                tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
                 time.sleep(5.)
@@ -225,6 +222,9 @@ try:
     fp.write(`istate`+"\n");
     fp.close();
     
+# retract the Fe55 arm
+    xedsub.synchCommand(30,"retractFe55");
+    
 # move TS to idle state
     tssub.synchCommand(60,"setTSReady");
 
@@ -232,8 +232,14 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
 
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
 except Exception, ex:                                                     
 
+# retract the Fe55 arm
+    xedsub.synchCommand(30,"retractFe55");
+    
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "FE55: END"
