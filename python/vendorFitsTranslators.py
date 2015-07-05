@@ -70,7 +70,7 @@ class ItlFitsTranslator(VendorFitsTranslator):
 
 class e2vFitsTranslator(VendorFitsTranslator):
     """
-    FITS Translator for e2v data based on their TRR package.
+    FITS Translator for e2v data based on their delta TRR package.
     """
     def __init__(self, lsst_num, rootdir, outputBaseDir='.'):
         super(e2vFitsTranslator, self).__init__(lsst_num, rootdir,
