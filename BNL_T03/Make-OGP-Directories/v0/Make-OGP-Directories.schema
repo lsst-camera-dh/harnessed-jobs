@@ -1,7 +1,6 @@
 # -*- python -*-
 {
-    'schema_name' : 'TS3_flat',
+    'schema_name' : 'Make-OGP-Directories',
     'schema_version' : 0,
     'stat' : int,
 }
-

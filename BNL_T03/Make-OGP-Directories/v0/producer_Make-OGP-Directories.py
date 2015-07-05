@@ -14,6 +14,8 @@ ccddir = "%s/%s" % (topcddir,time.strftime("%Y%m%d-%H:%M:%S"))
 print "Creating dated directory for the CCD at %s" % ccddir
 os.mkdir(ccddir)
 print "Please setup the OGP MeasureMind application to store results in %s" % cddir
+# leave a link to the location where the files should go
+os.system("ln -s %s dlink" % ccddir);
 
 top = Tkinter.Tk()
 M = Tkinter.Button(top, text ="Please setup the OGP MeasureMind application to store results in %s" % cddir", bg = "green")
