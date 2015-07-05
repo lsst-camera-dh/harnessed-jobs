@@ -1,4 +1,4 @@
 #%Module1.0 #-*-tcl-*-#
 source "$::env(LCATR_MODULES)/lcatr.tcl"
-lcatr_package producer_Setup_EO_Scripts.py validator_.py
-Setup_EO_Scripts
+lcatr_package producer_Setup_EO_Scripts.py validator_Setup_EO_Scripts.py
+
