@@ -57,6 +57,9 @@ try:
     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
     reply = result.getResult();
 
+    print "Images will now automatically display in the DS9 window"
+    arcsub.synchCommand(10,"setSendImagesToDS9",true);
+
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
@@ -65,6 +68,17 @@ try:
     print "setting acquisition state"
     result = tssub.synchCommand(60,"setTSTEST");
     rply = result.getResult();
+
+apptxt = "Click on this button to proceed with the cooling."
+print apptxt
+top = Tkinter.Tk()
+def startcool(apptxt):
+    top.stop()
+A = Tkinter.Button(top, text = apptxt, command = lambda : startcool(apptxt), bg = diodecol)
+A.pack()
+top.title('Ready for cooling?')
+top.mainloop()
+
 
 #check state of ts devices
     print "wait for ts state to become ready";
@@ -75,8 +89,8 @@ try:
         result = tssub.synchCommand(10,"isTestStandReady");
         tsstate = result.getResult();
 # the following line is just for test situations so that there would be no waiting
-        tsstate=1;
-        if ((time.time()-starttim)>240):
+#        tsstate=1;
+        if ((time.time()-starttim)>4000):
             print "Something is wrong ... we will never make it to a runnable state"
             exit
         if tsstate!=0 :

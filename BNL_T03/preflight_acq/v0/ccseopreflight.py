@@ -51,43 +51,10 @@ try:
 #    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
-# the first image is usually bad so throw it away
-    print "Throwing away the first image"
-    arcsub.synchCommand(10,"setFitsFilename","");
-    for i in range(3) :
-        result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-        reply = result.getResult();
-
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
-# move to TS acquisition state
-    print "setting acquisition state"
-    result = tssub.synchCommand(60,"setTSTEST");
-    rply = result.getResult();
-
-#check state of ts devices
-    print "wait for ts state to become ready";
-    tsstate = 0
-    starttim = time.time()
-    while True:
-        print "checking for test stand to be ready for acq";
-        result = tssub.synchCommand(10,"isTestStandReady");
-        tsstate = result.getResult();
-# the following line is just for test situations so that there would be no waiting
-        tsstate=1;
-        if ((time.time()-starttim)>240):
-            print "Something is wrong ... we will never make it to a runnable state"
-            exit
-        if tsstate!=0 :
-            break
-        time.sleep(5.)
-
-#put in acquisition state
-    print "Since this is just a readiness check, we will NOT ramp the bias "
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
 
 # get the glowing vacuum gauge off
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
@@ -127,26 +94,14 @@ try:
 # take bias images
 
             result = arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
-#            arcsub.synchCommand(10,"setParameter","Light","0");
+            arcsub.synchCommand(10,"setParameter","Light","0");
 
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-            for i in range(bcount):
-                timestamp = time.time()
-                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
-                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-                result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
-
-                print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                print "after click click at %f" % time.time()
-                time.sleep(0.2)
-
 
 # take light exposures
-#            arcsub.synchCommand(10,"setParameter","Light","1");
+            arcsub.synchCommand(10,"setParameter","Light","1");
             result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             rply = result.getResult()
             print "setting location of fits exposure directory"
@@ -160,15 +115,10 @@ try:
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             for i in range(imcount):
-                print "Throwing away the first image"
-                arcsub.synchCommand(10,"setFitsFilename","");
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                reply = result.getResult();
-
                 print "starting acquisition step for lambda = %8.2f" % wl
 
                 print "Setting the monochrmator wavelength and filter"
-                print "You should HEAR some movement"
+#                print "You should HEAR some movement"
                 result = monosub.synchCommand(30,"setWaveAndFilter",wl);
                 rply = result.getResult()
                 time.sleep(4.)
@@ -198,7 +148,7 @@ try:
 
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_lambda_%3.3d_%3.3d_lambda_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
+                fitsfilename = "%s_preflight_%3.3d_%3.3d_preflight_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                 result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
 
