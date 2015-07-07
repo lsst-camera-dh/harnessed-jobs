@@ -69,6 +69,17 @@ try:
     result = tssub.synchCommand(60,"setTSTEST");
     rply = result.getResult();
 
+apptxt = "Click on this button to proceed with the cooling."
+print apptxt
+top = Tkinter.Tk()
+def startcool(apptxt):
+    top.stop()
+A = Tkinter.Button(top, text = apptxt, command = lambda : startcool(apptxt), bg = diodecol)
+A.pack()
+top.title('Ready for cooling?')
+top.mainloop()
+
+
 #check state of ts devices
     print "wait for ts state to become ready";
     tsstate = 0
