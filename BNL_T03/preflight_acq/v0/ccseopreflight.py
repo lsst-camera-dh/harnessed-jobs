@@ -64,7 +64,7 @@ try:
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
     bcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_BCOUNT', default='1'))
 #    imcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_IMCOUNT', default='1'))
-    imcount = 2
+    imcount = 1
 
     seq = 0
 
@@ -83,7 +83,7 @@ try:
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
     print "Scan at a low and a high wavelength to test monochromator and filter wheel"
-    for wl in [446.,823.] :
+    for wl in [450.,823.] :
 
             target = float(wl)
             print "target wl = %f" % target;
@@ -114,16 +114,18 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
+            monosub.synchCommand(60,"setTimeout",300.);
+
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
 
                 print "Setting the monochrmator wavelength and filter"
 #                print "You should HEAR some movement"
-                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                result = monosub.synchCommand(120,"setWaveAndFilter",wl);
                 rply = result.getResult()
                 time.sleep(4.)
                 print "Verifying wavelength setting of the monochromator"
-                result = monosub.synchCommand(30,"getWave");
+                result = monosub.synchCommand(230,"getWave");
                 rwl = result.getResult()
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
@@ -204,12 +206,18 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
 
-    print "            TEST STAND APPEARS TO BE READY"
-    print "          PLEASE PROCEED WITH THE EO TESTING"
+    print " ====================================================="
+    print "            PREFLIGHT DATA ACQUISITION DONE"
+    print "          CHECK FOR A WIDGET APPEARING THAT WILL"
+    print "           INDICATE WHETHER THE DATA LOOKS OK"
+    print " ====================================================="
 
 except Exception, ex:
 
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
+    result = pdsub.synchCommand(10,"softReset");
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
-
 
 print "preflight_acq: COMPLETED"

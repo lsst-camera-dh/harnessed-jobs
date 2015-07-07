@@ -2,17 +2,19 @@
 from ccsTools import ccsProducer
 import time
 import subprocess
+import commands
 import Tkinter
 import tkMessageBox
 import pyfits
+import glob
 
 print "starting widget for checking and starting the CCS apps"
-subprocess.Popen(["gnome-terminal","--command=./settitle /home/ts3prod/bin/checktsappswidget"]);
+subprocess.Popen(["gnome-terminal","--geometry=1x1","--working-directory=/home/ts3prod/prod/bin/","--command=/home/ts3prod/prod/bin/settitle /home/ts3prod/prod/bin/checktsappswidget"]);
 
 
-foundjython = false
-foundts     = false
-foundarchon = false
+foundjython = False
+foundts     = False
+foundarchon = False
     
 pstr = commands.getstatusoutput('ps -fe')
     
@@ -20,21 +22,22 @@ for s in pstr :
     if type(s) is str :
         app = "JythonConsole"
         if app in s :
-            foundjython = true
+            foundjython = True
         app = "-app ts"
         if app in s :
-            foundts = true
+            foundts = True
         app = "-app archon"
         if app in s :
-            foundarchon = true
+            foundarchon = True
 
-if (!(foundjython and foundts and foundarchon)) :
-    apptxt = "There are apps missing, please click OK when you have finished starting them using the widget"
+if (not (foundjython and foundts and foundarchon)) :
+    apptxt = "There are apps missing, please click on this button when\nyou have finished starting them using the widget"
     print apptxt
     top = Tkinter.Tk()
-    def startappsmsg(apptxt):
-        top.stop()
-    A = Tkinter.Button(top, text = apptxt, command = lambda : startappsmsg(apptxt), bg = "red")
+#    def startappsmsg(apptxt):
+#        top.stop()
+#    A = Tkinter.Button(top, text = apptxt, command = lambda : startappsmsg(apptxt), bg = "red")
+    A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = "red")
     A.pack()
     top.title('Please start missing CCS apps')
     top.mainloop()
@@ -55,23 +58,24 @@ mondiode1 = hdr1['MONDIODE']
 filter1 = hdr1['FILTER']
 
 hdu2 = pyfits.open(files[1])
-hdr2 = hdu1[0].header
+hdr2 = hdu2[0].header
 exptime2 = hdr2['EXPTIME']
 mondiode2 = hdr2['MONDIODE']
 filter2 = hdr2['FILTER']
 
 apptxt = "not OK"
 diodecol = "red"
-if (mondiode1 < 1.e-10 && mondiode2/mondiode1 > 2.0) :
+if (mondiode1 < 1.e-10 and mondiode2/mondiode1 > 2.0) :
     apptxt = "OK"
     diodecol = "green"
 
-apptxt = "The diode responses look -- %s -- . Their values are %f for exposure 1 and %f for exposure2."
+apptxt = "The diode responses look -- %s -- . Their values are %f for exposure 1 and %f for exposure2." % (apptxt,mondiode1,mondiode2)
 print apptxt
 top = Tkinter.Tk()
-def startappsmsg(apptxt):
-    top.stop()
-A = Tkinter.Button(top, text = apptxt, command = lambda : startappsmsg(apptxt), bg = diodecol)
+#def startappsmsg(apptxt):
+#    top.stop()
+#A = Tkinter.Button(top, text = apptxt, command = lambda : startappsmsg(apptxt), bg = diodecol)
+A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = diodecol)
 A.pack()
 top.title('Checking response of PDs')
 top.mainloop()
