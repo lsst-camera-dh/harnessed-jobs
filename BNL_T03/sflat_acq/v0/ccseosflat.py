@@ -260,6 +260,13 @@ try:
 #except CcsException as ex:                                                     
 except Exception, ex:
 
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
+
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "SFLAT: END"

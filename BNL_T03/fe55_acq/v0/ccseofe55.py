@@ -93,10 +93,6 @@ try:
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
     
-# extend the Fe55 arm
-    print "extend the Fe55 arm"
-    xedsub.synchCommand(30,"extendFe55");
-    
     seq = 0
 
 #number of PLCs between readings
@@ -186,8 +182,16 @@ try:
     
                 print "Ready to take image. time = %f" % time.time()
 
+# extend the Fe55 arm
+                print "extend the Fe55 arm"
+                xedsub.synchCommand(30,"extendFe55");
+    
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
+
+# retract the Fe55 arm - get the arm out of the way so that it won't affect the readout
+                xedsub.synchCommand(30,"retractFe55");
+    
                 print "after click click at %f" % time.time()
 
                 print "done with exposure # %d" % i
@@ -222,9 +226,6 @@ try:
     fp.write(`istate`+"\n");
     fp.close();
     
-# retract the Fe55 arm
-    xedsub.synchCommand(30,"retractFe55");
-    
 # move TS to idle state
     tssub.synchCommand(60,"setTSReady");
 
@@ -240,6 +241,13 @@ except Exception, ex:
 # retract the Fe55 arm
     xedsub.synchCommand(30,"retractFe55");
     
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
+
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "FE55: END"
