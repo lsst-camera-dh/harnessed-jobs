@@ -57,7 +57,7 @@ try:
     reply = result.getResult();
 
 # retract the Fe55 arm
-    xedsub.synchCommand(30,"retractFe55");
+    xedsub.synchCommand(30,"extendFe55");
 
 #    monosub.synchCommand(10,"closeShutter");
     print "set filter wheel to position 1"
@@ -187,13 +187,13 @@ try:
 
 # extend the Fe55 arm
                 print "extend the Fe55 arm"
-                xedsub.synchCommand(30,"extendFe55");
+                xedsub.synchCommand(30,"retractFe55");
     
 
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
 # retract the Fe55 arm
-                xedsub.synchCommand(30,"retractFe55");
+                xedsub.synchCommand(30,"extendFe55");
     
                 print "after click click at %f" % time.time()
 
