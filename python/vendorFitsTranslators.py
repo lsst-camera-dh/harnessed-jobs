@@ -1,6 +1,7 @@
 import os
 import glob
 import subprocess
+from collections import OrderedDict
 import datetime
 import pyfits
 import lsst.eotest.sensor as sensorTest
@@ -48,25 +49,122 @@ class VendorFitsTranslator(object):
             hdulist[hdu].header['DATASEC'] = ampGeom[amp]['DATASEC']
             hdulist[hdu].header['DETSEC'] = ampGeom[amp]['DETSEC']
     def _processFiles(self, test_type, image_type, pattern, 
-                      time_stamp=None, verbose=True):
+                      time_stamp=None, verbose=True, skip_zero_exptime=False):
         infiles = self._infiles(pattern)
         if time_stamp is None:
             time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         for iframe, infile in enumerate(infiles):
             if verbose:
                 print "processing", os.path.basename(infile)
+            if (skip_zero_exptime and 
+                pyfits.open(infile)[0].header['EXPTIME'] == 0):
+                if verbose:
+                    print "skipping zero exposure frame."
+                continue
             seqno = '%03i' % iframe
             self.translate(infile, test_type, image_type, seqno,
                            time_stamp=time_stamp, verbose=verbose)
         return time_stamp
-
+    def lambda_scan(self, pattern, time_stamp=None, verbose=True,
+                    monowl_keyword='MONOWL'):
+        if time_stamp is None:
+            time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        wl = lambda x : pyfits.open(x)[0].header[monowl_keyword]
+        infiles = self._infiles(pattern)
+        for infile in infiles:
+            if verbose:
+                print "processing", os.path.basename(infile)
+            seqno = "%04i" % int(wl(infile))
+            self.translate(infile, 'lambda', 'flat', seqno,
+                           time_stamp=time_stamp, verbose=verbose)
+        return time_stamp
         
 class ItlFitsTranslator(VendorFitsTranslator):
     """
     FITS Translator for ITL data.
     """
     def __init__(self, lsst_num, rootdir, outputBaseDir='.'):
-        raise NotImplementedError("ITL translator not implemented yet")
+        super(ItlFitsTranslator, self).__init__(lsst_num, rootdir,
+                                                outputBaseDir)
+    def translate(self, infile, test_type, image_type, seqno, time_stamp=None,
+                  verbose=True):
+        try:
+            hdulist = pyfits.open(infile)
+        except IOError, eobj:
+            print eobj
+            print "skipping"
+            return
+        lsst_num = self.lsst_num
+        hdulist[0].header['LSST_NUM'] = lsst_num
+        hdulist[0].header['CCD_MANU'] = 'ITL'
+        #hdulist[0].header['CCD_SERN'] = 
+        hdulist[0].header['MONOWL'] = float(hdulist[0].header['MONOWL'])
+        hdulist[0].header['TESTTYPE'] = test_type.upper()
+        hdulist[0].header['IMGTYPE'] = image_type.upper()
+        self._writeFile(hdulist, locals(), verbose=verbose)
+    def fe55(self, pattern='fe55/*_fe55.*.fits', time_stamp=None,
+             verbose=True):
+        return self._processFiles('fe55', 'fe55', pattern,
+                                  time_stamp=time_stamp, verbose=verbose,
+                                  skip_zero_exptime=True)
+    def bias(self, pattern='bias/*_bias.*.fits', time_stamp=None,
+             verbose=True):
+        return self._processFiles('fe55', 'bias', pattern,
+                                  time_stamp=time_stamp, verbose=verbose)
+    def dark(self, pattern='dark/*_dark.*.fits', time_stamp=None,
+             verbose=True):
+        return self._processFiles('dark', 'dark', pattern,
+                                  time_stamp=time_stamp, verbose=verbose,
+                                  skip_zero_exptime=True)
+    def trap(self, pattern='', time_stamp=None,
+             verbose=True):
+        raise NotImplemented("ITL trap dataset translation not implemented.")
+    def sflat_500(self, pattern='superflat1/*_superflat.*.fits', 
+                  time_stamp=None, verbose=True):
+        return self._processFiles('sflat_500', 'flat', pattern,
+                                  time_stamp=time_stamp, verbose=verbose)
+    def spot(self, pattern='', time_stamp=None,
+             verbose=True):
+        raise NotImplemented("ITL spot dataset translation not implemented.")
+    def flat(self, pattern='ptc/*_ptc.*.fits', time_stamp=None,
+             verbose=True):
+        if time_stamp is None:
+            time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        exptime = lambda x : pyfits.open(x)[0].header['EXPTIME']
+        infiles = self._infiles(pattern)
+        # Group files by exposure time and therefore into pairs, presumably.
+        groups = OrderedDict()
+        for infile in infiles:
+            my_exptime = exptime(infile)
+            if not groups.has_key(my_exptime):
+                groups[my_exptime] = []
+            groups[my_exptime].append(infile)
+        # Translate first two files in each exptime group as flat1 and flat2.
+        for key, infiles in groups.items():
+            if key == 0 or len(infiles) < 2:
+                # Skip zero exposure frames and groups with only one frame.
+                continue
+            seqno = '%06.1f_flat1' % key
+            self.translate(infiles[0], 'flat', 'flat', seqno,
+                           time_stamp=time_stamp, verbose=verbose)
+            seqno = '%06.1f_flat2' % key
+            self.translate(infiles[1], 'flat', 'flat', seqno,
+                           time_stamp=time_stamp, verbose=verbose)
+        return time_stamp
+    def lambda_scan(self, pattern='qe/*_qe.*.fits', time_stamp=None,
+                    verbose=True):
+        return super(ItlFitsTranslator, self).lambda_scan(pattern,
+                                                          time_stamp=time_stamp,
+                                                          verbose=verbose)
+    def run_all(self):
+        time_stamp = self.fe55()
+        self.bias(time_stamp=time_stamp)
+        self.dark()
+        #self.trap()
+        self.sflat_500()
+        #self.spot()
+        self.flat()
+        self.lambda_scan()
 
 class e2vFitsTranslator(VendorFitsTranslator):
     """
@@ -139,19 +237,12 @@ class e2vFitsTranslator(VendorFitsTranslator):
             self.translate(infile, 'flat', 'flat', seqno, time_stamp=time_stamp,
                            verbose=verbose)
         return time_stamp
-    def lambda_scan(self, pattern='Images/*_flat_*_illu_*.fits', time_stamp=None,
-               verbose=True):
-        if time_stamp is None:
-            time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-        wl = lambda x : pyfits.open(x)[0].header['WAVELEN']
-        infiles = self._infiles(pattern)
-        for infile in infiles:
-            if verbose:
-                print "processing", os.path.basename(infile)
-            seqno = "%04i" % wl(infile)
-            self.translate(infile, 'lambda', 'flat', seqno,
-                           time_stamp=time_stamp, verbose=verbose)
-        return time_stamp
+    def lambda_scan(self, pattern='Images/*_flat_*_illu_*.fits',
+                    time_stamp=None, verbose=True):
+        return super(e2vFitsTranslator, self).lambda_scan(pattern,
+                                                          time_stamp=time_stamp,
+                                                          verbose=verbose,
+                                                          monowl_keyword='WAVELEN')
 #    def dark_defects_data(self, pattern='superflat high/PRDefs/*.fits',
 #                          time_stamp=None, verbose=True):
 #        return self._processFiles('sflat_500', 'dark_flat', pattern,
