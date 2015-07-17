@@ -1,6 +1,7 @@
 import os
 import sys
 import fnmatch
+import ConfigParser
 import lcatr.schema
 import lcatr.harness.helpers
 import harnessedJobs as hj
@@ -121,9 +122,34 @@ def packageVersions():
     except ImportError:
         LSST_stack_version = 'none'
 
+    try:
+        hostname = os.environ['HOST']
+    except KeyError:
+        hostname = 'Unknown'
+        
     result = lcatr.schema.valid(lcatr.schema.get('package_versions'),
                                 eotest_version=eotest_version,
                                 LSST_stack_version=LSST_stack_version,
-                                harnessedJobs_version=hj.getVersion())
+                                harnessedJobs_version=hj.getVersion(),
+                                hostname=hostname)
     return result
 
+class Parfile(dict):
+    def __init__(self, infile, section):
+        super(Parfile, self).__init__()
+        parser = ConfigParser.ConfigParser()
+        parser.read(infile)
+        for key, value in parser.items(section):
+            self[key] = self._cast(value)
+    def _cast(self, value):
+        if value == 'None':
+            return None
+        try:
+            if value.find('.') == -1 and value.find('e') == -1:
+                return int(value)
+            else:
+                return float(value)
+        except ValueError:
+            # Cannot cast as either int or float so just return the
+            # value as-is (presumably a string).
+            return value

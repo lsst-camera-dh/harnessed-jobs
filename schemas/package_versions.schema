@@ -4,5 +4,6 @@
     'schema_version' : 0,
     'LSST_stack_version' : str,
     'eotest_version' : str,
-    'harnessedJobs_version': str
+    'harnessedJobs_version': str,
+    'hostname' : str
 }
