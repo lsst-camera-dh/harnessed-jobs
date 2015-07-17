@@ -52,6 +52,8 @@ def getSystemNoise():
     calibrations file.
     """
     pars = getEotestCalibs()
+    if pars['system_noise_file'] is None:
+        return None
     data = np.recfromtxt(pars['system_noise_file'], names=('amp', 'noise'))
     return dict([x for x in zip(data['amp'], data['noise'])])
 
