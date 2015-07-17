@@ -1,5 +1,6 @@
 import os
 import sys
+import socket
 import fnmatch
 import ConfigParser
 import lcatr.schema
@@ -121,17 +122,12 @@ def packageVersions():
         LSST_stack_version = lsst.afw.__version__
     except ImportError:
         LSST_stack_version = 'none'
-
-    try:
-        hostname = os.environ['HOST']
-    except KeyError:
-        hostname = 'Unknown'
         
     result = lcatr.schema.valid(lcatr.schema.get('package_versions'),
                                 eotest_version=eotest_version,
                                 LSST_stack_version=LSST_stack_version,
                                 harnessedJobs_version=hj.getVersion(),
-                                hostname=hostname)
+                                hostname=socket.getfqdn())
     return result
 
 class Parfile(dict):

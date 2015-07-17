@@ -1,6 +1,8 @@
 import os
+import socket
 import numpy as np
 import lsst.eotest.sensor as sensorTest
+import lcatr.schema
 from lcatr.harness.helpers import dependency_glob
 import siteUtils
 
@@ -30,7 +32,7 @@ def getTestStandHostName():
     if os.environ.has_key('EOTEST_HOST_DEV'):
         # For running  in development mode without a real test stand.
         return os.environ['EOTEST_HOST_DEV']
-    return os.environ['HOST']
+    return socket.gethostname()
 
 def getEotestCalibsFile():
     """
@@ -40,7 +42,7 @@ def getEotestCalibsFile():
 
 def getEotestCalibs():
     """
-    Return calibration files for the current test stand.  
+    Return calibration file names for the current test stand.  
     """
     pars = siteUtils.Parfile(getEotestCalibsFile(), getTestStandHostName())
     return pars
@@ -63,7 +65,7 @@ def getSystemCrosstalkFile():
     site-specific eotest calibrations file.
     """
     pars = getEotestCalibs()
-    return pars['system_crosstalk_file']
+    return os.path.abspath(pars['system_crosstalk_file'])
 
 def getPhotodiodeRatioFile():
     """
@@ -72,7 +74,7 @@ def getPhotodiodeRatioFile():
     calibrations file.
     """
     pars = getEotestCalibs()
-    return pars['photodiode_ratio_file']
+    return os.path.abspath(pars['photodiode_ratio_file'])
 
 def getIlluminationNonUniformityImage():
     """
@@ -81,4 +83,15 @@ def getIlluminationNonUniformityImage():
     calibrations file.
     """
     pars = getEotestCalibs()
-    return pars['illumination_non_uniformity_file']
+    return os.path.abspath(pars['illumination_non_uniformity_file'])
+
+def eotestCalibrations():
+    """
+    Return the lcatr.schema.valid results object for persisting the
+    eotest calibration file information.
+    """
+    pars = getEotestCalibs()
+    kwds = dict([(key, str(value)) for key, value in pars.items()])
+    kwds['eotest_host'] = getTestStandHostName()
+    result = lcatr.schema.valid(lcatr.schema.get('eotest_calibrations'), **kwds)
+    return result

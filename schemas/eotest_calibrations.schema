@@ -1,0 +1,10 @@
+# -*- python -*-
+{
+    'schema_name' : 'eotest_calibrations',
+    'schema_version' : 0,
+    'system_noise_file' : str,
+    'system_crosstalk_file' : str,
+    'photodiode_ratio_file' : str,
+    'illumination_non_uniformity_file' : str,
+    'eotest_host' : str
+}
