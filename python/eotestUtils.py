@@ -59,13 +59,18 @@ def getSystemNoise():
     data = np.recfromtxt(pars['system_noise_file'], names=('amp', 'noise'))
     return dict([x for x in zip(data['amp'], data['noise'])])
 
+def eotest_abspath(path):
+    if path is None:
+        return None
+    return os.path.abspath(path)
+
 def getSystemCrosstalkFile():
     """
     Return the full path to the system crosstalk file as given in the
     site-specific eotest calibrations file.
     """
     pars = getEotestCalibs()
-    return os.path.abspath(pars['system_crosstalk_file'])
+    return eotest_abspath(pars['system_crosstalk_file'])
 
 def getPhotodiodeRatioFile():
     """
@@ -74,7 +79,7 @@ def getPhotodiodeRatioFile():
     calibrations file.
     """
     pars = getEotestCalibs()
-    return os.path.abspath(pars['photodiode_ratio_file'])
+    return eotest_abspath(pars['photodiode_ratio_file'])
 
 def getIlluminationNonUniformityImage():
     """
@@ -83,7 +88,7 @@ def getIlluminationNonUniformityImage():
     calibrations file.
     """
     pars = getEotestCalibs()
-    return os.path.abspath(pars['illumination_non_uniformity_file'])
+    return eotest_abspath(pars['illumination_non_uniformity_file'])
 
 def eotestCalibrations():
     """

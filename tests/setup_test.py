@@ -20,7 +20,9 @@ try:
     import pylab
     
     import lcatr.schema
+    import lcatr.schema.version
     import lcatr.harness.helpers
+    import lcatr.harness.version
 
     import lsst.afw
     import lsst.ip.isr
@@ -43,6 +45,8 @@ try:
     print
     print "Using package versions:"
     print "  LSST Stack:", lsst.afw.__version__
+    print "  lcatr.harness:", lcatr.harness.version.__version__
+    print "  lcatr.schema:", lcatr.schema.version.__version__
     print "  eotest:", lsst.eotest.getVersion()
     print "  harnessed-jobs:", harnessedJobs.getVersion()
 except Exception, eobj:

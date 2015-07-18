@@ -10,8 +10,7 @@ lambda_files = siteUtils.dependency_glob('*_lambda_*.fits',
                                          description='Lambda files:')
 mask_files = eotestUtils.glob_mask_files()
 gains = eotestUtils.getSensorGains()
-eotest_calib_pars = eotestUtils.getEotestCalibs()
-correction_image = eotest_calib_pars['illumination_non_uniformity_file']
+correction_image = eotestUtils.getIlluminationNonUniformityImage()
 if correction_image is None:
     print 
     print "WARNING: The correction image file is not given in"

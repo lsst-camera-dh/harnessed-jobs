@@ -3,6 +3,8 @@
     'schema_name' : 'package_versions',
     'schema_version' : 0,
     'LSST_stack_version' : str,
+    'lcatr_harness_version' : str,
+    'lcatr_schema_version' : str,
     'eotest_version' : str,
     'harnessedJobs_version': str,
     'hostname' : str

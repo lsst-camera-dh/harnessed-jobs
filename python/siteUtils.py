@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess
 import socket
 import fnmatch
 import ConfigParser
@@ -122,10 +123,18 @@ def packageVersions():
         LSST_stack_version = lsst.afw.__version__
     except ImportError:
         LSST_stack_version = 'none'
+
+    import lcatr.harness.version
+    lcatr_harness_version = lcatr.harness.version.__version__
+
+    import lcatr.schema.version
+    lcatr_schema_version = lcatr.schema.version.__version__
         
     result = lcatr.schema.valid(lcatr.schema.get('package_versions'),
                                 eotest_version=eotest_version,
                                 LSST_stack_version=LSST_stack_version,
+                                lcatr_harness_version=lcatr_harness_version,
+                                lcatr_schema_version=lcatr_schema_version,
                                 harnessedJobs_version=hj.getVersion(),
                                 hostname=socket.getfqdn())
     return result
