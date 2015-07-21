@@ -19,4 +19,4 @@ def getVersion():
         for item in hj.__file__.split(os.path.sep):
             if item.startswith('harnessed-jobs-'):
                 return item[len('harnessed-jobs-'):]
-        return 'unknown'
+    return 'unknown'

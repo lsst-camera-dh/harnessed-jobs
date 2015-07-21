@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import subprocess
 from collections import OrderedDict
 import numpy as np
@@ -23,41 +24,54 @@ class VendorResults(object):
         pass
     def run_all(self):
         results = []
-        results.extend(self.fe55_analysis())
-        results.extend(self.read_noise())
-        results.extend(self.bright_defects())
-        results.extend(self.dark_defects())
-        results.extend(self.traps())
-        results.extend(self.dark_current())
-        results.extend(self.cte())
-        results.extend(self.prnu())
-        results.extend(self.flat_pairs())
-        results.extend(self.ptc())
-        results.extend(self.qe_analysis())
+        failures = OrderedDict()
+        analyses = ('fe55_analysis', 'read_noise', 'bright_defects',
+                    'dark_defects', 'traps', 'dark_current', 'cte',
+                    'prnu', 'flat_pairs', 'ptc', 'qe_analysis')
+        for analysis in analyses:
+            try:
+                exec('my_results = self.%s()' % analysis)
+                results.extend(my_results)
+            except Exception, eobj:
+                failures[analysis] = eobj
+        if failures:
+            print
+            print "Failed to extract vendor results for the following:"
+            for analysis, eobj in failures.items():
+                print "%s: %s, %s" % (analysis, type(eobj), eobj)
+            print
+        sys.stdout.flush()
         return results
 
 class ItlResults(VendorResults):
-    file_mapping = {'fe55_analysis' : 'fe55.txt',
-                    'bright_defects' : 'brightdefects.txt',
-                    'dark_defects' : 'darkdefects.txt',
-                    'dark_current' : 'dark.txt',
-                    'read_noise' : 'gain.txt',
-                    'cte' : 'eper1.txt',
-                    'traps' : 'traps.txt',
-                    'flat_pairs' : 'linearity.txt',
-                    'prnu' : 'prnu.txt',
-                    'qe_analysis' : 'qe.txt'}
+    file_end_mapping = {'fe55_analysis' : 'fe55.txt',
+                        'bright_defects' : 'brightdefects.txt',
+                        'dark_defects' : 'darkdefects.txt',
+                        'dark_current' : 'dark.txt',
+                        'read_noise' : 'gain.txt',
+                        'cte' : 'eper1.txt',
+                        'traps' : 'traps.txt',
+                        'flat_pairs' : 'linearity.txt',
+                        'prnu' : 'prnu.txt',
+                        'qe_analysis' : 'qe.txt'}
     def __init__(self, rootdir):
         super(ItlResults, self).__init__()
-        command = 'find %(rootdir)s -name \*.txt -print' % locals()
+        command = 'find %(rootdir)s/ -name \*.txt -print' % locals()
         text_files = subprocess.check_output(command, shell=True).split()
+        print "Found ITL results files:"
+        for item in text_files:
+            print "  ", item
         self.inverse_mapping = dict([(os.path.basename(path), path) for path
                                      in text_files])
         self._configs = {}
     def __getitem__(self, key):
         if not self._configs.has_key(key):
             self._configs[key] = ConfigParser.ConfigParser()
-            target = self.file_mapping[key]
+            file_ending = self.file_end_mapping[key]
+            for item in self.inverse_mapping.values():
+                if item.endswith(file_ending):
+                    target = os.path.basename(item)
+                    break
             self._configs[key].read(self.inverse_mapping[target])
         return self._configs[key]
     def fe55_analysis(self):

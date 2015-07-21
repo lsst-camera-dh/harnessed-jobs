@@ -18,7 +18,9 @@ if expected_path not in schema_path.split(os.path.pathsep):
 import pylab
 
 import lcatr.schema
+import lcatr.schema.version
 import lcatr.harness.helpers
+import lcatr.harness.version
 
 import lsst.afw
 import lsst.ip.isr
