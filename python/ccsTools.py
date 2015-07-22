@@ -126,11 +126,15 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
 
     results = []
 
-    statusFile = open("status.out")
     statusAssignments = {}
-    for flag in statusFlags:
-        value = int(statusFile.readline().strip())
-        statusAssignments[flag] = value
+    try:
+        statusFile = open("status.out")
+        for flag in statusFlags:
+            value = int(statusFile.readline().strip())
+            statusAssignments[flag] = value
+    except IOError:
+        for flag in statusFlags:
+            statusAssignments[flag] = -1
     
     results.append(lcatr.schema.valid(lcatr.schema.get(jobName), 
                                       **statusAssignments))

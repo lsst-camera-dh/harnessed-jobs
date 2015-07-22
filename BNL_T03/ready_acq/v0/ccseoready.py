@@ -48,7 +48,7 @@ try:
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
     time.sleep(3.);
-#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
 # the first image is usually bad so throw it away
@@ -58,7 +58,7 @@ try:
     reply = result.getResult();
 
     print "Images will now automatically display in the DS9 window"
-    arcsub.synchCommand(10,"setSendImagesToDS9",true);
+    arcsub.synchCommand(10,"setSendImagesToDS9",True);
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
