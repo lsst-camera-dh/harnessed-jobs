@@ -52,8 +52,9 @@ try:
     time.sleep(3.);
 
     print "set controller parameters for an exposure with the shutter closed"
-#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
+    arcsub.synchCommand(10,"setFetch_timeout",500000);
 
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
@@ -323,6 +324,8 @@ try:
 
 except Exception, ex:
 
+    print "Exception at " % time.time()
+
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
@@ -331,5 +334,18 @@ except Exception, ex:
     buff = result.getResult()
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+except ScriptingTimeoutException, exx:
+
+    print "ScriptingTimeoutException at " % time.time()
+
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
+
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % exx)
 
 print "FLAT: END"
