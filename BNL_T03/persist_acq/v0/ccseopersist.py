@@ -44,6 +44,7 @@ try:
     time.sleep(3.);
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
+    arcsub.synchCommand(10,"setFetch_timeout",500000);
 
 # the first image is usually bad so throw it away
 #    print "Throwing away the first image"
@@ -193,7 +194,7 @@ try:
                 result = arcsub.synchCommand(10,"setHeader","TestType",acqname)
                 result = arcsub.synchCommand(10,"setHeader","ImageType",acqname)
                 arcsub.synchCommand(10,"setFitsFilename","");
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 reply = result.getResult();
 # adjust timeout because we will be waiting for the data to become ready both
 # at the accumbuffer stage and the readbuffer stage
@@ -217,7 +218,7 @@ try:
                     arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
         
                     print "Ready to take image. time = %f" % time.time()
-                    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                    result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                     fitsfilename = result.getResult();
                     print "after click click at %f" % time.time()
         

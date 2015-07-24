@@ -136,11 +136,14 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
+            result = arcsub.synchCommand(10,"setFetch_timeout",5000000)
+
+            print "Throwing away the first image"
+            arcsub.synchCommand(10,"setFitsFilename","");
+            result = arcsub.synchCommand(1000,"exposeAcquireAndSave");
+            reply = result.getResult();
+
             for i in range(imcount):
-                print "Throwing away the first image"
-                arcsub.synchCommand(10,"setFitsFilename","");
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                reply = result.getResult();
 
 
 # adjust timeout because we will be waiting for the data to become ready both
@@ -162,10 +165,10 @@ try:
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                 result = arcsub.synchCommand(10,"setHeader","TestType","DARK")
                 result = arcsub.synchCommand(10,"setHeader","ImageType","DARK")
-                result = arcsub.synchCommand(10,"setFetch_timeout",int(int(mywait)*1000))
+#                result = arcsub.synchCommand(10,"setFetch_timeout",int(int(mywait)*1000))
 
                 print "Ready to take image. time = %f" % time.time()
-                result = arcsub.synchCommand(1000,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(10000,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
     

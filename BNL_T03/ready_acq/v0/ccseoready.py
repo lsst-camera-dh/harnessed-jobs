@@ -58,7 +58,7 @@ try:
     reply = result.getResult();
 
     print "Images will now automatically display in the DS9 window"
-    arcsub.synchCommand(10,"setSendImagesToDS9",True);
+    arcsub.synchCommand(10,"setSendImagesToDS9",False);
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -165,6 +165,8 @@ try:
             flncal = result.getResult();
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
+
+            flux = flux * 0.50
 
             exptime = target/flux
             print "exposure time = %f" % exptime

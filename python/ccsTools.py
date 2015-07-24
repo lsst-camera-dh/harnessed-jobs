@@ -158,3 +158,6 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
 
     lcatr.schema.write_file(results)
     lcatr.schema.validate_file()
+# now lets crash if that status file wasn't present
+# we do this so that the traveler will know that something bad happened
+    statusFileCheck = open("status.out")

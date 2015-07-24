@@ -218,7 +218,7 @@ try:
                 flux = float(result.getResult());
 # temporary
 #                flux = flux * 3.
-                flux = flux * 0.75
+                flux = flux * 0.50
 
                 print "The flux is determined to be %f" % flux
 

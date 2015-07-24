@@ -168,7 +168,7 @@ try:
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
 
-            flux = flux * 0.75
+            flux = flux * 0.50
 
             exptime = target/flux
             print "exposure time = %f" % exptime
