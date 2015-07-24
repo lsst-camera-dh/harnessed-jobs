@@ -126,11 +126,15 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
 
     results = []
 
-    statusFile = open("status.out")
     statusAssignments = {}
-    for flag in statusFlags:
-        value = int(statusFile.readline().strip())
-        statusAssignments[flag] = value
+    try:
+        statusFile = open("status.out")
+        for flag in statusFlags:
+            value = int(statusFile.readline().strip())
+            statusAssignments[flag] = value
+    except IOError:
+        for flag in statusFlags:
+            statusAssignments[flag] = -1
     
     results.append(lcatr.schema.valid(lcatr.schema.get(jobName), 
                                       **statusAssignments))
@@ -154,3 +158,6 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
 
     lcatr.schema.write_file(results)
     lcatr.schema.validate_file()
+# now lets crash if that status file wasn't present
+# we do this so that the traveler will know that something bad happened
+    statusFileCheck = open("status.out")

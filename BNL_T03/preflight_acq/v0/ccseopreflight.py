@@ -12,6 +12,8 @@ import eolib
 
 CCS.setThrowExceptions(True);
 
+doarch = True
+
 try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
@@ -38,18 +40,19 @@ try:
     reply = result.getResult();
     time.sleep(5.)
 
-    print "Loading configuration file into the Archon controller"
-    result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
-    reply = result.getResult();
-    print "Applying configuration"
-    result = arcsub.synchCommand(25,"applyConfig");
-    reply = result.getResult();
-    print "Powering on the CCD"
-    result = arcsub.synchCommand(30,"powerOnCCD");
-    reply = result.getResult();
-    time.sleep(3.);
-#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
-    arcsub.synchCommand(10,"setParameter","Expo","1");
+    if (doarch) :
+        print "Loading configuration file into the Archon controller"
+        result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
+        reply = result.getResult();
+        print "Applying configuration"
+        result = arcsub.synchCommand(25,"applyConfig");
+        reply = result.getResult();
+        print "Powering on the CCD"
+        result = arcsub.synchCommand(30,"powerOnCCD");
+        reply = result.getResult();
+        time.sleep(3.);
+        arcsub.synchCommand(10,"setAcqParam","Nexpo");
+        arcsub.synchCommand(10,"setParameter","Expo","1");
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -92,20 +95,20 @@ try:
 
 
 # take bias images
+            if (doarch) :
+                result = arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
+                arcsub.synchCommand(10,"setParameter","Light","0");
 
-            result = arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
-            arcsub.synchCommand(10,"setParameter","Light","0");
-
-            print "setting location of bias fits directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+                print "setting location of bias fits directory"
+                arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
 
 # take light exposures
-            arcsub.synchCommand(10,"setParameter","Light","1");
-            result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
-            rply = result.getResult()
-            print "setting location of fits exposure directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+                arcsub.synchCommand(10,"setParameter","Light","1");
+                result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+                rply = result.getResult()
+                print "setting location of fits exposure directory"
+                arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
@@ -124,9 +127,16 @@ try:
                 result = monosub.synchCommand(120,"setWaveAndFilter",wl);
                 rply = result.getResult()
                 time.sleep(4.)
-                print "Verifying wavelength setting of the monochromator"
-                result = monosub.synchCommand(230,"getWave");
-                rwl = result.getResult()
+                try:
+                    print "Verifying wavelength setting of the monochromator"
+                    result = monosub.synchCommand(20,"getWave");
+                    rwl = result.getResult()
+                except ScriptingTimeoutException, ex:
+                    print "first getWave attempt failed. Trying one more time ..."
+                    time.sleep(4.)
+                    result = monosub.synchCommand(20,"getWave");
+                    rwl = result.getResult()
+
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
 
@@ -151,16 +161,19 @@ try:
 # start acquisition
                 timestamp = time.time()
                 fitsfilename = "%s_preflight_%3.3d_%3.3d_preflight_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
-                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-                result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
+                if (doarch) :
+                    arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                    result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
 
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
  
-
-                print "Taking an image now. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
+                if (doarch) :
+                    print "Taking an image now. time = %f" % time.time()
+                    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                    fitsfilename = result.getResult();
+                else :
+                    time.sleep(exptime)
                 print "Done taking image at %f" % time.time()
 
                 print "done with exposure # %d" % i
@@ -182,9 +195,10 @@ try:
 # reset timeout to something reasonable for a regular command
                 pdsub.synchCommand(1000,"setTimeout",10.);
 
-                result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+                if (doarch) :
+                    result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
 #/home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/pd-values_1434501729-for-seq-0-exp-1.txt /home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/NoCCD1_lambda_400_000_lambda_1_20150616204212.fits MP time pd 123.00
-                fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
+                    fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
             seq = seq + 1
 
