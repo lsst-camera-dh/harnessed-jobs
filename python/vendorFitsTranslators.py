@@ -51,6 +51,11 @@ class VendorFitsTranslator(object):
     def _processFiles(self, test_type, image_type, pattern, 
                       time_stamp=None, verbose=True, skip_zero_exptime=False):
         infiles = self._infiles(pattern)
+        if verbose and not infiles:
+            print
+            print "WARNING:"
+            print "No files found for TESTTYPE=%(test_type)s, IMGTYPE=%(image_type)s and file pattern %(pattern)" % locals()
+            print
         if time_stamp is None:
             time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         for iframe, infile in enumerate(infiles):
@@ -200,31 +205,31 @@ class e2vFitsTranslator(VendorFitsTranslator):
         hdulist[0].header['IMGTYPE'] = image_type.upper()
         self._setAmpGeom(hdulist)
         self._writeFile(hdulist, locals(), verbose=verbose)
-    def fe55(self, pattern='Images/*_xray_xray_*.fits', time_stamp=None,
+    def fe55(self, pattern='*_xray_xray_*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('fe55', 'fe55', pattern, 
                                   time_stamp=time_stamp, verbose=verbose)
-    def bias(self, pattern='Images/*_noims_nois_*.fits', time_stamp=None,
+    def bias(self, pattern='*_noims_nois_*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('fe55', 'bias', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def dark(self, pattern='Images/*_dark_dark_*.fits', time_stamp=None,
+    def dark(self, pattern='*_dark_dark_*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('dark', 'dark', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def trap(self, pattern='Images/*_trapspp_cycl*.fits', time_stamp=None,
+    def trap(self, pattern='*_trapspp_cycl*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('trap', 'ppump', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def sflat_500(self, pattern='Images/*_sflatl_illu_*.fits', time_stamp=None,
+    def sflat_500(self, pattern='*_sflatl_illu_*.fits', time_stamp=None,
                   verbose=True):
         return self._processFiles('sflat_500', 'flat', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def spot(self, pattern='Images/*_xtalk_illu_*.fits', time_stamp=None,
+    def spot(self, pattern='*_xtalk_illu_*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('spot', 'spot', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def flat(self, pattern='Images/*_ifwm_illu_*.fits', time_stamp=None,
+    def flat(self, pattern='*_ifwm_illu_*.fits', time_stamp=None,
              verbose=True):
         if time_stamp is None:
             time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -237,7 +242,7 @@ class e2vFitsTranslator(VendorFitsTranslator):
             self.translate(infile, 'flat', 'flat', seqno, time_stamp=time_stamp,
                            verbose=verbose)
         return time_stamp
-    def lambda_scan(self, pattern='Images/*_flat_*_illu_*.fits',
+    def lambda_scan(self, pattern='*_flat_*_illu_*.fits',
                     time_stamp=None, verbose=True):
         return super(e2vFitsTranslator, self).lambda_scan(pattern,
                                                           time_stamp=time_stamp,
