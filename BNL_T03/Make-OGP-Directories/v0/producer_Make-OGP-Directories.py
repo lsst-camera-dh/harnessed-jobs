@@ -10,6 +10,9 @@ ccd = os.environ["LCATR_UNIT_ID"]
 topccddir = "/cygdrive/c/DATA/%s" % ccd
 print "Creating the top level directory for the CCD at %s" % topccddir
 os.mkdir(topccddir)
+edgedir = "%s/EdgeScan/" % topccddir
+print "Creating 
+faltdir = "%s/Flatness/" % topccddir
 ccddir = "%s/%s" % (topcddir,time.strftime("%Y%m%d-%H:%M:%S"))
 print "Creating dated directory for the CCD at %s" % ccddir
 os.mkdir(ccddir)

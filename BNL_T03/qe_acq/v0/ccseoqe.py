@@ -60,7 +60,7 @@ try:
     reply = result.getResult();
 
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.0000002)
+    pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
 # move to TS acquisition state
     print "setting acquisition state"

@@ -26,6 +26,11 @@ try:
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
+    print "attaching XED subsystem"
+    xedsub   = CCS.attachSubsystem("%s/Fe55" % ts);
+
+# retract the Fe55 arm
+    xedsub.synchCommand(30,"retractFe55");
 
     time.sleep(3.)
 
@@ -54,7 +59,7 @@ try:
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
     arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+    result = arcsub.synchCommand(500,"exposeAcquireAndSave");
     reply = result.getResult();
 
     print "Images will now automatically display in the DS9 window"
@@ -117,9 +122,8 @@ try:
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
     print "Scan at a low and a high wavelength to test monochromator and filter wheel"
-    for wl in [450.,823.] :
+    for ii in range(2) :
 # use a target signal instead
-            target = 100.
 #            target = float(wl)
 #            print "target wl = %f" % target;
 
@@ -134,7 +138,7 @@ try:
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
+            result = arcsub.synchCommand(10,"setHeader","TestType","READY")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(bcount):
                 timestamp = time.time()
@@ -147,7 +151,94 @@ try:
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
 
+    time.sleep(4.)
+################################## Fe55  ################################3
+    for exptime in [1000,3000] :
+            arcsub.synchCommand(10,"setParameter","Light","0");
+            print "setting location of fits exposure directory"
+            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
+            exptime = 3.0
+            print "exposure time = %f" % exptime
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+
+# prepare to readout diodes
+            nreads = exptime*60/nplc + 200
+            if (nreads > 3000):
+                nreads = 3000
+                nplc = exptime*60/(nreads-200)
+                print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+
+            result = arcsub.synchCommand(10,"setHeader","TestType","READYFe55")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","READYFe55")
+
+            print "throw away first image after all parameters set"
+            arcsub.synchCommand(10,"setFitsFilename","");
+            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+            flnthrow = result.getResult();
+
+# adjust timeout because we will be waiting for the data to become ready
+            mywait = nplc/60.*nreads*1.10 ;
+            print "Setting timeout to %f s" % mywait
+            pdsub.synchCommand(1000,"setTimeout",mywait);
+
+            for i in range(imcount):
+# extend the Fe55 arm
+                print "extend the Fe55 arm"
+                xedsub.synchCommand(30,"extendFe55");
+
+                print "Starting Photo Diode recording at %f" % time.time()
+                print "You should see digits changing on the PD device"
+                pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
+
+                print "recording should now be in progress and the time is %f" % time.time()
+
+# start acquisition
+                timestamp = time.time()
+                fitsfilename = "%s_fe55_%d_%3.3d_fe55_%d_${TIMESTAMP}.fits" % (ccd,exptime,seq,i+1)
+                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+
+# make sure to get some readings before the state of the shutter changes       
+                time.sleep(0.2);
+ 
+
+                print "Taking an image now. time = %f" % time.time()
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                fitsfilename = result.getResult();
+                print "Done taking image at %f" % time.time()
+
+# retract the Fe55 arm
+                xedsub.synchCommand(30,"retractFe55");
+
+                print "done with exposure # %d" % i
+                print "retrieving photodiode readings at time = %f" % time.time();
+
+                pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),seq,i+1)
+# the primary purpose of this is to guarantee that the accumBuffer method has completed
+                print "starting the wait for an accumBuffer done status message at %f" % time.time()
+                tottime = pdresult.get();
+
+# make sure the sample of the photo diode is complete
+                time.sleep(10.)
+
+                print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
+                result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
+                buff = result.getResult()
+                print "Finished getting readings at %f" % time.time()
+
+
+                result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+#/home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/pd-values_1434501729-for-seq-0-exp-1.txt /home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/NoCCD1_lambda_400_000_lambda_1_20150616204212.fits MP time pd 123.00
+                fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
+
+# reset timeout to something reasonable for a regular command
+            pdsub.synchCommand(1000,"setTimeout",10.);
+            seq = seq + 1
+
+    time.sleep(4.)
+############################## LIGHT ###################################3
+    target = 1000.
+    for wl in [450.,823.] :
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
             print "setting location of fits exposure directory"
@@ -157,11 +248,11 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
             arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
             rply = result.getResult();
             arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
 
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
             flncal = result.getResult();
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
@@ -179,12 +270,12 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
-            result = arcsub.synchCommand(10,"setHeader","ImageType","PREFLIGHT")
+            result = arcsub.synchCommand(10,"setHeader","TestType","READYLIGHT")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","READYLIGHT")
 
             print "throw away first image after all parameters set"
             arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
             flnthrow = result.getResult();
 
 # adjust timeout because we will be waiting for the data to become ready
@@ -213,7 +304,6 @@ try:
                 time.sleep(4.);
                 
 
-
                 print "Starting Photo Diode recording at %f" % time.time()
                 print "You should see digits changing on the PD device"
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
@@ -230,7 +320,7 @@ try:
  
 
                 print "Taking an image now. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "Done taking image at %f" % time.time()
 
@@ -272,6 +362,9 @@ try:
 
 # move TS to ready state                    
     tssub.synchCommand(60,"setTSReady");
+
+# retract the Fe55 arm
+    xedsub.synchCommand(30,"retractFe55");
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
