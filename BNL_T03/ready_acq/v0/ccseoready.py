@@ -62,7 +62,7 @@ try:
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.000002)
+    pdsub.synchCommand(10,"setCurrentRange",0.0002)
 
 # move to TS acquisition state
     print "setting acquisition state"

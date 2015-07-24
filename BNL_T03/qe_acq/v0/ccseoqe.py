@@ -49,7 +49,7 @@ try:
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
     time.sleep(3.);
-#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
 # the first image is usually bad so throw it away
@@ -173,6 +173,8 @@ try:
             flncal = result.getResult();
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
+
+            flux = flux * 0.75
 
             exptime = target/flux
             print "exposure time = %f" % exptime

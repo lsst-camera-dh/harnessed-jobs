@@ -217,7 +217,8 @@ try:
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
                 flux = float(result.getResult());
 # temporary
-                flux = flux * 3.
+#                flux = flux * 3.
+                flux = flux * 0.75
 
                 print "The flux is determined to be %f" % flux
 
