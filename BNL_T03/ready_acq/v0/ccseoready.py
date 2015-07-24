@@ -48,7 +48,7 @@ try:
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
     time.sleep(3.);
-#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
 # the first image is usually bad so throw it away
@@ -58,11 +58,11 @@ try:
     reply = result.getResult();
 
     print "Images will now automatically display in the DS9 window"
-    arcsub.synchCommand(10,"setSendImagesToDS9",true);
+    arcsub.synchCommand(10,"setSendImagesToDS9",False);
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.000002)
+    pdsub.synchCommand(10,"setCurrentRange",0.0002)
 
 # move to TS acquisition state
     print "setting acquisition state"
@@ -165,6 +165,8 @@ try:
             flncal = result.getResult();
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
+
+            flux = flux * 0.50
 
             exptime = target/flux
             print "exposure time = %f" % exptime

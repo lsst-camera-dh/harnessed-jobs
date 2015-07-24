@@ -49,8 +49,9 @@ try:
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
     time.sleep(3.);
-#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
+    arcsub.synchCommand(10,"setFetch_timeout",500000);
 
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
@@ -139,7 +140,7 @@ try:
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
                 print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
@@ -153,11 +154,27 @@ try:
 
             print "setting the monochromator wavelength"
 #            if (exptime > lo_lim):
-            result = monosub.synchCommand(60,"setWaveAndFilter",wl);
+            result = monosub.synchCommand(120,"setWaveAndFilter",wl);
             rply = result.getResult()
             time.sleep(4.)
-            result = monosub.synchCommand(30,"getWave");
-            rwl = result.getResult()
+            try:
+                result = monosub.synchCommand(60,"getWave");
+                rwl = result.getResult()
+            except ScriptingTimeoutException, ex:
+                try:
+                    print "failed once to do getWave ... try again"
+                    time.sleep(10.)
+                    result = monosub.synchCommand(100,"getWave");
+                    rwl = result.getResult()
+                except ScriptingTimeoutException, ex:
+                    print "failed yet again to do getWave ... try one last time"
+                    time.sleep(60.)
+                    try:
+                        result = monosub.synchCommand(200,"getWave");
+                        rwl = result.getResult()
+                    except ScriptingTimeoutException, ex:
+                        print "ALERT ALERT ALERT ... SKIPPING A WAVELENGTH SETTING DUE TO NO wl RESPONSE FROM MONOCHROMATOR"
+                        continue
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
 
@@ -173,6 +190,8 @@ try:
             flncal = result.getResult();
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
+
+            flux = flux * 0.50
 
             exptime = target/flux
             print "exposure time = %f" % exptime
