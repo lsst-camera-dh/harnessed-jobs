@@ -92,6 +92,8 @@ try:
 # get the glowing vacuum gauge off
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
     rply = result.getResult();
+# it takes time for it to fade away
+    time.sleep(5.)
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
@@ -181,24 +183,28 @@ try:
 # do in-job flux calibration
             arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
+# dispose of first image
             arcsub.synchCommand(10,"setFitsFilename","");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             rply = result.getResult();
-            arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
 
+
+            result  = arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             flncal = result.getResult();
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
-
+# cleanup
+            os.rm(flncal)
+# scale 
             flux = flux * 0.50
 
             exptime = target/flux
             print "exposure time = %f" % exptime
-            if (exptime<0.1):
-                exptime = 0.1
-            if (exptime>120.):
-                exptime = 120.
+            if (exptime<lo_lim):
+                exptime = lo_lim
+            if (exptime>hi_lim):
+                exptime = hi_lim
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
@@ -215,7 +221,9 @@ try:
             arcsub.synchCommand(10,"setFitsFilename","");
             result = arcsub.synchCommand(500,"exposeAcquireAndSave");
             reply = result.getResult();
-            time.sleep(exptime)
+            result = arcsub.synchCommand(500,"waitForExpoEnd");
+            reply = result.getResult();
+#            time.sleep(exptime)
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
@@ -297,6 +305,19 @@ except Exception, ex:
     buff = result.getResult()
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+except ScriptingTimeoutException, exx:
+
+    print "ScriptingTimeoutException at %f " % time.time()
+
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
+
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % exx)
 
 
 print "QE: END"

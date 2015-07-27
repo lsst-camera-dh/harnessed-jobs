@@ -53,7 +53,7 @@ try:
 
     print "Setting the current ranges on the Bias and PD devices"
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.000002)
+    pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
 # move to TS acquisition state
     print "setting acquisition state"
@@ -105,6 +105,8 @@ try:
     fp = open(acqcfgfile,"r");
     fpfiles = open("%s/acqfilelist" % cdir,"w");
     
+    owl = 0.
+    
     for line in fp:
         tokens = str.split(line)
         if ((len(tokens) > 0) and (tokens[0] == 'sflat')):
@@ -138,7 +140,7 @@ try:
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
-    
+# =========================================================================    
 # take light exposures
             result = arcsub.synchCommand(10,"setParameter","Light","1");
 #            result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
@@ -146,32 +148,76 @@ try:
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
             print "setting the monochromator wavelength"
-#            if (exptime > lo_lim):
-            result = monosub.synchCommand(200,"setWaveAndFilter",wl);
-            rply = result.getResult()
-            time.sleep(4.)
-            result = monosub.synchCommand(200,"getWave");
-            rwl = result.getResult()
-            print "publishing state"
-            result = tssub.synchCommand(60,"publishState");
+
+            if (wl!=owl) :
+                try:
+                    print "Setting monochromator lambda = %8.2f" % wl
+                    try:
+                        result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+# result = monosub.synchCommand(200,"setWave",wl);
+                        rply = result.getResult()
+                        time.sleep(4.0)
+                    except CommandRejectedException, er:
+                        print "set wave attempt rejected, try again ..."
+                        time.sleep(10.0)
+                        try:
+                            result = monosub.synchCommand(300,"setWave",wl);
+                            rply = result.getResult()
+                            time.sleep(4.0)
+                        except CommandRejectedException, er:
+                            print "set wave attempt rejected again, one last try after a long wait again ..."
+                            time.sleep(60.0)
+                            print "here we go ... its gotta work this time .... right?"
+                            result = monosub.synchCommand(300,"setWave",wl);
+                            rply = result.getResult()
+                            print "we survived a near crash"
+                            time.sleep(4.0)
+                    result = monosub.synchCommand(300,"getWave");
+                    rwl = result.getResult()
+                except ScriptingTimeoutException, ex:
+                    print "Failed to get monochromator to respond. Try one more time"
+                    try:
+                        time.sleep(30.)
+                        result = monosub.synchCommand(300,"getWave");
+                        rwl = result.getResult()
+                    except ScriptingTimeoutException, ex:
+                        print "Failed to get monochromator to respond. Skipping to the next step."
+                        continue
+
+                print "publishing state"
+                result = tssub.synchCommand(60,"publishState");
 
 # do in-job flux calibration
-            arcsub.synchCommand(10,"setParameter","ExpTime","2000");
+                arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-            rply = result.getResult();
-            arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
+# dispose of first image
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                rply = result.getResult();
 
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-            flncal = result.getResult();
-            result = arcsub.synchCommand(10,"getFluxStats",flncal);
-            flux = float(result.getResult());
+                arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
 
-            flux = flux * 0.50
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                flncal = result.getResult();
+                result = arcsub.synchCommand(10,"getFluxStats",flncal);
+                flux = float(result.getResult());
+
+# cleanup
+            os.rm(flncal)
+# scale 
+                flux = flux * 0.50
+
+                print "The flux is determined to be %f" % flux
+
+                owl = wl
 
             exptime = target/flux
-            print "exposure time = %f" % exptime
+            print "needed exposure time = %f" % exptime
+            if (exptime > hi_lim) :
+                exptime = hi_lim
+            if (exptime < lo_lim) :
+                exptime = lo_lim
+            print "adjusted exposure time = %f" % exptime
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
@@ -181,14 +227,16 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
-            result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
+            result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","SFLAT")
 
             print "Throwing away the first image"
             arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
             reply = result.getResult();
-            time.sleep(exptime);
+            result = arcsub.synchCommand(500,"waitForExpoEnd");
+            reply = result.getResult();
+#            time.sleep(exptime);
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
@@ -259,7 +307,6 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
 
-#except CcsException as ex:                                                     
 except Exception, ex:
 
 # get the glowing vacuum gauge back on
@@ -270,5 +317,18 @@ except Exception, ex:
     buff = result.getResult()
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+except ScriptingTimeoutException, exx:
+
+    print "ScriptingTimeoutException at %f " % time.time()
+
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
+
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % exx)
 
 print "SFLAT: END"

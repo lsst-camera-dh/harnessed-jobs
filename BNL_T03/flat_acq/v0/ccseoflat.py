@@ -96,6 +96,8 @@ try:
 # get the glowing vacuum gauge off
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
     rply = result.getResult();
+# it takes time for the glow to fade
+    time.sleep(5.)
 
     print "Now collect some parameters from the config file"
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_LOLIM', default='0.1'))
@@ -158,14 +160,13 @@ try:
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
-
+# ===========================================================================
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
 #            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-#            if (exptime > lo_lim):
             if (wl!=owl) :
                 try:
                     print "Setting monochromator lambda = %8.2f" % wl
@@ -207,17 +208,21 @@ try:
 # do in-job flux calibration
                 arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
+# dispose of first image
                 arcsub.synchCommand(10,"setFitsFilename","");
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 rply = result.getResult();
+
                 arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
 
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 flncal = result.getResult();
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
                 flux = float(result.getResult());
-# temporary
-#                flux = flux * 3.
+
+# cleanup
+            os.rm(flncal)
+# scale 
                 flux = flux * 0.50
 
                 print "The flux is determined to be %f" % flux
@@ -247,7 +252,9 @@ try:
             arcsub.synchCommand(10,"setFitsFilename","");
             result = arcsub.synchCommand(500,"exposeAcquireAndSave");
             reply = result.getResult();
-            time.sleep(exptime)
+            result = arcsub.synchCommand(500,"waitForExpoEnd");
+            reply = result.getResult();
+#            time.sleep(exptime)
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
