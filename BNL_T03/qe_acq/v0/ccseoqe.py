@@ -51,7 +51,7 @@ try:
     time.sleep(3.);
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
-    arcsub.synchCommand(10,"setFetch_timeout",500000);
+    arcsub.synchCommand(10,"setFetch_timeout",900000);
 
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
@@ -154,7 +154,7 @@ try:
 
             print "setting the monochromator wavelength"
 #            if (exptime > lo_lim):
-            result = monosub.synchCommand(120,"setWaveAndFilter",wl);
+            result = monosub.synchCommand(500,"setWaveAndFilter",wl);
             rply = result.getResult()
             time.sleep(4.)
             try:
@@ -195,6 +195,10 @@ try:
 
             exptime = target/flux
             print "exposure time = %f" % exptime
+            if (exptime<0.1):
+                exptime = 0.1
+            if (exptime>120.):
+                exptime = 120.
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
@@ -209,7 +213,7 @@ try:
 
             print "Throwing away the first image"
             arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
             reply = result.getResult();
             time.sleep(exptime)
 
@@ -234,7 +238,7 @@ try:
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
 
-                print "Ready to take image. time = %f" % time.time()
+                print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()

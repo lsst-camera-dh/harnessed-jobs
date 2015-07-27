@@ -59,7 +59,7 @@ try:
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
     arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+    result = arcsub.synchCommand(500,"exposeAcquireAndSave");
     reply = result.getResult();
 
     print "Setting the current ranges on the Bias and PD devices"
@@ -154,7 +154,7 @@ try:
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
                 print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
@@ -208,11 +208,11 @@ try:
                 arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
                 arcsub.synchCommand(10,"setFitsFilename","");
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 rply = result.getResult();
                 arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
 
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 flncal = result.getResult();
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
                 flux = float(result.getResult());
@@ -338,7 +338,7 @@ except Exception, ex:
 
 except ScriptingTimeoutException, exx:
 
-    print "ScriptingTimeoutException at " % time.time()
+    print "ScriptingTimeoutException at %f " % time.time()
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
