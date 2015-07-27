@@ -426,7 +426,7 @@ MOD4\LVLC_ORDER9=0
 MOD4\LVLC_V1=0.0
 MOD4\LVLC_V10=0.0
 MOD4\LVLC_V11=0.0
-MOD4\LVLC_V12=0
+MOD4\LVLC_V12=0.0
 MOD4\LVLC_V13=0.0
 MOD4\LVLC_V14=0.0
 MOD4\LVLC_V15=0.0
@@ -448,7 +448,7 @@ MOD4\LVLC_V7=0.0
 MOD4\LVLC_V8=0.0
 MOD4\LVLC_V9=0.0
 MOD5\CLAMP1=0.0
-MOD5\CLAMP2=0.5
+MOD5\CLAMP2=0.0
 MOD5\CLAMP3=0.0
 MOD5\CLAMP4=0.0
 MOD5\PREAMPGAIN=0
@@ -580,7 +580,7 @@ PARAMETER15="#Ncol=PixSkip+PixRead+PixOver"
 PARAMETER16=
 PARAMETER17="Expo=1               #1- expose  0 - no exposure"
 PARAMETER18="ExpTime=3000      #exposure time in milisec, backplane CLK0 is TRIG OUT"
-PARAMETER19="WaiTime=5      #wait time before readout starts (to park Fe55, for example) "
+PARAMETER19="WaiTime=500      #wait time before readout starts (to park Fe55, for example) "
 PARAMETER2="Nclear=2002   # number of fast clears 2050"
 PARAMETER20="Nexpo=100000"
 PARAMETER21=
@@ -591,15 +591,15 @@ PARAMETER25=
 PARAMETER26="Tpa=2000"
 PARAMETER27="Tpb=2000"
 PARAMETER28=
-PARAMETER29="Tsr1=5      # RG high & S1 high & S2 low  & S3 low"
+PARAMETER29="Tsr1=10        # RG high & S1 high & S2 low  & S3 low"
 PARAMETER3=
-PARAMETER30="Tsr2=5      # RG high & S1 high & S2 high & S3 low"
-PARAMETER31="Tsr3=5      # RG high & S1 low  & S2 high & S3 low "
-PARAMETER32="Tsr4=5      # RG high & S1 low  & S2 high & S3 high"
-PARAMETER33="Tsr5=5        #                  S1 low   & S2 low  & S3 high"
-PARAMETER34="Tsr6=5        #  reset int   S1 low   & S2 low  & S3 high  & RG low"
-PARAMETER35="Tsr7=77    #                  S1 high  & S2 low  & S3 high"
-PARAMETER36="Tsr8=77      #  signal int S1 high  & S2 low  & S3 low  "
+PARAMETER30="Tsr2=10      # RG high & S1 high & S2 high & S3 low"
+PARAMETER31="Tsr3=10      # RG high & S1 low  & S2 high & S3 low "
+PARAMETER32="Tsr4=10      # RG high & S1 low  & S2 high & S3 high"
+PARAMETER33="Tsr5=5        #                S1 low   & S2 low  & S3 high"
+PARAMETER34="Tsr6=7        #  reset int  S1 low   & S2 low  & S3 high  & RG low"
+PARAMETER35="Tsr7=120        #                S1 high  & S2 low  & S3 high"
+PARAMETER36="Tsr8=92      #  signal int S1 high  & S2 low  & S3 low  "
 PARAMETER37=
 PARAMETER38="Tsf=60        #fast serial clear"
 PARAMETER39=
@@ -619,10 +619,10 @@ RAWSEL=0
 RAWSTARTLINE=0
 RAWSTARTPIXEL=0
 SAMPLEMODE=0
-SHD1=124
-SHD2=184
-SHP1=67
-SHP2=107
+SHD1=180
+SHD2=230
+SHP1=85
+SHP2=135
 STATE0\CONTROL="0,0"
 STATE0\MOD10="RG_LOW,1,0,P_LOW,1,0,S_LOW,1,0,P_LOW,1,0,S_LOW,1,0,P_LOW,1,0,S_LOW,1,0,P_LOW,1,0"
 STATE0\MOD11=",1,1,CL_LOW,1,0,,1,1,,1,1,,1,1,,1,1,,1,1,,1,1"
@@ -795,7 +795,7 @@ STATE25\MOD7="0,1"
 STATE25\MOD8="0,1"
 STATE25\NAME=SR4
 STATE26\CONTROL="0,7"
-STATE26\MOD10="RG_LOW,1,0,,1,1,S_LOW,1,0,,1,1,S_LOW,1,0,,1,1,S_HIGH,1,0,,1,1"
+STATE26\MOD10="RG_HIGH,1,0,,1,1,S_LOW,1,0,,1,1,S_LOW,1,0,,1,1,S_HIGH,1,0,,1,1"
 STATE26\MOD11=",1,1,CL_HIGH,1,0,,1,1,,1,1,,1,1,,1,1,,1,1,,1,1"
 STATE26\MOD3=",1,1,,1,1,,1,1,,1,1,,1,1,,1,1,,1,1,,1,1"
 STATE26\MOD5="0,1"
@@ -804,7 +804,7 @@ STATE26\MOD7="0,1"
 STATE26\MOD8="0,1"
 STATE26\NAME=SR5
 STATE27\CONTROL="0,7"
-STATE27\MOD10="RG_LOW,1,0,,1,1,S_LOW,1,0,,1,1,S_HIGH,1,0,,1,1,S_HIGH,1,0,,1,1"
+STATE27\MOD10="RG_HIGH,1,0,,1,1,S_LOW,1,0,,1,1,S_HIGH,1,0,,1,1,S_HIGH,1,0,,1,1"
 STATE27\MOD11=",1,1,CL_HIGH,1,0,,1,1,,1,1,,1,1,,1,1,,1,1,,1,1"
 STATE27\MOD3=",1,1,,1,1,,1,1,,1,1,,1,1,,1,1,,1,1,,1,1"
 STATE27\MOD5="0,1"

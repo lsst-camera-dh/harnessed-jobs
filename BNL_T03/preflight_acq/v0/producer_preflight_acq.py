@@ -65,7 +65,7 @@ filter2 = hdr2['FILTER']
 
 apptxt = "not OK"
 diodecol = "red"
-if (mondiode1 < 1.e-10 and mondiode2/mondiode1 > 2.0) :
+if (-mondiode1 > 1.e-10 and mondiode2/mondiode1 > 2.0) :
     apptxt = "OK"
     diodecol = "green"
 

@@ -54,7 +54,7 @@ class CcsSetup(OrderedDict):
         configDir = siteUtils.configDir()
         for line in open(configFile):
             key, value = line.strip().split("=")
-            self[key.strip()] = _quote(os.path.join(configDir, value.strip()))
+            self[key.strip()] = _quote(os.path.realpath(os.path.join(configDir, value.strip())))
     def __call__(self):
         """
         Return the setup commands for the CCS script.
