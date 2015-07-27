@@ -5,6 +5,7 @@ Use Brian's python client to query the SRS datacatalog.
 import os
 import subprocess
 import datacat
+import datacat.error
 
 remote_hosts = {'SLAC' : 'rhel6-64.slac.stanford.edu'}
 
@@ -116,7 +117,12 @@ class DataCatalog(object):
         if folder is not None:
             self.folder = folder
         pattern_path = os.path.join(self.folder, pattern)
-        resp = self.client.search(pattern_path, query=query)
+        try:
+            resp = self.client.search(pattern_path, query=query)
+        except datacat.error.DcException, eobj:
+            print "Caught datacat.error.DcException:"
+            print eobj.raw
+            raise eobj
         return DatasetList(resp, self, job_id=job_id, job_name=job_name)
 
 if __name__ == '__main__':
