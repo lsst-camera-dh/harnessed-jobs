@@ -203,7 +203,7 @@ try:
                 flux = float(result.getResult());
 
 # cleanup
-            os.rm(flncal)
+#            os.rm(flncal)
 # scale 
                 flux = flux * 0.50
 
