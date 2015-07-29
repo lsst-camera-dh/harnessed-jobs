@@ -195,7 +195,7 @@ try:
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
 # cleanup
-            os.rm(flncal)
+#            os.rm(flncal)
 # scale 
             flux = flux * 0.50
 
