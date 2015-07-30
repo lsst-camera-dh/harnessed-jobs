@@ -136,10 +136,10 @@ try:
 
 # take bias images
 
-#            arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
-#            arcsub.synchCommand(10,"setParameter","Light","0");
-            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
-            arcsub.synchCommand(10,"setAndApplyParam","Light","0");
+            arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
+            arcsub.synchCommand(10,"setParameter","Light","0");
+#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
+#            arcsub.synchCommand(10,"setAndApplyParam","Light","0");
 
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
@@ -159,8 +159,8 @@ try:
 
 
 # take light exposures
-#            arcsub.synchCommand(10,"setParameter","Light","1");
-            arcsub.synchCommand(10,"setAndApplyParam","Light","1");
+            arcsub.synchCommand(10,"setParameter","Light","1");
+#            arcsub.synchCommand(10,"setAndApplyParam","Light","1");
 #            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
@@ -192,8 +192,8 @@ try:
             result = tssub.synchCommand(60,"publishState");
 
 # do in-job flux calibration
-#            arcsub.synchCommand(10,"setParameter","ExpTime","2000");
-            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","2000");
+            arcsub.synchCommand(10,"setParameter","ExpTime","2000");
+#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","2000");
 
 # dispose of first image
             arcsub.synchCommand(10,"setFitsFilename","");
@@ -219,8 +219,8 @@ try:
                 exptime = lo_lim
             print "adjusted exposure time = %f" % exptime
 
-#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
-            arcsub.synchCommand(10,"setAndApplyParam","ExpTime",str(int(exptime*1000)));
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200

@@ -118,8 +118,8 @@ try:
 
     
             print "start bias image exposure loop"
-#            arcsub.synchCommand(10,"setParameter","ExpTime","0");
-            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
+            arcsub.synchCommand(10,"setParameter","ExpTime","0");
+#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
 
             bcount = 2
             for i in range(bcount):
@@ -139,8 +139,8 @@ try:
 
 
             print "start dark image exposure loop"
-#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
-            arcsub.synchCommand(10,"setAndApplyParam","ExpTime",str(int(exptime*1000)));
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime",str(int(exptime*1000)));
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
 
