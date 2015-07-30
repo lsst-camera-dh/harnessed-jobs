@@ -32,6 +32,17 @@ try:
 # Initialization
     print "doing initialization"
 
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+# move TS to ready state
+    result = tssub.synchCommand(60,"setTSReady");
+    reply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
+
+    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
+
     print "Loading configuration file into the Archon controller"
     result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
     reply = result.getResult();
@@ -41,7 +52,7 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-    time.sleep(3.);
+    time.sleep(60.);
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     

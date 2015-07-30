@@ -18,8 +18,8 @@ try:
     tssub  = CCS.attachSubsystem("%s" % ts);
     print "attaching PD subsystem"
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
-    print "attaching XED subsystem"
-    xedsub   = CCS.attachSubsystem("%s/Fe55" % ts);
+#    print "attaching XED subsystem"
+#    xedsub   = CCS.attachSubsystem("%s/Fe55" % ts);
     print "attaching Mono subsystem"
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "attaching PDU subsystem"
@@ -34,6 +34,17 @@ try:
     # Initialization
     print "doing initialization"
 
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+# move TS to ready state
+    result = tssub.synchCommand(60,"setTSReady");
+    reply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
+
+    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
+
     print "Loading configuration file into the Archon controller"
     result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
     reply = result.getResult();
@@ -43,11 +54,12 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-    time.sleep(3.);
+    time.sleep(60.);
     print "set controller parameters for an exposure with the shutter closed"
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","Fe55","1");
     
 
 # the first image is usually bad so throw it away
@@ -57,7 +69,7 @@ try:
     reply = result.getResult();
 
 # retract the Fe55 arm
-    xedsub.synchCommand(30,"retractFe55");
+#    xedsub.synchCommand(30,"retractFe55");
 
 #    monosub.synchCommand(10,"closeShutter");
     print "set filter wheel to position 1"
@@ -186,14 +198,14 @@ try:
                 print "Ready to take image. time = %f" % time.time()
 
 # extend the Fe55 arm
-                print "extend the Fe55 arm"
-                xedsub.synchCommand(30,"extendFe55");
+#                print "extend the Fe55 arm"
+#                xedsub.synchCommand(30,"extendFe55");
     
 
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
 # retract the Fe55 arm
-                xedsub.synchCommand(30,"retractFe55");
+#                xedsub.synchCommand(30,"retractFe55");
     
                 print "after click click at %f" % time.time()
 
@@ -239,11 +251,25 @@ try:
     result = pdsub.synchCommand(10,"softReset");
     buff = result.getResult()
 
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
+
+
 except Exception, ex:                                                     
 
 # retract the Fe55 arm
-    xedsub.synchCommand(30,"retractFe55");
+#    xedsub.synchCommand(30,"retractFe55");
     
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
+
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+except ScriptingTimeoutException, ex:                                                     
+
+# retract the Fe55 arm
+#    xedsub.synchCommand(30,"retractFe55");
+    
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
+
+    raise Exception("There was an ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "FE55: END"

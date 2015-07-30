@@ -29,6 +29,17 @@ try:
 # Initialization
     print "doing initialization"
 
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+# move TS to ready state
+    result = tssub.synchCommand(60,"setTSReady");
+    reply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
+
+    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
+
     print "Loading configuration file into the Archon controller"
     result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
     reply = result.getResult();
@@ -43,11 +54,13 @@ try:
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
 
+    time.sleep(60.)
+
 # the first image is usually bad so throw it away
-    print "Throwing away the first image"
-    arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-    reply = result.getResult();
+#    print "Throwing away the first image"
+#    arcsub.synchCommand(10,"setFitsFilename","");
+#    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+#    reply = result.getResult();
 
     
 # move to TS acquisition state
@@ -105,7 +118,8 @@ try:
 
     
             print "start bias image exposure loop"
-            arcsub.synchCommand(10,"setParameter","ExpTime","0");
+#            arcsub.synchCommand(10,"setParameter","ExpTime","0");
+            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
 
             bcount = 2
             for i in range(bcount):
@@ -125,7 +139,8 @@ try:
 
 
             print "start dark image exposure loop"
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+            arcsub.synchCommand(10,"setAndApplyParam","ExpTime",str(int(exptime*1000)));
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
 
@@ -138,10 +153,10 @@ try:
 
             result = arcsub.synchCommand(10,"setFetch_timeout",5000000)
 
-            print "Throwing away the first image"
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(1000,"exposeAcquireAndSave");
-            reply = result.getResult();
+#            print "Throwing away the first image"
+#            arcsub.synchCommand(10,"setFitsFilename","");
+#            result = arcsub.synchCommand(1000,"exposeAcquireAndSave");
+#            reply = result.getResult();
 
             for i in range(imcount):
 

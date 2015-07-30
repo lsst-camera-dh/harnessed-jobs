@@ -35,10 +35,16 @@ try:
 
 # Initialization
 
-    print "resetting the Photo Diode device to make sure it is in a good state"
-    result = pdsub.synchCommand(20,"reset")
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+# move TS to ready state
+    result = tssub.synchCommand(60,"setTSReady");
     reply = result.getResult();
-    time.sleep(5.)
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
+
+    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
 
     if (doarch) :
         print "Loading configuration file into the Archon controller"
@@ -50,13 +56,13 @@ try:
         print "Powering on the CCD"
         result = arcsub.synchCommand(30,"powerOnCCD");
         reply = result.getResult();
-        time.sleep(3.);
+        time.sleep(60.);
         arcsub.synchCommand(10,"setAcqParam","Nexpo");
         arcsub.synchCommand(10,"setParameter","Expo","1");
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.000002)
+    pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
 
 # get the glowing vacuum gauge off
@@ -228,10 +234,24 @@ try:
 
 except Exception, ex:
 
+# move TS to ready state                    
+    tssub.synchCommand(60,"setTSReady");
+
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
     result = pdsub.synchCommand(10,"softReset");
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+except ScriptingTimeoutException, ex:
+
+# move TS to ready state                    
+    tssub.synchCommand(60,"setTSReady");
+
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
+    result = pdsub.synchCommand(10,"softReset");
+    raise Exception("There was a ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "preflight_acq: COMPLETED"

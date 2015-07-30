@@ -26,11 +26,11 @@ try:
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
-    print "attaching XED subsystem"
-    xedsub   = CCS.attachSubsystem("%s/Fe55" % ts);
+#    print "attaching XED subsystem"
+#    xedsub   = CCS.attachSubsystem("%s/Fe55" % ts);
 
 # retract the Fe55 arm
-    xedsub.synchCommand(30,"retractFe55");
+#    xedsub.synchCommand(30,"retractFe55");
 
     time.sleep(3.)
 
@@ -38,10 +38,16 @@ try:
 
 # Initialization
 
-    print "resetting the Photo Diode device to make sure it is in a good state"
-    result = pdsub.synchCommand(20,"reset")
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+# move TS to ready state
+    result = tssub.synchCommand(60,"setTSReady");
     reply = result.getResult();
-    time.sleep(5.)
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
+
+    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
 
     print "Loading configuration file into the Archon controller"
     result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
@@ -52,9 +58,11 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-    time.sleep(3.);
+    time.sleep(60.);
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
+    arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","Fe55","1");
 
 # the first image is usually bad so throw it away
     print "Throwing away the first image"
@@ -184,8 +192,8 @@ try:
 
             for i in range(imcount):
 # extend the Fe55 arm
-                print "extend the Fe55 arm"
-                xedsub.synchCommand(30,"extendFe55");
+#                print "extend the Fe55 arm"
+#                xedsub.synchCommand(30,"extendFe55");
 
                 print "Starting Photo Diode recording at %f" % time.time()
                 print "You should see digits changing on the PD device"
@@ -208,7 +216,7 @@ try:
                 print "Done taking image at %f" % time.time()
 
 # retract the Fe55 arm
-                xedsub.synchCommand(30,"retractFe55");
+#                xedsub.synchCommand(30,"retractFe55");
 
                 print "done with exposure # %d" % i
                 print "retrieving photodiode readings at time = %f" % time.time();
@@ -364,7 +372,8 @@ try:
     tssub.synchCommand(60,"setTSReady");
 
 # retract the Fe55 arm
-    xedsub.synchCommand(30,"retractFe55");
+#    xedsub.synchCommand(30,"retractFe55");
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
@@ -374,8 +383,14 @@ try:
     print "          PLEASE PROCEED WITH THE EO TESTING"
 
 except Exception, ex:
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+except ScriptingTimeoutException, ex:
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
+
+    raise Exception("There was an ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 
 print "TS3_ready: COMPLETED"
