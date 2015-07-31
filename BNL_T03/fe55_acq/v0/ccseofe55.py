@@ -47,6 +47,7 @@ try:
 
     print "Loading configuration file into the Archon controller"
     result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
+#    result = arcsub.synchCommand(20,"setConfigFromFile","/home/ts3prod/prod/acfs/bnl_STA_20150730_Fe55.acf");
     reply = result.getResult();
     print "Applying configuration"
     result = arcsub.synchCommand(25,"applyConfig");
@@ -60,13 +61,14 @@ try:
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","1");
-    
+
+#    arcsub.synchCommand(10,"setDefaultCCDTypeName","BNLITL");
 
 # the first image is usually bad so throw it away
-    print "Throwing away the first image"
-    arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-    reply = result.getResult();
+#    print "Throwing away the first image"
+#    arcsub.synchCommand(10,"setFitsFilename","");
+#    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+#    reply = result.getResult();
 
 # retract the Fe55 arm
 #    xedsub.synchCommand(30,"retractFe55");
@@ -79,7 +81,7 @@ try:
     
     # move to TS acquisition state
     print "setting acquisition state"
-    result = tssub.synchCommand(10,"setTSTEST");
+    result = tssub.synchCommand(60,"setTSTEST");
     rply = result.getResult();
     
 # get the glowing vacuum gauge off
@@ -108,6 +110,10 @@ try:
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
     
+    print "Now collect some parameters from the config file"
+    bcount = float(eolib.getCfgVal(acqcfgfile, 'FE55_BCOUNT', default = "2"))
+    dcount = float(eolib.getCfgVal(acqcfgfile, 'FE55_DCOUNT', default = "2"))
+
     seq = 0
 
 #number of PLCs between readings
@@ -138,11 +144,11 @@ try:
  
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+#            arcsub.synchCommand(10,"setFitsDirectory","/home/ts3prod/dumpster/");
 
             print "start bias exposure loop"
-            arcsub.synchCommand(10,"setParameter","ExpTime","0");
 
-            bcount = 2
+#            bcount = 2
             for i in range(bcount):
                 timestamp = time.time()
 
@@ -153,7 +159,8 @@ try:
                 result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
 
                 print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+                print "wait"
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
@@ -263,13 +270,13 @@ except Exception, ex:
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
-except ScriptingTimeoutException, ex:                                                     
+#except ScriptingTimeoutException, ex:                                                     
 
 # retract the Fe55 arm
 #    xedsub.synchCommand(30,"retractFe55");
     
-    arcsub.synchCommand(10,"setParameter","Fe55","0");
+#    arcsub.synchCommand(10,"setParameter","Fe55","0");
 
-    raise Exception("There was an ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+#    raise Exception("There was an ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "FE55: END"

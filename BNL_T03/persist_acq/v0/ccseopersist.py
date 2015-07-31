@@ -112,9 +112,10 @@ try:
     
     ccd = CCDID
     print "Working on CCD %s" % ccd
-    seq  = 0
+#    seq  = 0
     lseq = 0
     dseq = 0
+    bseq = 0
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'PERSIST_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'PERSIST_HILIM', default='120.0'))
@@ -147,7 +148,7 @@ try:
                     print "set fits filename"
                     fitsfilename = ""
                     if dowrite==1 :
-                        fitsfilename = "%s_%s_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,acqname,seq)
+                        fitsfilename = "%s_persist_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,bseq)
                     result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
     
                     print "Ready to take bias image. time = %f" % time.time()
@@ -155,6 +156,7 @@ try:
                     fitsfilename = result.getResult();
                     print "after click click at %f" % time.time()
                     time.sleep(0.2)
+                    bseq = bseq + 1
 
             if (acqtype==1 or acqtype==2) :
     
@@ -227,7 +229,11 @@ try:
     
 
 # ITL-113-10-3XXKhz_persist_dark_001_<timestamp>.fits
-                    fitsfilename = "%s_persist_%3d_${TIMESTAMP}.fits" % (ccd,acqname,lightdark,iseq)
+                    if (acqtype == 1 ) :
+                        iseq = lseq
+                    if (acqtype == 2 ) :
+                        iseq = dseq
+                    fitsfilename = "%s_persist_%s_%3.3d_${TIMESTAMP}.fits" % (ccd,lightdark,iseq)
                     arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
         
                     print "Ready to take image. time = %f" % time.time()
@@ -238,7 +244,7 @@ try:
                     print "done with exposure # %d" % i
                     print "getting photodiode readings at time = %f" % time.time();
     
-                    pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),seq,i+1)
+                    pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),iseq,i+1)
     
 # the primary purpose of this is to guarantee that the accumBuffer method has completed
                     print "starting the wait for an accumBuffer done status message at %f" % time.time()
