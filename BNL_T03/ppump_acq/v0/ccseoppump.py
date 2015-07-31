@@ -32,6 +32,17 @@ try:
 # Initialization
     print "doing initialization"
     
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+# move TS to ready state
+    result = tssub.synchCommand(60,"setTSReady");
+    reply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
+
+    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
+
     print "Loading configuration file into the Archon controller"
     result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
     reply = result.getResult();
@@ -41,7 +52,7 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-    time.sleep(3.);
+    time.sleep(60.);
 #    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
@@ -125,7 +136,6 @@ try:
             arcsub.synchCommand(10,"setParameter","Pdepth","1");
     
 # pump with some darks then do a light exposure
-# 2sec for the bias
             print "take some bias images with exptime = 0"
             arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
             arcsub.synchCommand(10,"setParameter","Light","0");
@@ -133,6 +143,8 @@ try:
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
+            result = arcsub.synchCommand(10,"setHeader","TestType","PPUMP")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(pcount):
 # start acquisition
                 timestamp = time.time()
@@ -169,6 +181,8 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
+            result = arcsub.synchCommand(10,"setHeader","TestType","PPUMP")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","PPUMP")
             for i in range(imcount):
                 print "Throwing away the first image"
                 arcsub.synchCommand(10,"setFitsFilename","");

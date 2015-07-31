@@ -66,7 +66,7 @@ class CcsSetup(OrderedDict):
         commands.append('sys.path.append("%s")' % siteUtils.pythonDir())
         return commands
 
-def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
+def ccsProducer(jobName, ccsScript, makeBiasDir=False, verbose=True):
     """
     Run the CCS data acquistion script under the CCS jython interpreter.
     """
