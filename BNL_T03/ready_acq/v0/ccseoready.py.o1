@@ -71,7 +71,7 @@ try:
     reply = result.getResult();
 
     print "Images will now automatically display in the DS9 window"
-    arcsub.synchCommand(10,"setSendImagesToDS9",True);
+    arcsub.synchCommand(10,"setSendImagesToDS9",False);
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -245,7 +245,6 @@ try:
 
     time.sleep(4.)
 ############################## LIGHT ###################################3
-    arcsub.synchCommand(10,"setParameter","Fe55","0");
     target = 1000.
     for wl in [450.,823.] :
 # take light exposures
@@ -380,7 +379,8 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
 
-    print "            TEST ACQUISITIONS COMPLETED"
+    print "            TEST STAND APPEARS TO BE READY"
+    print "          PLEASE PROCEED WITH THE EO TESTING"
 
 except Exception, ex:
     arcsub.synchCommand(10,"setParameter","Fe55","0");
