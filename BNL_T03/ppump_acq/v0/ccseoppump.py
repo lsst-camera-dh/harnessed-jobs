@@ -53,15 +53,15 @@ try:
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
     time.sleep(60.);
-#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
     
 # the first image is usually bad so throw it away
-    print "Throwing away the first image"
-    arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-    reply = result.getResult();
+#    print "Throwing away the first image"
+#    arcsub.synchCommand(10,"setFitsFilename","");
+#    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+#    reply = result.getResult();
 
     print "Setting the current ranges on the Bias and PD devices"
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -184,10 +184,10 @@ try:
             result = arcsub.synchCommand(10,"setHeader","TestType","PPUMP")
             result = arcsub.synchCommand(10,"setHeader","ImageType","PPUMP")
             for i in range(imcount):
-                print "Throwing away the first image"
-                arcsub.synchCommand(10,"setFitsFilename","");
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                reply = result.getResult();
+#                print "Throwing away the first image"
+#                arcsub.synchCommand(10,"setFitsFilename","");
+#                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+#                reply = result.getResult();
 
 
 # adjust timeout because we will be waiting for the data to become ready
