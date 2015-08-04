@@ -24,9 +24,10 @@ import tarfile
 
 print "Ingest LSST Vendor Data from ftp directory, SLAC:/nfs/farm/g/lsst/u1/vendorData/FTP"
 start = datetime.datetime.now()
-print start
+print 'start time: ',start
 print 'Current working directory: ',os.environ['PWD']
-os.system('printenv|grep -i lcatr')
+#rc = os.system('printenv|grep -i lcatr')
+rc = os.system('echo ALL ENVIRONMENT VARIABLES;printenv|sort;echo END ENVVAR LIST')
 
 vendor = os.environ['LCATR_UNIT_ID'].split('-')[0]
 LSSTID = os.environ['LCATR_UNIT_ID']
@@ -42,9 +43,6 @@ print 'vendorDir = ',vendorDir
 print 'vendorLDir = ',vendorLDir
 
 debug = True
-
-
-
 
 
 def regFiles(targetDir,targetLDirRoot,deliveryTime):
@@ -350,11 +348,13 @@ elif vendor == 'e2v':
       sys.exit(1)
 
    md5new = hashlib.md5(open(datafile).read()).hexdigest().upper()
+   print 'Old e2v checksum = ',md5old
    print 'New md5 checksum = ',md5new
    if md5old != md5new:
       print '\n%ERROR: Checksum error in vendor tarball:\n old md5 = ',md5old,'\n new md5 = ',md5new
       sys.exit(1)
       pass
+   print 'Checksums match.'
 
 
 # Uncompress/untar into target directory
@@ -376,20 +376,25 @@ elif vendor == 'e2v':
 
 
 # Create pointer to new Vendor Data for subsequent 'validator' step
-   # Look into the top level of the targetDir to find name of vendor delivery directory
-   topOfDelivery = ''
-   for root,dirs,files in os.walk(targetDir):
-      if len(dirs) == 1 and len(files) == 0:
-         topOfDelivery = os.path.join(root,dirs[0])
-      else:
-         print '%ERROR: vendor data delivery is not organized properly'
-         print 'root = ',root
-         print 'dirs = ',dirs
-         print 'files= ',files
-         sys.exit(1)
-         pass
-      break
-   print 'topOfDelivery = ',topOfDelivery
+
+## June 2015 e2v deliveries contained a number of subdirectories
+   ## # Look into the top level of the targetDir to find name of vendor delivery directory
+   ## topOfDelivery = ''
+   ## for root,dirs,files in os.walk(targetDir):
+   ##    if len(dirs) == 1 and len(files) == 0:
+   ##       topOfDelivery = os.path.join(root,dirs[0])
+   ##    else:
+   ##       print '%ERROR: vendor data delivery is not organized properly'
+   ##       print 'root = ',root
+   ##       print 'dirs = ',dirs
+   ##       print 'files= ',files
+   ##       sys.exit(1)
+   ##       pass
+   ##    break
+   ## print 'topOfDelivery = ',topOfDelivery
+
+## July 2015 e2v deliveries contain NO subdirectories - all files in top-level
+   topOfDelivery = targetDir
 
    try:
       os.symlink(topOfDelivery,'vendorData')
