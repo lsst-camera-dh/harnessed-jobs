@@ -127,7 +127,7 @@ try:
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
     fp = open(acqcfgfile,"r");
-    fpfiles = open("%s/acqfilelist" % cdir,"w");
+#    fpfiles = open("%s/acqfilelist" % cdir,"w");
 
     print "Scan at a low and a high wavelength to test monochromator and filter wheel"
     for ii in range(2) :
@@ -245,7 +245,6 @@ try:
 
     time.sleep(4.)
 ############################## LIGHT ###################################3
-    arcsub.synchCommand(10,"setParameter","Fe55","0");
     target = 1000.
     for wl in [450.,823.] :
 # take light exposures
@@ -380,7 +379,8 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
 
-    print "            TEST ACQUISITIONS COMPLETED"
+    print "            TEST STAND APPEARS TO BE READY"
+    print "          PLEASE PROCEED WITH THE EO TESTING"
 
 except Exception, ex:
     arcsub.synchCommand(10,"setParameter","Fe55","0");

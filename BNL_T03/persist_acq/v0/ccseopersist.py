@@ -13,7 +13,7 @@ import eolib
 CCS.setThrowExceptions(True);
 
 try:
-    acqname = "persist"
+    acqname = "PERSISTENCE"
 
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
@@ -32,6 +32,17 @@ try:
 # Initialization
     print "doing initialization"
 
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+# move TS to ready state
+    result = tssub.synchCommand(60,"setTSReady");
+    reply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
+
+    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
+
     print "Loading configuration file into the Archon controller"
     result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
     reply = result.getResult();
@@ -41,17 +52,10 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-    time.sleep(3.);
+    time.sleep(60.);
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setFetch_timeout",500000);
-
-# the first image is usually bad so throw it away
-#    print "Throwing away the first image"
-#    for i in range(3) :
-#        arcsub.synchCommand(10,"setFitsFilename","");
-#        result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-#        reply = result.getResult();
 
     print "Setting the current ranges on the Bias and PD devices so they don't overflow when the full power of the lamp is bearing down on the diodes"
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -94,6 +98,11 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
     rply = result.getResult();
 
+# wait
+    for i in range(10):
+        print "doing long wait ... step %d " % i
+        time.sleep(60.)
+
 # go through config file looking for  instructions, execute
  
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
@@ -103,10 +112,13 @@ try:
     
     ccd = CCDID
     print "Working on CCD %s" % ccd
-    seq = 0
+#    seq  = 0
+    lseq = 0
+    dseq = 0
+    bseq = 0
 
-    lo_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_LOLIM', default='1.0'))
-    hi_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_HILIM', default='120.0'))
+    lo_lim = float(eolib.getCfgVal(acqcfgfile, 'PERSIST_LOLIM', default='1.0'))
+    hi_lim = float(eolib.getCfgVal(acqcfgfile, 'PERSIST_HILIM', default='120.0'))
 
 
     print "Scanning config file for persist specifications";
@@ -136,7 +148,7 @@ try:
                     print "set fits filename"
                     fitsfilename = ""
                     if dowrite==1 :
-                        fitsfilename = "%s_%s_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,acqname,seq)
+                        fitsfilename = "%s_persist_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,bseq)
                     result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
     
                     print "Ready to take bias image. time = %f" % time.time()
@@ -144,6 +156,7 @@ try:
                     fitsfilename = result.getResult();
                     print "after click click at %f" % time.time()
                     time.sleep(0.2)
+                    bseq = bseq + 1
 
             if (acqtype==1 or acqtype==2) :
     
@@ -151,7 +164,8 @@ try:
                 print "start image exposure loop"
                 lightdark = "undef"
                 if (acqtype==1) :
-                    lightdark = "light"
+                    result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
+                    lightdark = "flat"
                     print "Received instruction for doing some Light exposures"
 # take light exposures
                     target = float(tokens[2])
@@ -177,11 +191,14 @@ try:
 
                 else :
                     lightdark = "dark"
+                    result = arcsub.synchCommand(10,"setHeader","ImageType","DARK")
                     print "Received instruction for doing some Dark exposures"
 # take exposures
                     arcsub.synchCommand(10,"setParameter","Light","0")
                     exptime = float(tokens[2])
                     imcount = int(tokens[3])
+
+#  ---- the rest is common to light/dark
 
                 arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 # prepare to readout diodes
@@ -192,10 +209,7 @@ try:
                     print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
     
                 result = arcsub.synchCommand(10,"setHeader","TestType",acqname)
-                result = arcsub.synchCommand(10,"setHeader","ImageType",acqname)
-                arcsub.synchCommand(10,"setFitsFilename","");
-                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-                reply = result.getResult();
+
 # adjust timeout because we will be waiting for the data to become ready both
 # at the accumbuffer stage and the readbuffer stage
                 mywait = nplc/60.*nreads*1.10 ;
@@ -214,7 +228,12 @@ try:
                     timestamp = time.time()
     
 
-                    fitsfilename = "%s_%s_%s_%d_${TIMESTAMP}.fits" % (ccd,acqname,lightdark,i+1)
+# ITL-113-10-3XXKhz_persist_dark_001_<timestamp>.fits
+                    if (acqtype == 1 ) :
+                        iseq = lseq
+                    if (acqtype == 2 ) :
+                        iseq = dseq
+                    fitsfilename = "%s_persist_%s_%3.3d_${TIMESTAMP}.fits" % (ccd,lightdark,iseq)
                     arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
         
                     print "Ready to take image. time = %f" % time.time()
@@ -225,7 +244,7 @@ try:
                     print "done with exposure # %d" % i
                     print "getting photodiode readings at time = %f" % time.time();
     
-                    pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),seq,i+1)
+                    pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),iseq,i+1)
     
 # the primary purpose of this is to guarantee that the accumBuffer method has completed
                     print "starting the wait for an accumBuffer done status message at %f" % time.time()
@@ -241,11 +260,15 @@ try:
     
                     result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
                     fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
+
+                    if (acqtype == 1 ) :
+                        lseq = lseq + 1
+                    if (acqtype == 2 ) :
+                        dseq = dseq + 1
      
       
 # reset timeout to something reasonable for a regular command
                 pdsub.synchCommand(1000,"setTimeout",10.);
-                seq = seq + 1
     
     fpfiles.close();
     fp.close();
@@ -259,9 +282,11 @@ try:
     
     fp.close();
     
-# move TS to idle state
-                        
-    tssub.synchCommand(10,"setTSReady");
+# move TS to ready state
+    result = tssub.synchCommand(60,"setTSReady");
+    reply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);

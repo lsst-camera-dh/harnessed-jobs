@@ -4,5 +4,6 @@
     'schema_version' : 0,
     'amp' : int,
     'gain' : float,
+    'gain_error' : float,
     'psf_sigma' : float
 }

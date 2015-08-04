@@ -34,10 +34,16 @@ try:
 # Initialization
     print "doing initialization"
 
-    print "resetting PD device"
-#    result = pdsub.synchCommand(20,"reset")
-#    reply = result.getResult();
-#    time.sleep(5.)
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+# move TS to ready state
+    result = tssub.synchCommand(60,"setTSReady");
+    reply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
+
+    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
 
     print "Loading configuration file into the Archon controller"
     result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
@@ -48,19 +54,21 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-    time.sleep(3.);
+#    time.sleep(3.);
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
-    arcsub.synchCommand(10,"setFetch_timeout",500000);
+    arcsub.synchCommand(10,"setFetch_timeout",900000);
+
+    time.sleep(60.);
 
 # the first image is usually bad so throw it away
-    print "Throwing away the first image"
-    arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-    reply = result.getResult();
+#    print "Throwing away the first image"
+#    arcsub.synchCommand(10,"setFitsFilename","");
+#    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+#    reply = result.getResult();
 
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.0000002)
+    pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
 # move to TS acquisition state
     print "setting acquisition state"
@@ -92,6 +100,8 @@ try:
 # get the glowing vacuum gauge off
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
     rply = result.getResult();
+# it takes time for it to fade away
+    time.sleep(5.)
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
@@ -128,6 +138,8 @@ try:
 
             arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
             arcsub.synchCommand(10,"setParameter","Light","0");
+#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
+#            arcsub.synchCommand(10,"setAndApplyParam","Light","0");
 
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
@@ -148,13 +160,14 @@ try:
 
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
+#            arcsub.synchCommand(10,"setAndApplyParam","Light","1");
 #            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
             print "setting the monochromator wavelength"
 #            if (exptime > lo_lim):
-            result = monosub.synchCommand(120,"setWaveAndFilter",wl);
+            result = monosub.synchCommand(500,"setWaveAndFilter",wl);
             rply = result.getResult()
             time.sleep(4.)
             try:
@@ -180,22 +193,34 @@ try:
 
 # do in-job flux calibration
             arcsub.synchCommand(10,"setParameter","ExpTime","2000");
+#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","2000");
 
+# dispose of first image
             arcsub.synchCommand(10,"setFitsFilename","");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             rply = result.getResult();
-            arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
 
+
+            result  = arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             flncal = result.getResult();
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
-
+# cleanup
+#            os.rm(flncal)
+# scale 
             flux = flux * 0.50
 
             exptime = target/flux
-            print "exposure time = %f" % exptime
+            print "needed exposure time = %f" % exptime
+            if (exptime > hi_lim) :
+                exptime = hi_lim
+            if (exptime < lo_lim) :
+                exptime = lo_lim
+            print "adjusted exposure time = %f" % exptime
+
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
@@ -207,11 +232,14 @@ try:
             result = arcsub.synchCommand(10,"setHeader","TestType","QE")
             result = arcsub.synchCommand(10,"setHeader","ImageType","QE")
 
-            print "Throwing away the first image"
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-            reply = result.getResult();
-            time.sleep(exptime)
+#            print "Throwing away the first image"
+#            arcsub.synchCommand(10,"setFitsFilename","");
+#            result = arcsub.synchCommand(500,"exposeAcquireAndSaveWithoutApply");
+#            reply = result.getResult();
+#            result = arcsub.synchCommand(500,"waitForExpoEnd");
+#            reply = result.getResult();
+
+#            time.sleep(exptime)
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
@@ -234,8 +262,8 @@ try:
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
 
-                print "Ready to take image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
 
@@ -293,6 +321,19 @@ except Exception, ex:
     buff = result.getResult()
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+except ScriptingTimeoutException, exx:
+
+    print "ScriptingTimeoutException at %f " % time.time()
+
+# get the glowing vacuum gauge back on
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
+
+    result = pdsub.synchCommand(10,"softReset");
+    buff = result.getResult()
+
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % exx)
 
 
 print "QE: END"

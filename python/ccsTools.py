@@ -54,7 +54,7 @@ class CcsSetup(OrderedDict):
         configDir = siteUtils.configDir()
         for line in open(configFile):
             key, value = line.strip().split("=")
-            self[key.strip()] = _quote(os.path.join(configDir, value.strip()))
+            self[key.strip()] = _quote(os.path.realpath(os.path.join(configDir, value.strip())))
     def __call__(self):
         """
         Return the setup commands for the CCS script.
@@ -66,7 +66,7 @@ class CcsSetup(OrderedDict):
         commands.append('sys.path.append("%s")' % siteUtils.pythonDir())
         return commands
 
-def ccsProducer(jobName, ccsScript, makeBiasDir=True, verbose=True):
+def ccsProducer(jobName, ccsScript, makeBiasDir=False, verbose=True):
     """
     Run the CCS data acquistion script under the CCS jython interpreter.
     """

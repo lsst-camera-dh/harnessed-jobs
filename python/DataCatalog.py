@@ -11,7 +11,7 @@ remote_hosts = {'SLAC' : 'rhel6-64.slac.stanford.edu'}
 
 def _get_job_id(dataset):
     folder = os.path.split(dataset.path)[0]
-    return str(os.path.split(folder)[1])
+    return str(os.path.split(folder)[1]) 
 
 def _get_job_name(dataset):
     "Get the name of the harnessed job from the Data Catalog folder name."
@@ -112,17 +112,41 @@ class DataCatalog(object):
             # Override the computed value.
             my_config_url = config_url
         self.client = datacat.Client(my_config_url)
-    def find_datasets(self, query, folder=None, pattern='**', job_id=None,
-                      job_name=None):
-        if folder is not None:
-            self.folder = folder
-        pattern_path = os.path.join(self.folder, pattern)
-        try:
-            resp = self.client.search(pattern_path, query=query)
-        except datacat.error.DcException, eobj:
-            print "Caught datacat.error.DcException:"
-            print eobj.raw
-            raise eobj
+    def find_datasets(self, query, folder=None, job_id=None, job_name=None,
+                      datacat_search_patterns = (None, '**')):
+        """
+        Find datasets in the Data Catalog given the self.folder
+        attribute or the specified folder.  For the default value of
+        datacat_search_patterns, do a recursive search only if no
+        files are found in the desired folder.
+        """
+        my_folder = folder
+        if folder is None:
+            my_folder = self.folder
+        for pattern in datacat_search_patterns:
+            if pattern is not None:
+                pattern_path = os.path.join(my_folder.rstrip('/'), pattern)
+            else:
+                pattern_path = my_folder.rstrip('/')
+            try:
+                resp = self.client.search(pattern_path, query=query)
+            except datacat.error.DcException, eobj:
+                print "Caught datacat.error.DcException:"
+                print eobj.raw
+                raise eobj
+            if resp:
+                # resp has data, so no need to try remaining search patterns.
+                break
+
+#        try:
+#            if folder is not None:
+#                resp = self.client.search(folder, query=query)
+#            else:
+#                resp = self.client.search(self.folder, query=query)
+#        except datacat.error.DcException, eobj:
+#            print "Caught datacat.error.DcException:"
+#            print eobj.raw
+#            raise eobj
         return DatasetList(resp, self, job_id=job_id, job_name=job_name)
 
 if __name__ == '__main__':

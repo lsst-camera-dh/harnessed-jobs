@@ -37,7 +37,7 @@ if (not (foundjython and foundts and foundarchon)) :
 #    def startappsmsg(apptxt):
 #        top.stop()
 #    A = Tkinter.Button(top, text = apptxt, command = lambda : startappsmsg(apptxt), bg = "red")
-    A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = "red")
+    A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = "red", font = ("Helvetica",24))
     A.pack()
     top.title('Please start missing CCS apps')
     top.mainloop()
@@ -65,7 +65,7 @@ filter2 = hdr2['FILTER']
 
 apptxt = "not OK"
 diodecol = "red"
-if (mondiode1 < 1.e-10 and mondiode2/mondiode1 > 2.0) :
+if (abs(mondiode1) > 1.e-10 and abs(mondiode2/mondiode1) > 2.0) :
     apptxt = "OK"
     diodecol = "green"
 
@@ -75,7 +75,7 @@ top = Tkinter.Tk()
 #def startappsmsg(apptxt):
 #    top.stop()
 #A = Tkinter.Button(top, text = apptxt, command = lambda : startappsmsg(apptxt), bg = diodecol)
-A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = diodecol)
+A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = diodecol, font = ("Helvetica",16))
 A.pack()
 top.title('Checking response of PDs')
 top.mainloop()

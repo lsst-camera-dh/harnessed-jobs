@@ -124,7 +124,7 @@ class ItlFitsTranslator(VendorFitsTranslator):
     def trap(self, pattern='', time_stamp=None,
              verbose=True):
         raise NotImplemented("ITL trap dataset translation not implemented.")
-    def sflat_500(self, pattern='superflat1/*_superflat.*.fits', 
+    def sflat_500(self, pattern='superflat2/*_superflat.*.fits', 
                   time_stamp=None, verbose=True):
         return self._processFiles('sflat_500', 'flat', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
@@ -221,7 +221,7 @@ class e2vFitsTranslator(VendorFitsTranslator):
              verbose=True):
         return self._processFiles('trap', 'ppump', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def sflat_500(self, pattern='*_sflatl_illu_*.fits', time_stamp=None,
+    def sflat_500(self, pattern='*_sflath_illu_*.fits', time_stamp=None,
                   verbose=True):
         return self._processFiles('sflat_500', 'flat', pattern,
                                   time_stamp=time_stamp, verbose=verbose)

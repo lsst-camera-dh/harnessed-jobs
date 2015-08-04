@@ -12,10 +12,16 @@ results = []
 #os.system("cp -vp %s/* ." % cddir)
 #os.system("chmod 644 *.*")
 
-
-files = siteUtils.dependency_glob('dlink/*.*',
+# edge scan files
+files = siteUtils.dependency_glob('edgelink/*.*',
                                   jobname=siteUtils.getProcessName('Make-OGP-Directories'),
                                   description='OGP result files:')
+
+# flatness files
+files = siteUtils.dependency_glob('flatlink/*.*',
+                                  jobname=siteUtils.getProcessName('Make-OGP-Directories'),
+                                  description='OGP result files:')
+
 #files = glob.glob('*.*')    
 data_products = [lcatr.schema.fileref.make(item) for item in files]
 results.extend(data_products)
