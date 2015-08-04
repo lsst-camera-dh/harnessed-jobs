@@ -153,7 +153,7 @@ try:
                 timestamp = time.time()
 
                 print "set fits filename"
-                fitsfilename = "%s_fe55_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+                fitsfilename = "%s_fe55_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,i)
                 result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                 result = arcsub.synchCommand(10,"setHeader","TestType","FE55")
                 result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
