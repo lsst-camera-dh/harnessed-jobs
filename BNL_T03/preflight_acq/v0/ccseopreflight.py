@@ -97,8 +97,8 @@ try:
             target = float(wl)
             print "target wl = %f" % target;
 
-            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
-
+#            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
+            exptime = 5.0
 
 # take bias images
             if (doarch) :

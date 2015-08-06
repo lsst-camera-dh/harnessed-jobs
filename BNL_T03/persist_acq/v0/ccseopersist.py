@@ -69,7 +69,7 @@ try:
 
 # move to TS acquisition state
     print "setting acquisition state"
-    result = tssub.synchCommand(10,"setTSTEST");
+    result = tssub.synchCommand(120,"setTSTEST");
     rply = result.getResult();
 
 #check state of ts devices
