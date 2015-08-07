@@ -56,13 +56,6 @@ try:
 
     time.sleep(60.)
 
-# the first image is usually bad so throw it away
-#    print "Throwing away the first image"
-#    arcsub.synchCommand(10,"setFitsFilename","");
-#    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-#    reply = result.getResult();
-
-    
 # move to TS acquisition state
     print "setting acquisition state"
     result = tssub.synchCommand(10,"setTSTEST");
@@ -93,6 +86,9 @@ try:
 # get the glowing vacuum gauge off
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
     rply = result.getResult();
+
+# wait until its dark .... very dark
+    time.sleep(30.)
 
 # go through config file looking for 'dark' instructions, take the darks
     
@@ -153,10 +149,6 @@ try:
 
             result = arcsub.synchCommand(10,"setFetch_timeout",5000000)
 
-#            print "Throwing away the first image"
-#            arcsub.synchCommand(10,"setFitsFilename","");
-#            result = arcsub.synchCommand(1000,"exposeAcquireAndSave");
-#            reply = result.getResult();
 
             for i in range(imcount):
 
@@ -200,7 +192,7 @@ try:
                 time.sleep(5.)
     
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-                result = pdsub.synchCommand(900,"readBuffer","%s/%s" % (cdir,pdfilename));
+                result = pdsub.synchCommand(1200,"readBuffer","%s/%s" % (cdir,pdfilename));
                 buff = result.getResult()
                 print "Finished getting readings at %f" % time.time()
 
@@ -209,6 +201,18 @@ try:
 
                 result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
+
+# ====================== clear the sensor by taking a bias image =================
+                arcsub.synchCommand(10,"setParameter","ExpTime","0");
+                fitsfilename = "%s_dark_biasclear_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+                result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                result = arcsub.synchCommand(10,"setHeader","TestType","DARK")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+
+                print "Ready to take bias image. time = %f" % time.time()
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                fitsfilename = result.getResult();
+                print "finished with bias clear %f" % time.time()
  
   
             seq = seq + 1
