@@ -98,12 +98,12 @@ try:
             print "target wl = %f" % target;
 
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
-            exptime = 5.0
+            exptime = 3.0
 
-# take bias images
+## take bias images
             if (doarch) :
-                result = arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
-                arcsub.synchCommand(10,"setParameter","Light","0");
+#                result = arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
+#                arcsub.synchCommand(10,"setParameter","Light","0");
 
                 print "setting location of bias fits directory"
                 arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
