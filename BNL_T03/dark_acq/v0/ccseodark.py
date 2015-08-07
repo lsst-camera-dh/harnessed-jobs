@@ -135,7 +135,7 @@ try:
 
 
             print "start dark image exposure loop"
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 #            arcsub.synchCommand(10,"setAndApplyParam","ExpTime",str(int(exptime*1000)));
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
@@ -152,6 +152,7 @@ try:
 
             for i in range(imcount):
 
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # adjust timeout because we will be waiting for the data to become ready both
 # at the accumbuffer stage and the readbuffer stage
