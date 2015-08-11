@@ -1,0 +1,8 @@
+# -*- python -*-
+{
+    'schema_name' : 'persistence',
+    'schema_version' : 0,
+    'amp' : int,
+    'median_flux' : float,
+    'stdev' : float
+}
