@@ -27,9 +27,9 @@ index = np.where(times == min(post_flat_times))[0][0]
 for amp in imutils.allAmps:
     median_flux = persistence[1].data.field('MEDIAN%02i' % amp)[index]
     stdev = persistence[1].data.field('STDEV%02i' % amp)[index]
-    results.append(lcatr.schema.valid(lcatr.schema.get('persistence'),
-                                      amp=amp, median_flux=median_flux,
-                                      stdev=stdev))
+    results.append(lcatr.schema.valid(lcatr.schema.get('persistence'), amp=amp,
+                                      deferred_charge_median=median_flux,
+                                      deferred_charge_stdev=stdev))
 
 results.append(siteUtils.packageVersions())
 

@@ -3,6 +3,6 @@
     'schema_name' : 'persistence',
     'schema_version' : 0,
     'amp' : int,
-    'median_flux' : float,
-    'stdev' : float
+    'deferred_charge_median' : float,
+    'deferred_charge_stdev' : float
 }
