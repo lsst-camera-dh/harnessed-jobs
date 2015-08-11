@@ -249,7 +249,10 @@ try:
     fp.close();
     
 # move TS to ready state
-    tssub.synchCommand(60,"setTSReady");
+    result = tssub.synchCommand(60,"setTSReady");
+    reply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
