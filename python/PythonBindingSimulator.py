@@ -14,7 +14,8 @@ class AcqSim(object):
                             ('qe', 'lambda'),
                             ('sflat', 'sflat_500'),
                             ('xtalk', 'spot'),
-                            ('ppump', 'trap')])
+                            ('ppump', 'trap'),
+                            ('persist', 'persistence')])
     def __init__(self, rootdir):
         self.rootdir = rootdir
     def getData(self, dataset):
