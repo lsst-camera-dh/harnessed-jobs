@@ -39,6 +39,8 @@ class JsonRepackager(object):
                      ('cti_parallel', 'CTI_PARALLEL'),
                      ('full_well', 'FULL_WELL'),
                      ('max_frac_dev', 'MAX_FRAC_DEV'),
+                     ('deferred_charge_median', 'DEFERRED_CHARGE_MEDIAN'),
+                     ('deferred_charge_stdev', 'DEFERRED_CHARGE_STDEV')
                      ))
     def __init__(self, outfile='eotest_results.fits'):
         """
@@ -152,6 +154,12 @@ print wl_files
 wl_file_path = os.path.split(wl_files[0])[0]
 plots.flat_fields(wl_file_path)
 pylab.savefig('%s_flat_fields.png' % sensor_id)
+
+# Image persistence
+persistence_file = processName_dependencyGlob('%s_persistence.fits' % sensor_id,
+                                              jobname='persistence')[0]
+plots.persistence(infile=persistence_file)
+pylab.savefig('%s_persistence.png' % sensor_id)
 
 # Create the test report pdf.
 report = sensorTest.EOTestReport(plots, wl_file_path)
