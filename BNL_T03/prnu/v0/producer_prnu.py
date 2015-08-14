@@ -5,7 +5,7 @@ import siteUtils
 import eotestUtils
 
 sensor_id = siteUtils.getUnitId()
-lambda_files = siteUtils.dependency_glob('*_lambda_*.fits',
+lambda_files = siteUtils.dependency_glob('*_lambda_flat_*.fits',
                                          jobname=siteUtils.getProcessName('qe_acq'),
                                          description='Lambda files:')
 mask_files = eotestUtils.glob_mask_files()
