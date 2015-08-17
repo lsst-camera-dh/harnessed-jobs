@@ -3,6 +3,7 @@ import glob
 import lcatr.schema
 import subprocess
 import os
+import stat
 
 #import siteUtils
 
