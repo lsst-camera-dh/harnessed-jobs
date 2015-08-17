@@ -15,10 +15,10 @@ print "Creating the top level directory for the CCD at %s" % topccddir
 edgedir = "%s/EdgeScan/" % topccddir
 print "Creating directory for edge scan results. Location is %s" % edgedir
 #os.mkdir(edgedir)
-flatdir = "%s/DimensionMetrology/" % topccddir
+flatdir = "%s/DimensionalMetrology/" % topccddir
 print "Creating directory for flatness results. Location is %s" % flatdir
 #os.mkdir(flatdir)
-edgedatedir = "%s%s" % (edgedir,time.strftime("%Y%m%d-%H:%M:%S"))
+edgedatedir = "%s%s" % (edgedir,time.strftime("%Y%m%d-%HH%MM%))
 print "Creating dated edge directory for the CCD at %s" % edgedatedir
 os.makedirs(edgedatedir)
 flatdatedir = "%s%s" % (flatdir,time.strftime("%Y%m%d-%H:%M:%S"))
