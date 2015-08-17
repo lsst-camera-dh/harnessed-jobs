@@ -7,6 +7,8 @@ import tkMessageBox
 import time
 
 
+ogpscriptname = "CCDa\ Edge\ scan\ Abs\ hgt\ Flatness\ robust.RTN"
+
 ccd = os.environ["LCATR_UNIT_ID"]
 #/cygdrive/c/Production DATA/ITL-STA3800B-160641/Flatness/150812
 topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
@@ -56,6 +58,8 @@ print "untarring"
 os.system("cd %s ; tar -vzxf %s.tar.gz" % (ogpscriptshome,tag))
 print "making a link to it"
 os.system("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
+
+os.system("cp -vp %s/%s %s" % (ogpscriptshome,ogpscriptname,flatdatedir))
 
 os.system("cd %s" % cwd)
 
