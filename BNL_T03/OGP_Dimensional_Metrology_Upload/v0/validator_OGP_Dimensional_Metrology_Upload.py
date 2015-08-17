@@ -17,10 +17,10 @@ print "looking for links to edge, flatness and absolute height files in %s and %
 #os.sys("chmod 644 %s/*.*" % theogpflatdir)
 edgefiles = glob.glob("%s/*.*" % theogpedgedir)
 for fl in edgefiles :
-    os.sys("chmod 644 %s" % fl)
+    os.system("chmod 644 %s" % fl)
 flatfiles = glob.glob("%s/*.*" % theogpflatdir)
 for fl in flatfiles :
-    os.sys("chmod 644 %s" % fl)
+    os.system("chmod 644 %s" % fl)
 #abshghtfiles = glob.glob("%s/*.*" % theogpabshghtdir)
 
 #files = glob.glob('*.*')
