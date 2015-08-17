@@ -13,16 +13,18 @@ theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))
 theogpflatdir = os.path.realpath("%s/flatlink/" % ogpdir.strip("\n"))
 #theogpabshghtdir = os.path.realpath("%s/abshghtlink/" % ogpdir.strip("\n"))
 print "Edge scan file will now be moved from C:/DATA/Image  files to %s" % theogpedgedir
-os.system("mv C:/DATA/Image\ files/* %s")
+os.system("mv C:/DATA/Image\ files/* %s" % theogpedgedir)
 print "looking for links to edge, flatness and absolute height files in %s and %s" % (theogpedgedir,theogpflatdir)
 #os.sys("chmod 644 %s/*.*" % theogpedgedir)
 #os.sys("chmod 644 %s/*.*" % theogpflatdir)
 edgefiles = glob.glob("%s/*.*" % theogpedgedir)
 for fl in edgefiles :
-    os.system("chmod 644 %s" % fl)
+    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
+#    os.system("chmod 644 %s" % fl)
 flatfiles = glob.glob("%s/*.*" % theogpflatdir)
 for fl in flatfiles :
-    os.system("chmod 644 %s" % fl)
+    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
+#    os.system("chmod 644 %s" % fl)
 #abshghtfiles = glob.glob("%s/*.*" % theogpabshghtdir)
 
 #files = glob.glob('*.*')
