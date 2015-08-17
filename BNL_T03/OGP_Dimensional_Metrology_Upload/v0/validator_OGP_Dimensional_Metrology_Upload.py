@@ -13,13 +13,13 @@ ogpdir = subprocess.check_output("ls -rtd %s/../../../Setup-InJig-Metrology-Dire
 theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))
 theogpflatdir = os.path.realpath("%s/flatlink/" % ogpdir.strip("\n"))
 
-os.system("cp -r %s DimensionalMetrology/" % theogpflatdir.strip("/"))
+os.system("cp -r /%s DimensionalMetrology/" % theogpflatdir.strip("/"))
 
 #theogpabshghtdir = os.path.realpath("%s/abshghtlink/" % ogpdir.strip("\n"))
 print "Edge scan file will now be moved from C:/DATA/Image  files to %s" % theogpedgedir
 os.system("cp -v /cygdrive/c/DATA/Image\ files/* %s" % theogpedgedir)
 
-os.system("cp -r %s EdgeScan/" % theogpedgedir.strip("/"))
+os.system("cp -r /%s EdgeScan/" % theogpedgedir.strip("/"))
 
 
 print "looking for links to edge, flatness and absolute height files in %s and %s" % (theogpedgedir,theogpflatdir)
