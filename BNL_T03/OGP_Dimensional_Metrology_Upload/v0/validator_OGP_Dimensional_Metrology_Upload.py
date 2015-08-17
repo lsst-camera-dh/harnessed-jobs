@@ -19,16 +19,17 @@ print "looking for links to edge, flatness and absolute height files in %s and %
 #os.sys("chmod 644 %s/*.*" % theogpedgedir)
 #os.sys("chmod 644 %s/*.*" % theogpflatdir)
 edgefiles = glob.glob("%s/*.*" % theogpedgedir)
-for fl in edgefiles :
-    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
+#for fl in edgefiles :
+#    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
 #    os.system("chmod 644 %s" % fl)
 flatfiles = glob.glob("%s/*.*" % theogpflatdir)
-for fl in flatfiles :
-    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
+#for fl in flatfiles :
+#    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
 #    os.system("chmod 644 %s" % fl)
 #abshghtfiles = glob.glob("%s/*.*" % theogpabshghtdir)
 
-os.system("rm -vr /cygdrive/c/DATA/Image\ files/")
+os.system("mv /cygdrive/c/DATA/Image\ files /cygdrive/c/DATA/Image\ files\ old")
+os.system("mkdir /cygdrive/c/DATA/Image\ files")
 
 #files = glob.glob('*.*')
 data_products1 = [lcatr.schema.fileref.make(item) for item in edgefiles]
