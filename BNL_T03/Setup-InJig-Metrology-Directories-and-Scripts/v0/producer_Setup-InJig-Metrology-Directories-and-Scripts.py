@@ -22,10 +22,10 @@ print "Creating directory for flatness results. Location is %s" % flatdir
 #os.mkdir(flatdir)
 edgedatedir = "%s%s" % (edgedir,time.strftime("%Y%m%d-%HH%MM"))
 print "Creating dated edge directory for the CCD at %s" % edgedatedir
-os.makedirs(edgedatedir)
+os.makedirs(edgedatedir,777)
 flatdatedir = "%s%s" % (flatdir,time.strftime("%Y%m%d-%HH%MM"))
 print "Creating dated edge directory for the CCD at %s" % flatdatedir
-os.makedirs(flatdatedir)
+os.makedirs(flatdatedir,777)
 print "Please setup the OGP MeasureMind application to store results in respective edge scan and flatness directories indicated above"
 # leave a link to the location where the files should go
 print "Making links to the data directories in %s" % os.getcwd()
