@@ -154,6 +154,8 @@ try:
                 print "Ready to take bias image. time = %f" % time.time()
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
 

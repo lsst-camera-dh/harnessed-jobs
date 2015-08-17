@@ -212,6 +212,9 @@ try:
 
                     result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                     fitsfilename = result.getResult();
+                    result = arcsub.synchCommand(500,"waitForExpoEnd");
+                    rply = result.getResult();
+
 # retract the Fe55 arm
 #                xedsub.synchCommand(30,"retractFe55");
     
