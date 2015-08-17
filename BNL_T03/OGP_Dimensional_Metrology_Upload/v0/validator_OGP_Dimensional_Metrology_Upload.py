@@ -13,10 +13,14 @@ theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))
 theogpflatdir = os.path.realpath("%s/flatlink/" % ogpdir.strip("\n"))
 #theogpabshghtdir = os.path.realpath("%s/abshghtlink/" % ogpdir.strip("\n"))
 print "looking for links to edge, flatness and absolute height files in %s and %s" % (theogpedgedir,theogpflatdir)
-os.sys("chmod 644 %s/*.*" % theogpedgedir)
-os.sys("chmod 644 %s/*.*" % theogpflatdir)
+#os.sys("chmod 644 %s/*.*" % theogpedgedir)
+#os.sys("chmod 644 %s/*.*" % theogpflatdir)
 edgefiles = glob.glob("%s/*.*" % theogpedgedir)
+for fl in edgefiles :
+    os.sys("chmod 644 %s" % fl)
 flatfiles = glob.glob("%s/*.*" % theogpflatdir)
+for fl in flatfiles :
+    os.sys("chmod 644 %s" % fl)
 #abshghtfiles = glob.glob("%s/*.*" % theogpabshghtdir)
 
 #files = glob.glob('*.*')
