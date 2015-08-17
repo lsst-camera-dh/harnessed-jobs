@@ -12,17 +12,26 @@ ogpdir = subprocess.check_output("ls -rtd %s/../../../Setup-InJig-Metrology-Dire
 
 theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))
 theogpflatdir = os.path.realpath("%s/flatlink/" % ogpdir.strip("\n"))
+
+os.system("cp -rp %s DimensionalMetrology/" % theogpflatdir)
+
 #theogpabshghtdir = os.path.realpath("%s/abshghtlink/" % ogpdir.strip("\n"))
 print "Edge scan file will now be moved from C:/DATA/Image  files to %s" % theogpedgedir
 os.system("cp -v /cygdrive/c/DATA/Image\ files/* %s" % theogpedgedir)
+
+os.system("cp -rp %s EdgeScan/" % theopgedgedir)
+
+
 print "looking for links to edge, flatness and absolute height files in %s and %s" % (theogpedgedir,theogpflatdir)
 #os.sys("chmod 644 %s/*.*" % theogpedgedir)
 #os.sys("chmod 644 %s/*.*" % theogpflatdir)
-edgefiles = glob.glob("%s/*.*" % theogpedgedir)
+#edgefiles = glob.glob("%s/*.*" % theogpedgedir)
+edgefiles = glob.glob("EdgeScan/*.*")
 #for fl in edgefiles :
 #    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
 #    os.system("chmod 644 %s" % fl)
-flatfiles = glob.glob("%s/*.*" % theogpflatdir)
+#flatfiles = glob.glob("%s/*.*" % theogpflatdir)
+flatfiles = glob.glob("DimensionalMetrology/*.*")
 #for fl in flatfiles :
 #    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
 #    os.system("chmod 644 %s" % fl)
