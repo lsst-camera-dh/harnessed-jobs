@@ -53,7 +53,7 @@ os.system("cd %s ; cp -Lvrp OGP-scripts /tmp/ ; mv OGP-scripts moved-OGP-scripts
 print "downloading tar of new tag"
 os.system("cd %s ; wget https://github.com/lsst-camera-dh/OGP-scripts/archive/%s.tar.gz" % (ogpscriptshome,tag))
 print "untarring"
-os.system("cd %s ; tar -vzxf %s.tar.gz" % (eogpscriptshome,tag))
+os.system("cd %s ; tar -vzxf %s.tar.gz" % (ogpscriptshome,tag))
 print "making a link to it"
 os.system("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
 
