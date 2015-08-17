@@ -13,7 +13,7 @@ theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))
 theogpflatdir = os.path.realpath("%s/flatlink/" % ogpdir.strip("\n"))
 #theogpabshghtdir = os.path.realpath("%s/abshghtlink/" % ogpdir.strip("\n"))
 print "Edge scan file will now be moved from C:/DATA/Image  files to %s" % theogpedgedir
-os.system("mv C:/DATA/Image\ files/* %s" % theogpedgedir)
+os.system("mv /cygdrive/c/DATA/Image\ files/* %s" % theogpedgedir)
 print "looking for links to edge, flatness and absolute height files in %s and %s" % (theogpedgedir,theogpflatdir)
 #os.sys("chmod 644 %s/*.*" % theogpedgedir)
 #os.sys("chmod 644 %s/*.*" % theogpflatdir)
