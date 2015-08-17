@@ -59,7 +59,7 @@ os.system("cd %s ; tar -vzxf %s.tar.gz" % (ogpscriptshome,tag))
 print "making a link to it"
 os.system("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
 
-os.system("cp -vp %s/%s %s" % (ogpscriptshome,ogpscriptname,flatdatedir))
+os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname,flatdatedir))
 
 os.system("cd %s" % cwd)
 
