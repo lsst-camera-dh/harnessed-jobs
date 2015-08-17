@@ -9,7 +9,7 @@ import time
 
 ccd = os.environ["LCATR_UNIT_ID"]
 #/cygdrive/c/Production DATA/ITL-STA3800B-160641/Flatness/150812
-topccddir = "/cygdrive/c/Production DATA/%s" % ccd
+topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
 print "Creating the top level directory for the CCD at %s" % topccddir
 #os.mkdir(topccddir)
 edgedir = "%s/EdgeScan/" % topccddir
@@ -37,7 +37,7 @@ os.system("ls -lrt")
 #M.pack()
 #top.title('OGP Dirs Ready')
 #top.mainloop()
-print "Please setup the OGP MeasureMind application to store\nedge scan results in %s edgedatedir\nand\nflatness results in %s" % (edgedatedir,flatdatedir)
+print "Please setup the OGP MeasureMind application to store\nedge scan results in %s \nand\nflatness results in %s" % (edgedatedir,flatdatedir)
 print "============================================="
 print "Now installing scripts"
 tag = os.environ["OGP_SCRIPTS_TAG"]
