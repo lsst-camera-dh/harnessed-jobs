@@ -13,6 +13,10 @@ ogpdir = subprocess.check_output("ls -rtd %s/../../../Setup-InJig-Metrology-Dire
 theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))
 theogpflatdir = os.path.realpath("%s/flatlink/" % ogpdir.strip("\n"))
 
+os.mkdir("DimensionalMetrology")
+os.mkdir("EdgeScan")
+
+
 print "The copy command will be: cp -r /%s DimensionalMetrology/" % theogpflatdir.strip("/")
 os.system("cp -r /%s DimensionalMetrology/" % theogpflatdir.strip("/"))
 
