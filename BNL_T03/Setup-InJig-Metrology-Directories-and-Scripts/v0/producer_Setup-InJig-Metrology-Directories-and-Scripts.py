@@ -41,22 +41,22 @@ print "Please setup the OGP MeasureMind application to store\nedge scan results 
 print "============================================="
 print "Now installing scripts"
 tag = os.environ["OGP_SCRIPTS_TAG"]
-eohome = os.environ["OGP_SCRIPTS_HOME"]
+ogpscriptshome = os.environ["OGP_SCRIPTS_HOME"]
 
 
 print "The release of OGP-scripts with tag %s will be installed" % tag
 cwd = os.getcwd() 
-print "copying old installation of harnessed jobs to a safe place"
-os.system("cd %s ; cp -Lrvp harnessed-jobs old-harnessed-jobs-`date +%%F-%%R`" % eohome)
+print "copying old installation of OGP scripts to a safe place"
+os.system("cd %s ; cp -Lrvp OGP-scripts old-OGP-scripts-`date +%%F-%%R`" % ogpscriptshome)
 print "moving the original to /tmp"
-os.system("cd %s ; cp -Lvrp harnessed-jobs /tmp/ ; mv harnessed-jobs moved-harnessed-jobs" % eohome)
+os.system("cd %s ; cp -Lvrp OGP-scripts /tmp/ ; mv OGP-scripts moved-OGP-scripts" % ogpscriptshome)
 print "downloading tar of new tag"
-os.system("cd %s ; wget https://github.com/lsst-camera-dh/harnessed-jobs/archive/%s.tar.gz" % (eohome,tag))
+os.system("cd %s ; wget https://github.com/lsst-camera-dh/OGP-scripts/archive/%s.tar.gz" % (ogpscriptshome,tag))
 print "untarring"
-os.system("cd %s ; tar -vzxf %s.tar.gz" % (eohome,tag))
+os.system("cd %s ; tar -vzxf %s.tar.gz" % (eogpscriptshome,tag))
 print "making a link to it"
-os.system("cd %s ; ln -s harnessed-jobs-%s harnessed-jobs" % (eohome,tag))
+os.system("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
 
 os.system("cd %s" % cwd)
 
-print "The release has been installed."
+print "The OGP acquisition and analysis scripts have been installed."
