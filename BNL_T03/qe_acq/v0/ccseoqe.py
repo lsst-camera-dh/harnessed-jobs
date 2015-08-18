@@ -119,6 +119,21 @@ try:
     print "set filter position"
     monosub.synchCommand(30,"setFilter",1); # open position
 
+# clear the buffers
+    print "doing some unrecorded bias acquisitions to clear the buffers"
+    print "set controller for bias exposure"
+    arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","ExpTime","0");
+    for i in range(5):
+        timestamp = time.time()
+        result = arcsub.synchCommand(10,"setFitsFilename","");
+        print "Ready to take clearing bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        rply = result.getResult()
+        result = arcsub.synchCommand(500,"waitForExpoEnd");
+        rply = result.getResult();
+
+
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
     fp = open(acqcfgfile,"r");
@@ -258,7 +273,7 @@ try:
 
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_lambda_%3.3d_%3.3d_lambda_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
+                fitsfilename = "%s_lambda_%3.3d_%3.3d_flat_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       

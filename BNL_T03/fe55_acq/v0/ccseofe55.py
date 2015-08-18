@@ -96,7 +96,7 @@ try:
             break
         time.sleep(5.)
 
-    #put in acquisition state
+#put in acquisition state
     print "go teststand go"
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
@@ -112,6 +112,20 @@ try:
 
     ccd = CCDID
     print "Working on CCD %s" % ccd
+
+# clear the buffers
+    print "doing some unrecorded bias acquisitions to clear the buffers"
+    print "set controller for bias exposure"
+    arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","ExpTime","0");
+    for i in range(5):
+        timestamp = time.time()
+        result = arcsub.synchCommand(10,"setFitsFilename","");
+        print "Ready to take clearing bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        rply = result.getResult()
+        result = arcsub.synchCommand(500,"waitForExpoEnd");
+        rply = result.getResult();
 
 # go through config file looking for 'fe55' instructions, take the fe55s
     print "Scanning config file for fe55 specifications";
@@ -138,7 +152,6 @@ try:
 
             print "start bias exposure loop"
 
-#            bcount = 2
             for i in range(bcount):
                 timestamp = time.time()
 

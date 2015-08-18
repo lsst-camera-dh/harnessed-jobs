@@ -60,7 +60,7 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-    time.sleep(3.);
+    time.sleep(30.);
 
     print "set controller parameters for an exposure with the shutter closed"
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
@@ -127,6 +127,21 @@ try:
 
     ccd = CCDID
     print "Working on CCD %s" % ccd
+
+# clear the buffers                                                                                          
+    print "doing some unrecorded bias acquisitions to clear the buffers"
+    print "set controller for bias exposure"
+    arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","ExpTime","0");
+    for i in range(5):
+        timestamp = time.time()
+        result = arcsub.synchCommand(10,"setFitsFilename","");
+        print "Ready to take clearing bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        rply = result.getResult()
+        result = arcsub.synchCommand(500,"waitForExpoEnd");
+        rply = result.getResult();
+
 
 # go through config file looking for 'flat' instructions, take the flats
     print "Scanning config file for FLAT specifications";
@@ -259,13 +274,6 @@ try:
             result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
             result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
-            print "Throwing away the first image"
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-            reply = result.getResult();
-            result = arcsub.synchCommand(500,"waitForExpoEnd");
-            reply = result.getResult();
-#            time.sleep(exptime)
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
