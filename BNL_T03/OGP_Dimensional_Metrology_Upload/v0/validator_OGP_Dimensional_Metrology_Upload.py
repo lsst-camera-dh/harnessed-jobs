@@ -42,6 +42,7 @@ flatfiles = glob.glob("DimensionalMetrology/*.*")
 #    os.system("chmod 644 %s" % fl)
 #abshghtfiles = glob.glob("%s/*.*" % theogpabshghtdir)
 
+os.system("rm -rf /cygdrive/c/DATA/Image\ files\ old")
 os.system("mv /cygdrive/c/DATA/Image\ files /cygdrive/c/DATA/Image\ files\ old")
 os.system("mkdir /cygdrive/c/DATA/Image\ files")
 

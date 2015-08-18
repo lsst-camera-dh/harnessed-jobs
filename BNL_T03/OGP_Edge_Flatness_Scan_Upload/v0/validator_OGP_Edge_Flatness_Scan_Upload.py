@@ -9,19 +9,42 @@ import os
 results = []
 ogpdir = subprocess.check_output("ls -rtd %s/../../../Make-OGP-Edge-Flatness-Directories/v0/* | tail -1" % os.getcwd(), shell=True)
 
+
 theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))
 theogpflatdir = os.path.realpath("%s/flatlink/" % ogpdir.strip("\n"))
+
+os.mkdir("Flatness")
+os.mkdir("EdgeScan")
+
+
+print "The copy command will be: cp -r /%s Flatness/" % theogpflatdir.strip("/")
+os.system("cp -r /%s Flatness/" % theogpflatdir.strip("/"))
+
 #theogpabshghtdir = os.path.realpath("%s/abshghtlink/" % ogpdir.strip("\n"))
+print "Edge scan file will now be moved from C:/DATA/Image  files to %s" % theogpedgedir
+os.system("cp -v /cygdrive/c/DATA/Image\ files/* %s" % theogpedgedir)
+
+os.system("cp -r /%s EdgeScan/" % theogpedgedir.strip("/"))
+
+
 print "looking for links to edge, flatness and absolute height files in %s and %s" % (theogpedgedir,theogpflatdir)
 #os.sys("chmod 644 %s/*.*" % theogpedgedir)
 #os.sys("chmod 644 %s/*.*" % theogpflatdir)
-edgefiles = glob.glob("%s/*.*" % theogpedgedir)
-for fl in edgefiles :
-    os.system("chmod 644 %s" % fl)
-flatfiles = glob.glob("%s/*.*" % theogpflatdir)
-for fl in flatfiles :
-    os.system("chmod 644 %s" % fl)
+#edgefiles = glob.glob("%s/*.*" % theogpedgedir)
+edgefiles = glob.glob("EdgeScan/*.*")
+#for fl in edgefiles :
+#    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
+#    os.system("chmod 644 %s" % fl)
+#flatfiles = glob.glob("%s/*.*" % theogpflatdir)
+flatfiles = glob.glob("Flatness/*.*")
+#for fl in flatfiles :
+#    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
+#    os.system("chmod 644 %s" % fl)
 #abshghtfiles = glob.glob("%s/*.*" % theogpabshghtdir)
+
+os.system("rm -rf /cygdrive/c/DATA/Image\ files\ old")
+os.system("mv /cygdrive/c/DATA/Image\ files /cygdrive/c/DATA/Image\ files\ old")
+os.system("mkdir /cygdrive/c/DATA/Image\ files")
 
 #files = glob.glob('*.*')
 data_products1 = [lcatr.schema.fileref.make(item) for item in edgefiles]
