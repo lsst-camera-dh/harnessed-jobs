@@ -124,6 +124,8 @@ try:
     print "Scanning config file for persist specifications";
     fp = open(acqcfgfile,"r");
     fpfiles = open("%s/acqfilelist" % cdir,"w");
+
+    result = arcsub.synchCommand(10,"setCCDnum",ccd)
     
     for line in fp:
         tokens = str.split(line)
@@ -148,7 +150,7 @@ try:
                     print "set fits filename"
                     fitsfilename = ""
                     if dowrite==1 :
-                        fitsfilename = "%s_persist_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,bseq)
+                        fitsfilename = "%s_persistence_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,bseq)
                     result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
     
                     print "Ready to take bias image. time = %f" % time.time()
@@ -233,7 +235,7 @@ try:
                         iseq = lseq
                     if (acqtype == 2 ) :
                         iseq = dseq
-                    fitsfilename = "%s_persist_%s_%3.3d_${TIMESTAMP}.fits" % (ccd,lightdark,iseq)
+                    fitsfilename = "%s_persistence_%s_%3.3d_${TIMESTAMP}.fits" % (ccd,lightdark,iseq)
                     arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
         
                     print "Ready to take image. time = %f" % time.time()

@@ -68,7 +68,7 @@ try:
 
 # move to TS acquisition state
     print "setting acquisition state"
-    result = tssub.synchCommand(10,"setTSTEST");
+    result = tssub.synchCommand(500,"setTSTEST");
     rply = result.getResult();
 
     
@@ -111,7 +111,7 @@ try:
     ccd = CCDID    
     print "Working on CCD %s" % ccd
 
- clear the buffers                                                                                          
+# clear the buffers
     print "doing some unrecorded bias acquisitions to clear the buffers"
     print "set controller for bias exposure"
     arcsub.synchCommand(10,"setParameter","Light","0");
@@ -154,7 +154,8 @@ try:
             result = monosub.synchCommand(60,"setFilter",1); # open position
             reply = result.getResult();
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
+            result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(bcount):
                 timestamp = time.time()
@@ -254,7 +255,7 @@ try:
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT")
-            result = arcsub.synchCommand(10,"setHeader","ImageType","SFLAT")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
             print "Throwing away the first image"
             arcsub.synchCommand(10,"setFitsFilename","");

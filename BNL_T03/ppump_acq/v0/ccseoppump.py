@@ -114,7 +114,7 @@ try:
     
     print "Working on CCD %s" % ccd
 
- clear the buffers                                                                                          
+# clear the buffers
     print "doing some unrecorded bias acquisitions to clear the buffers"
     print "set controller for bias exposure"
     arcsub.synchCommand(10,"setParameter","Light","0");
@@ -157,12 +157,13 @@ try:
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","PPUMP")
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
+            result = arcsub.synchCommand(10,"setHeader","TestType","TRAP")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(pcount):
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_ppump_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+                fitsfilename = "%s_trap_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
     
                 print "Ready to take bias image. time = %f" % time.time()
@@ -195,7 +196,7 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","PPUMP")
+            result = arcsub.synchCommand(10,"setHeader","TestType","TRAP")
             result = arcsub.synchCommand(10,"setHeader","ImageType","PPUMP")
             for i in range(imcount):
 #                print "Throwing away the first image"
@@ -217,7 +218,7 @@ try:
 # start acquisition
                 timestamp = time.time()
     
-                fitsfilename = "%s_trap_ppump_%3.3d_%3.3d_ppump%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
+                fitsfilename = "%s_trap_ppump_%3.3d_%3.3d_${TIMESTAMP}.fits" % (ccd,seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       

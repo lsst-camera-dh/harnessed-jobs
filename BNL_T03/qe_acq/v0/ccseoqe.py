@@ -72,7 +72,7 @@ try:
 
 # move to TS acquisition state
     print "setting acquisition state"
-    result = tssub.synchCommand(60,"setTSTEST");
+    result = tssub.synchCommand(500,"setTSTEST");
     rply = result.getResult();
 
 #check state of ts devices
@@ -159,7 +159,10 @@ try:
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","QE")
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
+
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
+            result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(bcount):
                 timestamp = time.time()
@@ -246,8 +249,8 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","QE")
-            result = arcsub.synchCommand(10,"setHeader","ImageType","QE")
+            result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
 #            print "Throwing away the first image"
 #            arcsub.synchCommand(10,"setFitsFilename","");

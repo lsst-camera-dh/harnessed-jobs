@@ -172,6 +172,7 @@ try:
  
             print "start bias exposure loop"
 
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
             result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(bcount):

@@ -133,6 +133,8 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime","0");
 #            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
 
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
+
             bcount = 3
             for i in range(bcount):
                 timestamp = time.time()
