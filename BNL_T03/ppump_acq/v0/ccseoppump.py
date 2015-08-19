@@ -188,7 +188,7 @@ try:
             rwl = result.getResult()
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
-
+            result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",str(rwl))
     
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200

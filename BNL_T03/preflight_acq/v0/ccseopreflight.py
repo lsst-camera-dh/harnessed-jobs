@@ -147,6 +147,8 @@ try:
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
 
+                result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",str(rwl))
+
                 print "getting filter wheel setting"
                 result = monosub.synchCommand(60,"getFilter");
                 ifl = result.getResult()

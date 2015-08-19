@@ -152,6 +152,7 @@ try:
 
             print "start bias exposure loop"
 
+            arcsub.synchCommand(10,"setParameter","Fe55","1");
             for i in range(bcount):
                 timestamp = time.time()
 

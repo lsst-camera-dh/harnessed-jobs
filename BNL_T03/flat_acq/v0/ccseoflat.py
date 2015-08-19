@@ -233,6 +233,7 @@ try:
 
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
+                result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",str(rwl))
 
 # do in-job flux calibration
                 arcsub.synchCommand(10,"setParameter","ExpTime","2000");
