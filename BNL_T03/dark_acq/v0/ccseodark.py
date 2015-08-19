@@ -53,6 +53,7 @@ try:
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
 
     time.sleep(60.)
 

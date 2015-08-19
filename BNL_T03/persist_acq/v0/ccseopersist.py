@@ -55,6 +55,7 @@ try:
     time.sleep(60.);
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
+    arcsub.synchCommand(10,"setParameter","Fe55","0")
     arcsub.synchCommand(10,"setFetch_timeout",500000);
 
     print "Setting the current ranges on the Bias and PD devices so they don't overflow when the full power of the lamp is bearing down on the diodes"

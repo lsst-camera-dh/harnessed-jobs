@@ -111,6 +111,8 @@ try:
     ccd = CCDID    
     print "Working on CCD %s" % ccd
 
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
+
 # clear the buffers
     print "doing some unrecorded bias acquisitions to clear the buffers"
     print "set controller for bias exposure"
@@ -229,10 +231,9 @@ try:
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
                 flux = float(result.getResult());
 
-# cleanup
-#            os.rm(flncal)
+
 # scale 
-                flux = flux * 0.50
+#                flux = flux * 0.50
 
                 print "The flux is determined to be %f" % flux
 

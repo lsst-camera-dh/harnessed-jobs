@@ -10,16 +10,16 @@ import time
 ogpscriptname = "CCDa\ Edge\ scan\ Abs\ hgt\ Flatness\ robust.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
-#/cygdrive/c/Production DATA/ITL-STA3800B-160641/Flatness/150812
+
 topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
 print "Creating the top level directory for the CCD at %s" % topccddir
-#os.mkdir(topccddir)
+
 edgedir = "%s/EdgeScan/" % topccddir
 print "Creating directory for edge scan results. Location is %s" % edgedir
-#os.mkdir(edgedir)
+
 flatdir = "%s/DimensionalMetrology/" % topccddir
 print "Creating directory for flatness results. Location is %s" % flatdir
-#os.mkdir(flatdir)
+
 edgedatedir = "%s%s" % (edgedir,time.strftime("%Y%m%d-%HH%MM"))
 print "Creating dated edge directory for the CCD at %s" % edgedatedir
 os.makedirs(edgedatedir)
@@ -29,6 +29,7 @@ print "Creating dated edge directory for the CCD at %s" % flatdatedir
 os.makedirs(flatdatedir)
 os.system("chmod 777 %s" %  flatdatedir)
 print "Please setup the OGP MeasureMind application to store results in respective edge scan and flatness directories indicated above"
+
 # leave a link to the location where the files should go
 print "Making links to the data directories in %s" % os.getcwd()
 os.system("ln -s %s edgelink" % edgedatedir);
@@ -41,6 +42,7 @@ os.system("ls -lrt")
 #M.pack()
 #top.title('OGP Dirs Ready')
 #top.mainloop()
+
 print "Please setup the OGP MeasureMind application to store\nedge scan results in %s \nand\nflatness results in %s" % (edgedatedir,flatdatedir)
 print "============================================="
 print "Now installing scripts"

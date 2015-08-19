@@ -56,6 +56,7 @@ try:
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
     
 # the first image is usually bad so throw it away
 #    print "Throwing away the first image"
