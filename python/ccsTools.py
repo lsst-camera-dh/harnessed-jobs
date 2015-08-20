@@ -115,7 +115,7 @@ def ccsTrendingPlots(quantities, outfile_suffix, credentials_file,
         pylab.ylabel(quantity)
         pylab.savefig('%s_%s.png'%(quantity.replace('/', '_'), outfile_suffix))
 
-def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
+def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','teststand_version','teststand_revision','archon_version','archon_revision')):
     try:
         hdrtools.updateFitsHeaders(acqfilelist)
     except IOError:
@@ -130,12 +130,20 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat',)):
     try:
         statusFile = open("status.out")
         for flag in statusFlags:
-            value = int(statusFile.readline().strip())
-            statusAssignments[flag] = value
+            if (flag=='stat') :
+                value = int(statusFile.readline().strip())
+                statusAssignments[flag] = value
+            else :
+                strval = statusFile.readline().strip()
+                statusAssignments[flag] = strval
     except IOError:
         for flag in statusFlags:
             statusAssignments[flag] = -1
     
+
+    print "jobName = %s" % jobName
+    print "schema = %s" % str(lcatr.schema.get(jobName))
+
     results.append(lcatr.schema.valid(lcatr.schema.get(jobName), 
                                       **statusAssignments))
 

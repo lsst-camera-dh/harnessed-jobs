@@ -63,7 +63,7 @@ try:
     pdsub.synchCommand(10,"setCurrentRange",0.0002)
 
 # nominal setup
-    result =monosub.synchCommand(30,"setFilter",1); # open
+    result =monosub.synchCommand(60,"setFilter",1); # open
     rply = result.getResult()
     result =monosub.synchCommand(30,"setWave",0.);  # full spectrum blast
     rply = result.getResult()

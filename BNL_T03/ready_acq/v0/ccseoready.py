@@ -170,6 +170,9 @@ try:
             print "exposure time = %f" % exptime
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
+            result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
+
+
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
             if (nreads > 3000):

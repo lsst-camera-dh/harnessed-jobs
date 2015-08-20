@@ -29,6 +29,43 @@ try:
 
     cdir = tsCWD
     
+# record the CCS versions being used                                            
+
+    result = tssub.synchCommand(10,"getCCSVersions");
+    ccsversions = result.getResult()
+    ccsvfiles = open("%s/ccsversion" % cdir,"w");
+    ccsvfiles.write("%s" % ccsversions)
+    ccsvfiles.close()
+
+    ssys = ""
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
+    for line in str(ccsversions).split("\t"):
+        tokens = line.split()
+        if (len(tokens)>2) :
+            if ("ts" in tokens[2]) :
+                ssys = "ts"
+            if ("archon" in tokens[2]) :
+                ssys = "archon"
+
+            if (tokens[1] == "Version:") :
+                print "%s - version = %s" % (ssys,tokens[2])
+                if (ssys == "ts") :
+                    ts_version = tokens[2]
+                if (ssys == "archon") :
+                    archon_version = tokens[2]
+            if (len(tokens)>3) :
+                if (tokens[2] == "Rev:") :
+                    print "%s - revision = %s" % (ssys,tokens[3])
+                    if (ssys == "ts") :
+                        ts_revision = tokens[3]
+                    if (ssys == "archon") :
+                        archon_revision = tokens[3]
+
+
+
 # Initialization
     print "doing initialization"
 
@@ -143,6 +180,7 @@ try:
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='FLAT', use_nd=False)
     
             imcount = int(tokens[3])
+            result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
     
 # take bias images
 # 2sec for the bias
@@ -215,7 +253,7 @@ try:
 
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
-                result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",str(rwl))
+                result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
 # do in-job flux calibration
                 arcsub.synchCommand(10,"setParameter","ExpTime","2000");

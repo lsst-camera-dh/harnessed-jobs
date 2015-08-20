@@ -2,6 +2,10 @@
 {
     'schema_name' : 'qe_acq',
     'schema_version' : 0,
-    'stat' : int
+    'stat' : int,
+    'teststand_version' : str,
+    'teststand_revision' : str,
+    'archon_version' : str,
+    'archon_revision' : str
 }
 

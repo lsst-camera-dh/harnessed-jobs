@@ -29,6 +29,41 @@ try:
 
     cdir = tsCWD
 
+# record the CCS versions being used                                                                  
+
+    result = tssub.synchCommand(10,"getCCSVersions");
+    ccsversions = result.getResult()
+    ccsvfiles = open("%s/ccsversion" % cdir,"w");
+    ccsvfiles.write("%s" % ccsversions)
+    ccsvfiles.close()
+
+    ssys = ""
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
+    for line in str(ccsversions).split("\t"):
+        tokens = line.split()
+        if (len(tokens)>2) :
+            if ("ts" in tokens[2]) :
+                ssys = "ts"
+            if ("archon" in tokens[2]) :
+                ssys = "archon"
+
+            if (tokens[1] == "Version:") :
+                print "%s - version = %s" % (ssys,tokens[2])
+                if (ssys == "ts") :
+                    ts_version = tokens[2]
+                if (ssys == "archon") :
+                    archon_version = tokens[2]
+            if (len(tokens)>3) :
+                if (tokens[2] == "Rev:") :
+                    print "%s - revision = %s" % (ssys,tokens[3])
+                    if (ssys == "ts") :
+                        ts_revision = tokens[3]
+                    if (ssys == "archon") :
+                        archon_revision = tokens[3]
+
 # Initialization
     print "doing initialization"
 
@@ -139,44 +174,13 @@ try:
             target = float(tokens[2])
             print "wl = %f" % wl;
 
+            result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
 
-# take bias images
-
-            arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
-            arcsub.synchCommand(10,"setParameter","Light","0");
-
-            print "setting location of bias fits directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
-
-            result = arcsub.synchCommand(10,"setCCDnum",ccd)
-
-            result = arcsub.synchCommand(10,"setCCDnum",ccd)
-            result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
-            result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
-            for i in range(bcount):
-                timestamp = time.time()
-                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
-                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-
-                print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                result = arcsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
-                print "after click click at %f" % time.time()
-                time.sleep(0.2)
-
-
-# take light exposures
-            arcsub.synchCommand(10,"setParameter","Light","1");
-            print "setting location of fits exposure directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
-
-            print "setting the monochromator wavelength"
+            print "setting the monochromator wavelength to %f" % wl
 #            if (exptime > lo_lim):
             result = monosub.synchCommand(500,"setWaveAndFilter",wl);
             rply = result.getResult()
-            time.sleep(4.)
+            time.sleep(10.)
             try:
                 result = monosub.synchCommand(60,"getWave");
                 rwl = result.getResult()
@@ -203,15 +207,48 @@ try:
                 continue
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
-            result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",str(rwl))
+            print "The wl retrieved from the monochromator is rwl = %f" % rwl
+            result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
+
+# take bias images
+
+            arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
+            arcsub.synchCommand(10,"setParameter","Light","0");
+
+            print "setting location of bias fits directory"
+            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
+
+            result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+            for i in range(bcount):
+                timestamp = time.time()
+                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+
+                print "Ready to take bias image. time = %f" % time.time()
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                fitsfilename = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
+                print "after click click at %f" % time.time()
+                time.sleep(0.2)
+
+
+# take light exposures
+            arcsub.synchCommand(10,"setParameter","Light","1");
+            print "setting location of fits exposure directory"
+            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
 
 # do in-job flux calibration
             arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
 # dispose of first image
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-            rply = result.getResult();
+#            arcsub.synchCommand(10,"setFitsFilename","");
+#            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+#            rply = result.getResult();
 
 
             result  = arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
@@ -261,6 +298,7 @@ try:
                 timestamp = time.time()
                 fitsfilename = "%s_lambda_%3.3d_%3.3d_flat_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                print "fitsfilename = %s" % fitsfilename
 
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
