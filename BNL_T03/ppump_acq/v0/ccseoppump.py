@@ -29,6 +29,9 @@ try:
     
     time.sleep(3.)
 
+# clear header setting
+    result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",0.0)
+
 # record the CCS versions being used                                            
 
     result = tssub.synchCommand(10,"getCCSVersions");
@@ -225,7 +228,7 @@ try:
             rwl = result.getResult()
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
-            result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",str(rwl))
+            result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
     
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
@@ -263,7 +266,7 @@ try:
                 time.sleep(0.2);
     
                 print "Ready to take image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
     
