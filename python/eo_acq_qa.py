@@ -105,7 +105,7 @@ class TrendingObjects(object):
         self['EXPTIME'] = FrameTrending('exptime (s)')
         self['MONDIODE'] = FrameTrending('PD (pA)')
         self['MONOWL'] = FrameTrending('WL (nm)')
-        self['FILTER'] = FrameTrending('Filter')
+        self['FILTPOS'] = FrameTrending('Filter Position')
         self['oscan mean'] = AmpTrending('oscan mean (ADU)')
         self['oscan std'] = AmpTrending('oscan std (ADU rms)')
         self['imaging mean'] = AmpTrending('imaging area mean (ADU)')
@@ -133,7 +133,7 @@ class TrendingObjects(object):
             if verbose:
                 print os.path.basename(item), obs_time
             self['File Count'].add_value(obs_time)
-            keywords = 'CCDTEMP EXPTIME MONDIODE MONOWL FILTER'
+            keywords = 'CCDTEMP EXPTIME MONDIODE MONOWL FILTPOS'
             for keyword, scale in zip(keywords.split(), (1, 1, 1e3, 1, 1)):
                 self[keyword].add_value(obs_time,
                                         frame.header_value(keyword)*scale)
@@ -163,9 +163,9 @@ class TrendingObjects(object):
         pylab.subplot(6, 1, 4)
         self['MONDIODE'].plot()
         pylab.subplot(6, 1, 5)
-        self['MONOWL'].plot(show_xlabels=True)
-#        pylab.subplot(6, 1, 6)
-#        self['FILTER'].plot()
+        self['MONOWL'].plot()
+        pylab.subplot(6, 1, 6)
+        self['FILTPOS'].plot(show_xlabels=True)
         if ext is None:
             outfile = '%s_QA_monitoring.png' % sensor_id
         else:
@@ -240,7 +240,7 @@ if __name__ == '__main__':
     test_types = [x.split('_')[0].upper() for x in subdirs]
 
     foo = TrendingObjects()
-    for dirname, test_type in zip(directories, test_types):
+    for dirname, test_type in zip(directories[2:3], test_types[2:3]):
         foo.processDirectory(dirname, test_type)
-    foo.plot('ITL-113-10-360Khz-test12', ext='all')
+    foo.plot('ITL-113-10-360Khz-test12', ext='flat')
 
