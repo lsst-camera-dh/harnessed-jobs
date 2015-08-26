@@ -16,8 +16,6 @@ try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
     tssub  = CCS.attachSubsystem("%s" % ts);
-#    print "attaching Bias subsystem"
-#    biassub = CCS.attachSubsystem("%s/Bias" % ts);
     print "attaching PD subsystem"
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
@@ -30,6 +28,41 @@ try:
     time.sleep(3.)
 
     cdir = tsCWD
+
+# record the CCS versions being used                                                                  
+
+    result = tssub.synchCommand(10,"getCCSVersions");
+    ccsversions = result.getResult()
+    ccsvfiles = open("%s/ccsversion" % cdir,"w");
+    ccsvfiles.write("%s" % ccsversions)
+    ccsvfiles.close()
+
+    ssys = ""
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
+    for line in str(ccsversions).split("\t"):
+        tokens = line.split()
+        if (len(tokens)>2) :
+            if ("ts" in tokens[2]) :
+                ssys = "ts"
+            if ("archon" in tokens[2]) :
+                ssys = "archon"
+
+            if (tokens[1] == "Version:") :
+                print "%s - version = %s" % (ssys,tokens[2])
+                if (ssys == "ts") :
+                    ts_version = tokens[2]
+                if (ssys == "archon") :
+                    archon_version = tokens[2]
+            if (len(tokens)>3) :
+                if (tokens[2] == "Rev:") :
+                    print "%s - revision = %s" % (ssys,tokens[3])
+                    if (ssys == "ts") :
+                        ts_revision = tokens[3]
+                    if (ssys == "archon") :
+                        archon_revision = tokens[3]
 
 # Initialization
     print "doing initialization"
@@ -54,25 +87,18 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-#    time.sleep(3.);
+
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setFetch_timeout",900000);
 
     time.sleep(60.);
 
-# the first image is usually bad so throw it away
-#    print "Throwing away the first image"
-#    arcsub.synchCommand(10,"setFitsFilename","");
-#    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-#    reply = result.getResult();
-
-#    biassub.synchCommand(10,"setCurrentRange",0.0002)
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
 # move to TS acquisition state
     print "setting acquisition state"
-    result = tssub.synchCommand(60,"setTSTEST");
+    result = tssub.synchCommand(500,"setTSTEST");
     rply = result.getResult();
 
 #check state of ts devices
@@ -119,6 +145,23 @@ try:
     print "set filter position"
     monosub.synchCommand(30,"setFilter",1); # open position
 
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
+
+# clear the buffers
+    print "doing some unrecorded bias acquisitions to clear the buffers"
+    print "set controller for bias exposure"
+    arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","ExpTime","0");
+    for i in range(5):
+        timestamp = time.time()
+        result = arcsub.synchCommand(10,"setFitsFilename","");
+        print "Ready to take clearing bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        rply = result.getResult()
+        result = arcsub.synchCommand(500,"waitForExpoEnd");
+        rply = result.getResult();
+
+
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
     fp = open(acqcfgfile,"r");
@@ -128,48 +171,16 @@ try:
         tokens = str.split(line)
         if ((len(tokens) > 0) and (tokens[0] == 'lambda')):
             wl = int(tokens[1])
-            target = float(tokens[1])
-            print "target wl = %f" % target;
+            target = float(tokens[2])
+            print "wl = %f" % wl;
 
-#            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
+            result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
 
-
-# take bias images
-
-            arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
-            arcsub.synchCommand(10,"setParameter","Light","0");
-#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
-#            arcsub.synchCommand(10,"setAndApplyParam","Light","0");
-
-            print "setting location of bias fits directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
-
-            result = arcsub.synchCommand(10,"setHeader","TestType","QE")
-            result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
-            for i in range(bcount):
-                timestamp = time.time()
-                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
-                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-
-                print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                print "after click click at %f" % time.time()
-                time.sleep(0.2)
-
-
-# take light exposures
-            arcsub.synchCommand(10,"setParameter","Light","1");
-#            arcsub.synchCommand(10,"setAndApplyParam","Light","1");
-#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
-            print "setting location of fits exposure directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
-
-            print "setting the monochromator wavelength"
+            print "setting the monochromator wavelength to %f" % wl
 #            if (exptime > lo_lim):
             result = monosub.synchCommand(500,"setWaveAndFilter",wl);
             rply = result.getResult()
-            time.sleep(4.)
+            time.sleep(10.)
             try:
                 result = monosub.synchCommand(60,"getWave");
                 rwl = result.getResult()
@@ -188,17 +199,56 @@ try:
                     except ScriptingTimeoutException, ex:
                         print "ALERT ALERT ALERT ... SKIPPING A WAVELENGTH SETTING DUE TO NO wl RESPONSE FROM MONOCHROMATOR"
                         continue
+            if (abs(wl-rwl)>1.0) :
+                print "ALERT ALERT ALERT MONOCHROMATOR APPEARS NOT TO HAVE REACHED THE DESIRED WAVELENGTH"
+                print "request wl = %f" % wl
+                print "getwave returned wl = %f" % rwl
+                print "SKIPPING THIS WAVELENGTH!"
+                continue
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
+            print "The wl retrieved from the monochromator is rwl = %f" % rwl
+            result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
+
+# take bias images
+
+            arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
+            arcsub.synchCommand(10,"setParameter","Light","0");
+
+            print "setting location of bias fits directory"
+            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
+
+            result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+            for i in range(bcount):
+                timestamp = time.time()
+                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+
+                print "Ready to take bias image. time = %f" % time.time()
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                fitsfilename = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
+                print "after click click at %f" % time.time()
+                time.sleep(0.2)
+
+
+# take light exposures
+            arcsub.synchCommand(10,"setParameter","Light","1");
+            print "setting location of fits exposure directory"
+            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
 
 # do in-job flux calibration
             arcsub.synchCommand(10,"setParameter","ExpTime","2000");
-#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","2000");
 
 # dispose of first image
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-            rply = result.getResult();
+#            arcsub.synchCommand(10,"setFitsFilename","");
+#            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+#            rply = result.getResult();
 
 
             result  = arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
@@ -206,10 +256,9 @@ try:
             flncal = result.getResult();
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
-# cleanup
-#            os.rm(flncal)
+
 # scale 
-            flux = flux * 0.50
+#            flux = flux * 0.50
 
             exptime = target/flux
             print "needed exposure time = %f" % exptime
@@ -220,7 +269,6 @@ try:
             print "adjusted exposure time = %f" % exptime
 
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
-#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
@@ -229,17 +277,9 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","QE")
-            result = arcsub.synchCommand(10,"setHeader","ImageType","QE")
+            result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
+            result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
-#            print "Throwing away the first image"
-#            arcsub.synchCommand(10,"setFitsFilename","");
-#            result = arcsub.synchCommand(500,"exposeAcquireAndSaveWithoutApply");
-#            reply = result.getResult();
-#            result = arcsub.synchCommand(500,"waitForExpoEnd");
-#            reply = result.getResult();
-
-#            time.sleep(exptime)
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
@@ -256,8 +296,9 @@ try:
 
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_lambda_%3.3d_%3.3d_lambda_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
+                fitsfilename = "%s_lambda_%3.3d_%3.3d_flat_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                print "fitsfilename = %s" % fitsfilename
 
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);

@@ -33,6 +33,42 @@ try:
 
     cdir = tsCWD
 
+    result = tssub.synchCommand(10,"getCCSVersions");
+    ccsversions = result.getResult()
+    ccsvfiles = open("%s/ccsversion" % cdir,"w");
+    ccsvfiles.write("%s" % ccsversions)
+    ccsvfiles.close()
+#    print "ccsversions = %s" % ccsversions
+    ssys = ""
+
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
+    for line in str(ccsversions).split("\t"):
+        tokens = line.split()
+        if (len(tokens)>2) :
+            if ("ts" in tokens[2]) :
+                ssys = "ts"
+            if ("archon" in tokens[2]) :
+                ssys = "archon"
+#            print "tokens[1] = %s " % tokens[1]
+            if (tokens[1] == "Version:") :
+                print "%s - version = %s" % (ssys,tokens[2])
+                if (ssys == "ts") :
+                    ts_version = tokens[2]
+                if (ssys == "archon") :
+                    archon_version = tokens[2]
+            if (len(tokens)>3) :
+                if (tokens[2] == "Rev:") :
+                    print "%s - revision = %s" % (ssys,tokens[3])
+                    if (ssys == "ts") :
+                        ts_revision = tokens[3]
+                    if (ssys == "archon") :
+                        archon_revision = tokens[3]
+#                print "tokens[2] = %s " % tokens[2]
+#       print "\nCCSVersions line = %s \n" % line
+
 # Initialization
 
     result = pdsub.synchCommand(10,"softReset");
@@ -81,6 +117,7 @@ try:
     nplc = 1
 
     ccd = CCDID
+    result = arcsub.synchCommand(10,"setCCDnum",ccd)
     print "Working on CCD %s" % ccd
 
     print "set filter position"
@@ -97,8 +134,11 @@ try:
             target = float(wl)
             print "target wl = %f" % target;
 
+            result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
+
+
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
-            exptime = 3.0
+            exptime = 1.0
 
 ## take bias images
             if (doarch) :
@@ -111,6 +151,7 @@ try:
 
 # take light exposures
                 arcsub.synchCommand(10,"setParameter","Light","1");
+                arcsub.synchCommand(10,"setParameter","Fe55","0");
                 result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
                 rply = result.getResult()
                 print "setting location of fits exposure directory"
@@ -128,7 +169,7 @@ try:
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
 
-                print "Setting the monochrmator wavelength and filter"
+                print "Setting the monochromator wavelength and filter"
 #                print "You should HEAR some movement"
                 result = monosub.synchCommand(120,"setWaveAndFilter",wl);
                 rply = result.getResult()
@@ -145,6 +186,9 @@ try:
 
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
+
+                result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
+#                result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",str(rwl))
 
                 print "getting filter wheel setting"
                 result = monosub.synchCommand(60,"getFilter");
@@ -166,10 +210,11 @@ try:
 
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_preflight_%3.3d_%3.3d_preflight_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
+                fitsfilename = "%s_preflight_%3.3d_flat_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq)
                 if (doarch) :
                     arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                     result = arcsub.synchCommand(10,"setHeader","TestType","PREFLIGHT")
+                    result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
@@ -217,6 +262,10 @@ try:
     result = tssub.synchCommandLine(10,"getstate");
     istate=result.getResult();
     fp.write(`istate`+"\n");
+    fp.write("%s\n" % ts_version);
+    fp.write("%s\n" % ts_revision);
+    fp.write("%s\n" % archon_version);
+    fp.write("%s\n" % archon_revision);
     fp.close();
 
 # move TS to ready state                    
@@ -226,11 +275,11 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
 
-    print " ====================================================="
-    print "            PREFLIGHT DATA ACQUISITION DONE"
-    print "          CHECK FOR A WIDGET APPEARING THAT WILL"
-    print "           INDICATE WHETHER THE DATA LOOKS OK"
-    print " ====================================================="
+    print " =====================================================\n"
+    print "            PREFLIGHT DATA ACQUISITION DONE\n"
+    print "          CHECK FOR A WIDGET APPEARING THAT WILL\n"
+    print "           INDICATE WHETHER THE DATA LOOKS OK\n"
+    print " =====================================================\n"
 
 except Exception, ex:
 

@@ -29,6 +29,41 @@ try:
     
     time.sleep(3.)
 
+# record the CCS versions being used                                            
+
+    result = tssub.synchCommand(10,"getCCSVersions");
+    ccsversions = result.getResult()
+    ccsvfiles = open("%s/ccsversion" % cdir,"w");
+    ccsvfiles.write("%s" % ccsversions)
+    ccsvfiles.close()
+
+    ssys = ""
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
+    for line in str(ccsversions).split("\t"):
+        tokens = line.split()
+        if (len(tokens)>2) :
+            if ("ts" in tokens[2]) :
+                ssys = "ts"
+            if ("archon" in tokens[2]) :
+                ssys = "archon"
+
+            if (tokens[1] == "Version:") :
+                print "%s - version = %s" % (ssys,tokens[2])
+                if (ssys == "ts") :
+                    ts_version = tokens[2]
+                if (ssys == "archon") :
+                    archon_version = tokens[2]
+            if (len(tokens)>3) :
+                if (tokens[2] == "Rev:") :
+                    print "%s - revision = %s" % (ssys,tokens[3])
+                    if (ssys == "ts") :
+                        ts_revision = tokens[3]
+                    if (ssys == "archon") :
+                        archon_revision = tokens[3]
+
 # Initialization
     print "doing initialization"
     
@@ -56,6 +91,7 @@ try:
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
     
 # the first image is usually bad so throw it away
 #    print "Throwing away the first image"
@@ -113,7 +149,21 @@ try:
     ccd = CCDID
     
     print "Working on CCD %s" % ccd
-    
+
+# clear the buffers
+    print "doing some unrecorded bias acquisitions to clear the buffers"
+    print "set controller for bias exposure"
+    arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","ExpTime","0");
+    for i in range(5):
+        timestamp = time.time()
+        result = arcsub.synchCommand(10,"setFitsFilename","");
+        print "Ready to take clearing bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        rply = result.getResult()
+        result = arcsub.synchCommand(500,"waitForExpoEnd");
+        rply = result.getResult();
+
     
     fp = open(acqcfgfile,"r");
     fpfiles = open("%s/acqfilelist" % cdir,"w");
@@ -125,6 +175,8 @@ try:
             exptime = float(tokens[1])
             imcount = float(tokens[2])
             nshifts  = float(tokens[3])
+
+            result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
     
             print "starting acquisition step for lambda = %8.2f with exptime %8.2f s" % (wl, exptime)
     
@@ -143,12 +195,13 @@ try:
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","PPUMP")
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
+            result = arcsub.synchCommand(10,"setHeader","TestType","TRAP")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(pcount):
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_ppump_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+                fitsfilename = "%s_trap_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
     
                 print "Ready to take bias image. time = %f" % time.time()
@@ -172,7 +225,7 @@ try:
             rwl = result.getResult()
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
-
+            result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",str(rwl))
     
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
@@ -181,7 +234,7 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","PPUMP")
+            result = arcsub.synchCommand(10,"setHeader","TestType","TRAP")
             result = arcsub.synchCommand(10,"setHeader","ImageType","PPUMP")
             for i in range(imcount):
 #                print "Throwing away the first image"
@@ -203,7 +256,7 @@ try:
 # start acquisition
                 timestamp = time.time()
     
-                fitsfilename = "%s_trap_ppump_%3.3d_%3.3d_ppump%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
+                fitsfilename = "%s_trap_ppump_%3.3d_%3.3d_${TIMESTAMP}.fits" % (ccd,seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       

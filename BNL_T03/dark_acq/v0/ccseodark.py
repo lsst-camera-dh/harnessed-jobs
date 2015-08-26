@@ -53,6 +53,7 @@ try:
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
 
     time.sleep(60.)
 
@@ -101,6 +102,22 @@ try:
     print "Working on CCD %s" % ccd
 
     seq = 0
+
+# clear the buffers                                                                                          
+    print "doing some unrecorded bias acquisitions to clear the buffers"
+    print "set controller for bias exposure"
+    arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","ExpTime","0");
+    for i in range(5):
+        timestamp = time.time()
+        result = arcsub.synchCommand(10,"setFitsFilename","");
+        print "Ready to take clearing bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        rply = result.getResult()
+        result = arcsub.synchCommand(500,"waitForExpoEnd");
+        rply = result.getResult();
+
+
     
     print "Scanning config file for DARK specifications";
     fp = open(acqcfgfile,"r");
@@ -117,7 +134,9 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime","0");
 #            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
 
-            bcount = 2
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
+
+            bcount = 3
             for i in range(bcount):
                 timestamp = time.time()
 
@@ -128,8 +147,10 @@ try:
                 result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
 
                 print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
 

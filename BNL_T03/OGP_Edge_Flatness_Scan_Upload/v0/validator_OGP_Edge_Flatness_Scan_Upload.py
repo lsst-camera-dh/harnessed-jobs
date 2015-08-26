@@ -7,43 +7,59 @@ import os
 #import siteUtils
 
 results = []
-#ccd = os.environ["LCATR_UNIT_ID"]
-#topccddir = "/cygdrive/c/DATA/%s" % ccd
-#ccddir = "%s/%s" % (topcddir,time.strftime("%Y%m%d-%H:%M:%S"))
+ogpdir = subprocess.check_output("ls -rtd %s/../../../Make-OGP-Edge-Flatness-Directories/v0/* | tail -1" % os.getcwd(), shell=True)
 
-#os.system("cp -vp %s/* ." % cddir)
-#os.system("chmod 644 *.*")
-
-# edge scan files
-#files1 = siteUtils.dependency_glob('edgelink/*.*',
-#                                  jobname=siteUtils.getProcessName('Make-OGP-Directories'),
-#                                  description='OGP result files:')
-
-# flatness files
-#files2 = siteUtils.dependency_glob('flatlink/*.*',
-#                                  jobname=siteUtils.getProcessName('Make-OGP-Directories'),
-#                                  description='OGP result files:')
-
-# cannot access siteUtils on this machine so ...
-
-ogpdir = subprocess.check_output("ls -rtd %s/../../../Make-OGP-Directories/v0/* | tail -1" % os.getcwd(), shell=True)
 
 theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))
 theogpflatdir = os.path.realpath("%s/flatlink/" % ogpdir.strip("\n"))
-print "looking for links to edge and flatness files in %s and %s" % (theogpedgedir,theogpflatdir)
-edgefiles = glob.glob("%s/*.*" % theogpedgedir)
-flatfiles = glob.glob("%s/*.*" % theogpflatdir)
 
-#files = glob.glob('*.*')    
+os.mkdir("Flatness")
+os.mkdir("EdgeScan")
+
+
+print "The copy command will be: cp -r /%s Flatness/" % theogpflatdir.strip("/")
+os.system("cp -r /%s Flatness/" % theogpflatdir.strip("/"))
+
+#theogpabshghtdir = os.path.realpath("%s/abshghtlink/" % ogpdir.strip("\n"))
+print "Edge scan file will now be moved from C:/DATA/Image  files to %s" % theogpedgedir
+os.system("cp -v /cygdrive/c/DATA/Image\ files/* %s" % theogpedgedir)
+
+os.system("cp -r /%s EdgeScan/" % theogpedgedir.strip("/"))
+
+
+print "looking for links to edge, flatness and absolute height files in %s and %s" % (theogpedgedir,theogpflatdir)
+#os.sys("chmod 644 %s/*.*" % theogpedgedir)
+#os.sys("chmod 644 %s/*.*" % theogpflatdir)
+#edgefiles = glob.glob("%s/*.*" % theogpedgedir)
+edgefiles = glob.glob("EdgeScan/*.*")
+#for fl in edgefiles :
+#    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
+#    os.system("chmod 644 %s" % fl)
+#flatfiles = glob.glob("%s/*.*" % theogpflatdir)
+flatfiles = glob.glob("Flatness/*.*")
+#for fl in flatfiles :
+#    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
+#    os.system("chmod 644 %s" % fl)
+#abshghtfiles = glob.glob("%s/*.*" % theogpabshghtdir)
+
+os.system("rm -rf /cygdrive/c/DATA/Image\ files\ old")
+os.system("mv /cygdrive/c/DATA/Image\ files /cygdrive/c/DATA/Image\ files\ old")
+os.system("mkdir /cygdrive/c/DATA/Image\ files")
+
+#files = glob.glob('*.*')
 data_products1 = [lcatr.schema.fileref.make(item) for item in edgefiles]
 results.extend(data_products1)
 data_products2 = [lcatr.schema.fileref.make(item) for item in flatfiles]
 results.extend(data_products2)
+#data_products3 = [lcatr.schema.fileref.make(item) for item in abshghtfiles]
+#results.extend(data_products3)
 
 for item in edgefiles :
     print "Archiving Edge file - %s" % item
 for item in flatfiles :
     print "Archiving Flatness file - %s" % item
+#for item in abshghtfiles :
+#    print "Archiving Absolute Height file - %s" % item
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

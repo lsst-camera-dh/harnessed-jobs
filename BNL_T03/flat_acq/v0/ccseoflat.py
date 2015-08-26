@@ -36,6 +36,42 @@ try:
 
     cdir = tsCWD
 
+# record the CCS versions being used
+
+    result = tssub.synchCommand(10,"getCCSVersions");
+    ccsversions = result.getResult()
+    ccsvfiles = open("%s/ccsversion" % cdir,"w");
+    ccsvfiles.write("%s" % ccsversions)
+    ccsvfiles.close()
+
+    ssys = ""
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
+    for line in str(ccsversions).split("\t"):
+        tokens = line.split()
+        if (len(tokens)>2) :
+            if ("ts" in tokens[2]) :
+                ssys = "ts"
+            if ("archon" in tokens[2]) :
+                ssys = "archon"
+
+            if (tokens[1] == "Version:") :
+                print "%s - version = %s" % (ssys,tokens[2])
+                if (ssys == "ts") :
+                    ts_version = tokens[2]
+                if (ssys == "archon") :
+                    archon_version = tokens[2]
+            if (len(tokens)>3) :
+                if (tokens[2] == "Rev:") :
+                    print "%s - revision = %s" % (ssys,tokens[3])
+                    if (ssys == "ts") :
+                        ts_revision = tokens[3]
+                    if (ssys == "archon") :
+                        archon_revision = tokens[3]
+
+
 # Initialization
     print "doing initialization"
 
@@ -60,7 +96,7 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-    time.sleep(3.);
+    time.sleep(30.);
 
     print "set controller parameters for an exposure with the shutter closed"
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
@@ -128,6 +164,23 @@ try:
     ccd = CCDID
     print "Working on CCD %s" % ccd
 
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
+
+# clear the buffers                                                                                          
+    print "doing some unrecorded bias acquisitions to clear the buffers"
+    print "set controller for bias exposure"
+    arcsub.synchCommand(10,"setParameter","Light","0");
+    arcsub.synchCommand(10,"setParameter","ExpTime","0");
+    for i in range(5):
+        timestamp = time.time()
+        result = arcsub.synchCommand(10,"setFitsFilename","");
+        print "Ready to take clearing bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        rply = result.getResult()
+        result = arcsub.synchCommand(500,"waitForExpoEnd");
+        rply = result.getResult();
+
+
 # go through config file looking for 'flat' instructions, take the flats
     print "Scanning config file for FLAT specifications";
     fp = open(acqcfgfile,"r");
@@ -144,6 +197,8 @@ try:
 
             print "target exposure = %d" % (target);
 
+            result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
+
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='FLAT', use_nd=False)
 
 # take bias images
@@ -157,6 +212,7 @@ try:
  
             print "start bias exposure loop"
 
+            result = arcsub.synchCommand(10,"setCCDnum",ccd)
             result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(bcount):
@@ -215,6 +271,7 @@ try:
 
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
+                result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
 # do in-job flux calibration
                 arcsub.synchCommand(10,"setParameter","ExpTime","2000");
@@ -231,10 +288,8 @@ try:
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
                 flux = float(result.getResult());
 
-# cleanup
-#                os.rm(flncal)
 # scale 
-                flux = flux * 0.50
+#                flux = flux * 0.50
 
                 print "The flux is determined to be %f" % flux
 
@@ -259,13 +314,6 @@ try:
             result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
             result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
-            print "Throwing away the first image"
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-            reply = result.getResult();
-            result = arcsub.synchCommand(500,"waitForExpoEnd");
-            reply = result.getResult();
-#            time.sleep(exptime)
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
