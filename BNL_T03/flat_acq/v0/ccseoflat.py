@@ -165,8 +165,12 @@ try:
     print "Working on CCD %s" % ccd
 
     arcsub.synchCommand(10,"setParameter","Fe55","0");
-    result = monosub.synchCommand(30,"setSlitSize",1,48);
-    result = monosub.synchCommand(30,"setSlitSize",2,48);
+
+    result = monosub.synchCommand(30,"setSlitSize",1,210);
+    result = monosub.synchCommand(30,"setSlitSize",2,210);
+# removing for test with no SW change
+#    result = monosub.synchCommand(30,"setSlitSize",1,48);
+#    result = monosub.synchCommand(30,"setSlitSize",2,48);
 
 # clear the buffers                                                                                          
     print "doing some unrecorded bias acquisitions to clear the buffers"
@@ -199,10 +203,11 @@ try:
 
             print "target exposure = %d" % (target);
 
-            if (target > 13000) :
-                result = monosub.synchCommand(30,"setSlitSize",1,200);
-                result = monosub.synchCommand(30,"setSlitSize",2,200);
-                owl = 0.
+# removing for test with no SW change
+#            if (target > 13000) :
+#                result = monosub.synchCommand(30,"setSlitSize",1,112);
+#                result = monosub.synchCommand(30,"setSlitSize",2,112);
+#                owl = 0.
 
 
             result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
@@ -397,8 +402,8 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
 
-    result = monosub.synchCommand(30,"setSlitSize",1,900);
-    result = monosub.synchCommand(30,"setSlitSize",2,900);
+    result = monosub.synchCommand(30,"setSlitSize",1,210);
+    result = monosub.synchCommand(30,"setSlitSize",2,210);
 
 except Exception, ex:
 
