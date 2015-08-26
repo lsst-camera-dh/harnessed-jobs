@@ -21,6 +21,15 @@ def obs_time(infile, method='filename_timestamp'):
     else:
         raise RuntimeError("Unrecognized file obs_time method")
 
+def obs_time_cmp(file1, file2):
+    t1 = obs_time(file1)
+    t2 = obs_time(file2)    
+    if t1 < t2:
+        return -1
+    elif t2 > t1:
+        return 1
+    return 0
+
 def annotate_acq(start_time, test_type, yposfrac=0.8, xoffset=0,
                  color='k', size=12):
     xmin, xmax, ymin, ymax = pylab.axis()
@@ -89,6 +98,21 @@ class AmpTrending(Trending):
 class TrendingObjects(object):
     def __init__(self):
         self._dict = dict()
+        self._generateDefaultObjects()
+    def _generateDefaultObjects(self):
+        self['File Count'] = FrameTrending('File Count')
+        self['CCDTEMP'] = FrameTrending('CCD Temp (C)')
+        self['EXPTIME'] = FrameTrending('exptime (s)')
+        self['MONDIODE'] = FrameTrending('PD (pA)')
+        self['MONOWL'] = FrameTrending('WL (nm)')
+        self['FILTER'] = FrameTrending('Filter')
+        self['oscan mean'] = AmpTrending('oscan mean (ADU)')
+        self['oscan std'] = AmpTrending('oscan std (ADU rms)')
+        self['imaging mean'] = AmpTrending('imaging area mean (ADU)')
+        self['imaging std'] = AmpTrending('imaging area std (ADU rms)')
+    @property
+    def times(self):
+        return self['CCDTEMP'].times
     def __getitem__(self, key):
         if not self._dict.has_key(key):
             self._dict[key] = FrameTrending(key)
@@ -98,6 +122,71 @@ class TrendingObjects(object):
     def add_test_type(self, time, test_type):
         for key, value in self._dict.items():
             value.add_test_type(time, test_type)
+    def processDirectory(self, dirname, test_type, verbose=True):
+        files = sorted(glob.glob(os.path.join(dirname, '*.fits')), obs_time_cmp)
+        t0 = None
+        for item in files:
+            frame = EoAcqFrame(item)
+            obs_time = frame.obs_time
+            if t0 is None:
+                t0 = obs_time
+            if verbose:
+                print os.path.basename(item), obs_time
+            self['File Count'].add_value(obs_time)
+            keywords = 'CCDTEMP EXPTIME MONDIODE MONOWL FILTER'
+            for keyword, scale in zip(keywords.split(), (1, 1, 1e3, 1, 1)):
+                self[keyword].add_value(obs_time,
+                                        frame.header_value(keyword)*scale)
+            for amp in frame.overscan:
+                self['oscan mean'].add_value(amp, obs_time, 
+                                             np.mean(frame.overscan[amp]))
+                self['oscan std'].add_value(amp, obs_time,
+                                            np.std(frame.overscan[amp]))
+            for amp in frame.imaging:
+                self['imaging mean'].add_value(amp, obs_time,
+                                               np.mean(frame.imaging[amp]))
+                self['imaging std'].add_value(amp, obs_time,
+                                              np.std(frame.imaging[amp]))
+        self.add_test_type(t0, test_type)
+    def plot(self, sensor_id, ext=None):
+        title = "%s: %s to %s" % (sensor_id,
+                                  self.times[0].strftime('%m-%d-%y %H:%M:%S'), 
+                                  self.times[-1].strftime('%m-%d-%y %H:%M:%S'))
+        figure = pylab.figure(num=0, figsize=(8.5, 11))
+        pylab.subplot(6, 1, 1)
+        self['File Count'].plot()
+        pylab.title(title)
+        pylab.subplot(6, 1, 2)
+        self['CCDTEMP'].plot()
+        pylab.subplot(6, 1, 3)
+        self['EXPTIME'].plot()
+        pylab.subplot(6, 1, 4)
+        self['MONDIODE'].plot()
+        pylab.subplot(6, 1, 5)
+        self['MONOWL'].plot(show_xlabels=True)
+#        pylab.subplot(6, 1, 6)
+#        self['FILTER'].plot()
+        if ext is None:
+            outfile = '%s_QA_monitoring.png' % sensor_id
+        else:
+            outfile = '%s_QA_monitoring_%s.png' % (sensor_id, ext)
+        pylab.savefig(outfile)
+    
+        figure = pylab.figure(num=1, figsize=(8.5, 11))
+        pylab.subplot(4, 1, 1)
+        self['oscan mean'].plot()
+        pylab.title(title)
+        pylab.subplot(4, 1, 2)
+        self['oscan std'].plot()
+        pylab.subplot(4, 1, 3)
+        self['imaging mean'].plot()
+        pylab.subplot(4, 1, 4)
+        self['imaging std'].plot(show_xlabels=True)
+        if ext is None:
+            outfile = '%s_QA_imstats.png' % sensor_id
+        else:
+            outfile = '%s_QA_imstats_%s.png' % (sensor_id, ext)
+        pylab.savefig(outfile)
 
 class EoAcqFrame(object):
     def __init__(self, infile, namps=16):
@@ -109,7 +198,6 @@ class EoAcqFrame(object):
         return self.fits_obj[hdu].header[keyword]
     @property
     def obs_time(self):
-        global _use_mjd_obs
         if self._obs_time is None:
             self._obs_time = obs_time(self.infile)
         return self._obs_time
@@ -140,54 +228,6 @@ class EoAcqFrame(object):
             self.overscan[amp] = segdata[datasec['ymin']-1:datasec['ymax']-1,
                                          datasec['xmax']-1:naxis1]
 
-def _cmp(file1, file2):
-    t1 = obs_time(file1)
-    t2 = obs_time(file2)    
-    if t1 < t2:
-        return -1
-    elif t2 > t1:
-        return 1
-    return 0
-
-def processDirectory(dirname, test_type, trending_objs=None):
-    files = sorted(glob.glob(os.path.join(dirname, '*.fits')), _cmp)
-    if trending_objs is None:
-        trending_objs = TrendingObjects()
-        trending_objs['oscan mean'] = AmpTrending('oscan mean (ADU)')
-        trending_objs['oscan std'] = AmpTrending('oscan std (ADU rms)')
-        trending_objs['imaging mean'] = AmpTrending('imaging area mean (ADU)')
-        trending_objs['imaging std'] = AmpTrending('imaging area std (ADU rms)')
-    t0 = None
-    for numfile, item in enumerate(files):
-        frame = EoAcqFrame(item)
-        obs_time = frame.obs_time
-        if t0 is None:
-            t0 = obs_time
-        print os.path.basename(item), obs_time
-        trending_objs['File Count'].add_value(obs_time)
-        trending_objs['CCD Temp (C)'].add_value(obs_time,
-                                                frame.header_value('CCDTEMP'))
-        trending_objs['exptime (s)'].add_value(obs_time,
-                                               frame.header_value('EXPTIME'))
-        trending_objs['PD (pA)'].add_value(obs_time,
-                                           frame.header_value('MONDIODE')*1e3)
-        trending_objs['WL (nm)'].add_value(obs_time,
-                                           frame.header_value('MONOWL'))
-#        trending_objs['Filter'].add_value(obs_time,
-#                                          frame.header_value('FILTER'))
-        for amp in frame.overscan:
-            trending_objs['oscan mean'].add_value(amp, obs_time, 
-                                                  np.mean(frame.overscan[amp]))
-            trending_objs['oscan std'].add_value(amp, obs_time,
-                                                 np.std(frame.overscan[amp]))
-        for amp in frame.imaging:
-            trending_objs['imaging mean'].add_value(amp, obs_time,
-                                                    np.mean(frame.imaging[amp]))
-            trending_objs['imaging std'].add_value(amp, obs_time,
-                                                   np.std(frame.imaging[amp]))
-    trending_objs.add_test_type(t0, test_type)
-    return trending_objs
-
 if __name__ == '__main__':
     root_path = lambda x : os.path.join('/nfs/farm/g/lsst/u1/mirror/BNL-test/test/ITL-CCD/ITL-113-10-360Khz-test12', x)
     subdirs = ('fe55_acq/v0/7017',
@@ -198,37 +238,9 @@ if __name__ == '__main__':
                'qe_acq/v0/7033')
     directories = [root_path(x) for x in subdirs]
     test_types = [x.split('_')[0].upper() for x in subdirs]
-    foo = None
-    for test_type, dirname in zip(test_types, directories):
-        foo = processDirectory(dirname, test_type, foo)
 
-    title = "Run start " + foo['CCD Temp (C)'].times[0].strftime('%m-%d-%y %H:%M:%S') + " end " + foo['CCD Temp (C)'].times[-1].strftime('%m-%d-%y %H:%M:%S')
-        
-    figure = pylab.figure(num=0, figsize=(8.5, 11))
-    pylab.subplot(6, 1, 1)
-    foo['File Count'].plot()
-    pylab.title(title)
-    pylab.subplot(6, 1, 2)
-    foo['CCD Temp (C)'].plot()
-    pylab.subplot(6, 1, 3)
-    foo['exptime (s)'].plot()
-    pylab.subplot(6, 1, 4)
-    foo['PD (pA)'].plot()
-    pylab.subplot(6, 1, 5)
-    foo['WL (nm)'].plot(show_xlabels=True)
-#    pylab.subplot(6, 1, 6)
-#    foo['Filter'].plot()
-    pylab.savefig('QA_monitoring.png')
-
-    figure = pylab.figure(num=1, figsize=(8.5, 11))
-    pylab.subplot(4, 1, 1)
-    foo['oscan mean'].plot()
-    pylab.title(title)
-    pylab.subplot(4, 1, 2)
-    foo['oscan std'].plot()
-    pylab.subplot(4, 1, 3)
-    foo['imaging mean'].plot()
-    pylab.subplot(4, 1, 4)
-    foo['imaging std'].plot(show_xlabels=True)
-    pylab.savefig('QA_imstats.png')
+    foo = TrendingObjects()
+    for dirname, test_type in zip(directories, test_types):
+        foo.processDirectory(dirname, test_type)
+    foo.plot('ITL-113-10-360Khz-test12', ext='all')
 
