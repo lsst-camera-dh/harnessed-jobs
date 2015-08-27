@@ -202,7 +202,7 @@ def hdrsummary(filename,outfile):
 
     avg = fitsAverage(filename)
     outfl.write("%s\n" % filename);
-    outfl.write("Average image signal = %f \n" % avg);
+    outfl.write("Average image pixel count = %f \n" % avg);
 
     phdr=hdulist[0].header
     try:
@@ -213,7 +213,7 @@ def hdrsummary(filename,outfile):
     outfl.write("Photodiode reading  = %f\n" % phdr['MONDIODE'])
     outfl.write("Filter position     = %d\n" % phdr['FILTPOS'])
     try:
-        outfl.write("Exposure time       = %d\n" % phdr['EXPTIME'])
+        outfl.write("Exposure time       = %f\n" % phdr['EXPTIME'])
     except:
         outfl.write("Exposure time       = N/A\n")
     for i in range(16):

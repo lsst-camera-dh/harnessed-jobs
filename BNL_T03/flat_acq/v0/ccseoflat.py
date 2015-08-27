@@ -166,6 +166,12 @@ try:
 
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
+    result = monosub.synchCommand(30,"setSlitSize",1,210);
+    result = monosub.synchCommand(30,"setSlitSize",2,210);
+# removing for test with no SW change
+#    result = monosub.synchCommand(30,"setSlitSize",1,48);
+#    result = monosub.synchCommand(30,"setSlitSize",2,48);
+
 # clear the buffers                                                                                          
     print "doing some unrecorded bias acquisitions to clear the buffers"
     print "set controller for bias exposure"
@@ -196,6 +202,13 @@ try:
             target = float(tokens[1])
 
             print "target exposure = %d" % (target);
+
+# removing for test with no SW change
+#            if (target > 13000) :
+#                result = monosub.synchCommand(30,"setSlitSize",1,112);
+#                result = monosub.synchCommand(30,"setSlitSize",2,112);
+#                owl = 0.
+
 
             result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
 
@@ -388,6 +401,9 @@ try:
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
+
+    result = monosub.synchCommand(30,"setSlitSize",1,210);
+    result = monosub.synchCommand(30,"setSlitSize",2,210);
 
 except Exception, ex:
 
