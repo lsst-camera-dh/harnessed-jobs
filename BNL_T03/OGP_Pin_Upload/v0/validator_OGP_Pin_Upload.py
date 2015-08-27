@@ -3,6 +3,8 @@ import glob
 import lcatr.schema
 import subprocess
 import os
+import Tkinter
+import tkMessageBox
 
 #import siteUtils
 
@@ -18,7 +20,7 @@ os.system("cp -r /%s LateralPin/" % theogppindir.strip("/"))
 
 print "looking for link to absolute height files in %s" % (theogppindir)
 
-pinfiles = glob.glob("LateralPin/*.*")
+pinfiles = glob.glob("LateralPin/*/*.*")
 
 os.system("rm -rf /cygdrive/c/DATA/Image\ files\ old")
 os.system("mv /cygdrive/c/DATA/Image\ files /cygdrive/c/DATA/Image\ files\ old")
@@ -34,3 +36,15 @@ for item in pinfiles :
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
+
+# make a button showing the name that should be used for the output filename
+#E2V-CCD250-82-5-G42-14041-08-01_DimMet_20150817-16H23M.DAT
+ccd = os.environ["LCATR_UNIT_ID"]
+dateddir = glob.glob("LateralPin/*")
+dirdate = dateddir[0].strip("/")
+top = Tkinter.Tk()
+M = Tkinter.Button(top, text ="Please use the following filename as the specification of the output filename\n%s_Pin_%s.DAT" % (ccd,dirdate), bg = "green")
+M=Tkinter.Button(top,text="filename")
+M.pack()
+top.title('OGP Routine Output Filename')
+top.mainloop()
