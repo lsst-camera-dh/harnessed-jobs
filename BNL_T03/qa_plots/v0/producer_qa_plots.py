@@ -31,16 +31,17 @@ def dirname_dependencyGlob(sensor_id, **kwds):
 
 sensor_id = siteUtils.getUnitId()
 
-datasets = OrderedDict(('FE55', 'fe55_acq'),
-                       ('DARK', 'dark_acq'),
-                       ('FLAT', 'flat_acq'),
-                       ('PPUMP', 'ppump_acq'),
-                       ('SFLAT', 'sflat_acq'),
-                       ('QE', 'qe_acq'),
-                       ('PERSISTENCE', 'persist_acq'))
+datasets = OrderedDict([('FE55', 'fe55_acq'),
+                        ('DARK', 'dark_acq'),
+                        ('FLAT', 'flat_acq'),
+                        ('PPUMP', 'ppump_acq'),
+                        ('SFLAT', 'sflat_acq'),
+                        ('QE', 'qe_acq'),
+                        ('PERSISTENCE', 'persist_acq')])
 
+frame_id = 0
 for test_type, jobname in datasets.items():
-    QA_trender = TrendingObject()
+    QA_trender = TrendingObjects()
     dirname = dirname_dependencyGlob(sensor_id, jobname=jobname)
     QA_trender.processDirectory(dirname, test_type)
-    QA_trender.plot(sensor_id, ext=test_type)
+    frame_id = QA_trender.plot(sensor_id, ext=test_type, frame_id=frame_id)
