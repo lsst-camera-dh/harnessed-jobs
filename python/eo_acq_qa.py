@@ -148,11 +148,13 @@ class TrendingObjects(object):
                 self['imaging std'].add_value(amp, obs_time,
                                               np.std(frame.imaging[amp]))
         self.add_test_type(t0, test_type)
-    def plot(self, sensor_id, ext=None):
+    def plot(self, sensor_id, ext=None, frame_id=0):
+        my_frame_id = frame_id
         title = "%s: %s to %s" % (sensor_id,
                                   self.times[0].strftime('%m-%d-%y %H:%M:%S'), 
                                   self.times[-1].strftime('%m-%d-%y %H:%M:%S'))
-        figure = pylab.figure(num=0, figsize=(8.5, 11))
+        figure = pylab.figure(num=my_frame_id, figsize=(8.5, 11))
+        my_frame_id += 1
         pylab.subplot(6, 1, 1)
         self['File Count'].plot()
         pylab.title(title)
@@ -172,7 +174,8 @@ class TrendingObjects(object):
             outfile = '%s_QA_monitoring_%s.png' % (sensor_id, ext)
         pylab.savefig(outfile)
     
-        figure = pylab.figure(num=1, figsize=(8.5, 11))
+        figure = pylab.figure(num=my_frame_id, figsize=(8.5, 11))
+        my_frame_id += 1
         pylab.subplot(4, 1, 1)
         self['oscan mean'].plot()
         pylab.title(title)
@@ -187,6 +190,7 @@ class TrendingObjects(object):
         else:
             outfile = '%s_QA_imstats_%s.png' % (sensor_id, ext)
         pylab.savefig(outfile)
+        return my_frame_id
 
 class EoAcqFrame(object):
     def __init__(self, infile, namps=16):

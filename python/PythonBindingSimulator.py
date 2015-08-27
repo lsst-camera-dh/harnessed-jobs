@@ -14,14 +14,15 @@ class AcqSim(object):
                             ('qe', 'lambda'),
                             ('sflat', 'sflat_500'),
                             ('xtalk', 'spot'),
-                            ('ppump', 'trap')])
+                            ('ppump', 'trap'),
+                            ('persist', 'persistence')])
     def __init__(self, rootdir):
         self.rootdir = rootdir
     def getData(self, dataset):
         if dataset not in self.dataset_mapping:
             raise RuntimeError("Invalid dataset name: " + dataset)
         testtype = self.dataset_mapping[dataset]
-        command = "cp %s ." % os.path.join(self.rootdir, testtype, '*')
+        command = "cp %s ." % os.path.join(self.rootdir, testtype, '*.fits')
         subprocess.check_call(command, shell=True)
 
 class CcsResult(object):
