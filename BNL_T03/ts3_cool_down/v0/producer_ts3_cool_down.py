@@ -4,11 +4,19 @@ import Tkinter
 import glob
 import os
 
+apptxt = "Warning, this script will turn on the Polycold\nand ramp the temperature to the operating setpoint.\nClick on this button only if this OK."
 
-ccsProducer('ready_acq', 'ccseoready.py')
+print apptxt
+top = Tkinter.Tk()
+A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = "yellow", font = ("Helvetica",24))
+A.pack()
+top.title('Ready for cooling?')
+top.mainloop()
+
+ccsProducer('ts3_cool_down_acq', 'ccseots3_cool_down.py')
 
 
-apptxt = "Please check the FLAT image that is about to be projected in ds9\nfor correct bias regions.\nClick on this window when ready."
+apptxt = "Please check the FLAT image that is about to be projected in ds9\nfor correct bias regions.\nClick on this window when ts3_cool_down."
 
 print apptxt
 topq = Tkinter.Tk()
@@ -20,7 +28,7 @@ topq.mainloop()
 qefiles = sorted(glob.glob('*lambda*.fits'))
 os.system("ds9 -scale datasec no -scale histequ %s" % qefiles[0])
 
-apptxt = "Please check the Fe55 image that is about to be projected in ds9\nfor clearly identifiable X-ray hits that should appear as clusters of pixels.\nClick on this window when ready."
+apptxt = "Please check the Fe55 image that is about to be projected in ds9\nfor clearly identifiable X-ray hits that should appear as clusters of pixels.\nClick on this window when ts3_cool_down."
 
 print apptxt
 topf = Tkinter.Tk()

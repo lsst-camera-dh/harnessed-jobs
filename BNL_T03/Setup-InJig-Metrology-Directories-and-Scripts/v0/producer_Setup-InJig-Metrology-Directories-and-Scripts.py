@@ -78,8 +78,9 @@ print "The OGP acquisition and analysis scripts have been installed."
 #dirdate = dateddir[0].strip("/")
 dirdate = tm
 top = Tkinter.Tk()
-M = Tkinter.Button(top, text ="Please use the following filename as the specification of the output filename\n%s_DimMet_%s.DAT" % (ccd,dirdate), bg = "green")
-M=Tkinter.Button(top,text="filename")
+
+M = Tkinter.Button(top, text ="%s_DimMet_%s.DAT" % (ccd,dirdate), command=lambda: w.event_generate("<<Copy>>")), bg = "green")
+#M=Tkinter.Button(top,text="filename")
 M.pack()
 top.title('OGP Routine Output Filename')
 top.mainloop()
