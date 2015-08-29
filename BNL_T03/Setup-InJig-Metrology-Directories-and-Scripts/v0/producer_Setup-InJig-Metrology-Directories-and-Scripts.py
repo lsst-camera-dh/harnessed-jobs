@@ -20,7 +20,9 @@ print "Creating directory for edge scan results. Location is %s" % edgedir
 flatdir = "%s/DimensionalMetrology/" % topccddir
 print "Creating directory for flatness results. Location is %s" % flatdir
 
-edgedatedir = "%s%s" % (edgedir,time.strftime("%Y%m%d-%HH%MM"))
+tm = time.strftime("%Y%m%d-%HH%MM")
+
+edgedatedir = "%s%s" % (edgedir,tm)
 print "Creating dated edge directory for the CCD at %s" % edgedatedir
 os.makedirs(edgedatedir)
 os.system("chmod 777 %s" %  edgedatedir)
@@ -68,3 +70,17 @@ os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,o
 os.system("cd %s" % cwd)
 
 print "The OGP acquisition and analysis scripts have been installed."
+
+# make a button showing the name that should be used for the output filename
+#E2V-CCD250-82-5-G42-14041-08-01_DimMet_20150817-16H23M.DAT
+#ccd = os.environ["LCATR_UNIT_ID"]
+#dateddir = glob.glob("DimensionalMetrology/*")
+#dirdate = dateddir[0].strip("/")
+dirdate = tm
+top = Tkinter.Tk()
+
+M = Tkinter.Button(top, text ="%s_DimMet_%s.DAT" % (ccd,dirdate), command=lambda: w.event_generate("<<Copy>>")), bg = "green")
+#M=Tkinter.Button(top,text="filename")
+M.pack()
+top.title('OGP Routine Output Filename')
+top.mainloop()

@@ -41,11 +41,11 @@ try:
     result = pdsub.synchCommand(10,"softReset");
     buff = result.getResult()
 
-# move TS to ready state
-    result = tssub.synchCommand(60,"setTSReady");
+# move TS to idle state
+    result = tssub.synchCommand(60,"setTSIdle");
     reply = result.getResult();
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
+#    result = tssub.synchCommand(120,"goTestStand");
+#    rply = result.getResult();
 
     print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
 
@@ -101,8 +101,8 @@ try:
 
 #put in acquisition state
     print "Since this is just a readiness check, we will NOT ramp the bias "
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
+#    result = tssub.synchCommand(120,"goTestStand");
+#    rply = result.getResult();
 
 # get the glowing vacuum gauge off
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
