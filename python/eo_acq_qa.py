@@ -82,7 +82,6 @@ class FrameTrending(Trending):
         pylab.plot_date(np.array(self.times), np.array(self.values), marker)
 
 class AmpTrending(Trending):
-    colors = 'krgbcymkrgbcymkrgbcymkrgbcym'
     def __init__(self, ylabel):
         super(AmpTrending, self).__init__(ylabel)
         self.values = dict([(amp, []) for amp in range(1, 17)])
@@ -92,8 +91,28 @@ class AmpTrending(Trending):
         self.values[amp].append(value)
     def plot_dates(self, **kwds):
         my_times = np.array(self.times)
-        for color, amp in zip(self.colors, self.values.keys()):
-            pylab.plot_date(my_times, np.array(self.values[amp]), '%so' % color)
+        # Set the color_cycle to use 16 different colors
+        try:
+            my_cmap = kwds['cmap']
+        except:
+            my_cmap = pylab.cm.rainbow
+        color_cycle = [my_cmap(int(x)) for x in np.linspace(0, 255, 16)]
+        pylab.rc('axes', color_cycle=color_cycle)
+        zero_offsets = dict([(amp, 0) for amp in self.values.keys()])
+        try:
+            if kwds['subtract_t0'] == True:
+                zero_offsets = dict([(amp, self.values[amp][0]) for amp in 
+                                     self.values.keys()])
+        except KeyError:
+            pass
+
+        for amp in self.values.keys():
+            # plot_date has bug such that it does not cycle through
+            # the color_cycle.  Setting the fmt keyword forces it to
+            # do so.  See
+            # http://stackoverflow.com/questions/17250392/setting-colors-using-color-cycle-on-date-plots-using-plot-date
+            y_vals = np.array(self.values[amp]) - zero_offsets[amp]
+            pylab.plot_date(my_times, y_vals , fmt='.')
 
 class TrendingObjects(object):
     def __init__(self):
@@ -138,13 +157,14 @@ class TrendingObjects(object):
                 self[keyword].add_value(obs_time,
                                         frame.header_value(keyword)*scale)
             for amp in frame.overscan:
-                self['oscan mean'].add_value(amp, obs_time, 
-                                             np.mean(frame.overscan[amp]))
+                oscan_mean = np.mean(frame.overscan[amp])
+                self['oscan mean'].add_value(amp, obs_time, oscan_mean)
                 self['oscan std'].add_value(amp, obs_time,
                                             np.std(frame.overscan[amp]))
-            for amp in frame.imaging:
+                # Perform bias subtraction of overscan mean
                 self['imaging mean'].add_value(amp, obs_time,
-                                               np.mean(frame.imaging[amp]))
+                                               np.mean(frame.imaging[amp] 
+                                                       - oscan_mean))
                 self['imaging std'].add_value(amp, obs_time,
                                               np.std(frame.imaging[amp]))
         self.add_test_type(t0, test_type)
@@ -177,7 +197,7 @@ class TrendingObjects(object):
         figure = pylab.figure(num=my_frame_id, figsize=(8.5, 11))
         my_frame_id += 1
         pylab.subplot(4, 1, 1)
-        self['oscan mean'].plot()
+        self['oscan mean'].plot(subtract_t0=True)
         pylab.title(title)
         pylab.subplot(4, 1, 2)
         self['oscan std'].plot()
@@ -234,17 +254,18 @@ class EoAcqFrame(object):
 
 if __name__ == '__main__':
     root_path = lambda x : os.path.join('/nfs/farm/g/lsst/u1/mirror/BNL-test/test/ITL-CCD/ITL-113-10-360Khz-test12', x)
-    subdirs = ('fe55_acq/v0/7017',
-               'dark_acq/v0/7018',
-               'flat_acq/v0/7027',
-               'ppump_acq/v0/7031',
-               'sflat_acq/v0/7032',
-               'qe_acq/v0/7033')
+    subdirs = (
+        'fe55_acq/v0/7017',
+        'dark_acq/v0/7018',
+        'flat_acq/v0/7027',
+        'ppump_acq/v0/7031',
+        'sflat_acq/v0/7032',
+        'qe_acq/v0/7033'
+               )
     directories = [root_path(x) for x in subdirs]
     test_types = [x.split('_')[0].upper() for x in subdirs]
 
     foo = TrendingObjects()
-    for dirname, test_type in zip(directories[2:3], test_types[2:3]):
+    for dirname, test_type in zip(directories, test_types):
         foo.processDirectory(dirname, test_type)
-    foo.plot('ITL-113-10-360Khz-test12', ext='flat')
-
+    foo.plot('ITL-113-10-360Khz-test12', ext='foo')
