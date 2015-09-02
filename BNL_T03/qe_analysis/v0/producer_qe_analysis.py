@@ -13,7 +13,7 @@ lambda_files = siteUtils.dependency_glob('*_lambda_flat_*.fits',
 pd_ratio_file = eotestUtils.getPhotodiodeRatioFile()
 if pd_ratio_file is None:
     pd_ratio_file = os.path.join(os.environ['EOTEST_DIR'], 'data', 'qe',
-                                 'BNL', 'pd_ratio_2015-08-27.txt')
+                                 'BNL', 'pd_ratio_2015-08-29.txt')
     print 
     print "WARNING: The test-stand specific photodiode ratio file is"
     print "not given in config/%s/eotest_calibrations.cfg." % siteUtils.getSiteName()
