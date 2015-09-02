@@ -5,13 +5,12 @@ from collections import OrderedDict
 
 #  This is needed so that pylab can write to .matplotlib
 os.environ['MPLCONFIGDIR'] = os.curdir
-import matplotlib
 
 # For batch-processing, use the AGG backend to avoid needing an X11
 # connection.
+import matplotlib
 matplotlib.use('Agg')
 
-import pylab
 from lcatr.harness.helpers import dependency_glob
 import siteUtils
 from eo_acq_qa import TrendingObjects
@@ -39,9 +38,8 @@ datasets = OrderedDict([('FE55', 'fe55_acq'),
                         ('QE', 'qe_acq'),
                         ('PERSISTENCE', 'persist_acq')])
 
-frame_id = 0
+QA_trender = TrendingObjects()
 for test_type, jobname in datasets.items():
-    QA_trender = TrendingObjects()
     dirname = dirname_dependencyGlob(sensor_id, jobname=jobname)
     QA_trender.processDirectory(dirname, test_type)
-    frame_id = QA_trender.plot(sensor_id, ext=test_type, frame_id=frame_id)
+QA_trender.plot(sensor_id)
