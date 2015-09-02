@@ -88,7 +88,8 @@ def print_file_list(description, file_list, use_basename=False):
             print "  ", item
     sys.stdout.flush()
 
-def datacatalog_glob(pattern, testtype=None, imgtype=None, description=None):
+def datacatalog_glob(pattern, testtype=None, imgtype=None, description=None,
+                     sorted=False):
     sensor_id = getUnitId()
     if testtype is None or imgtype is None:
         raise RuntimeError("Both testtype and imgtype values must be provided.")
@@ -100,12 +101,17 @@ def datacatalog_glob(pattern, testtype=None, imgtype=None, description=None):
     for item in datasets.full_paths():
         if fnmatch.fnmatch(os.path.basename(item), pattern):
             file_list.append(item)
+    if sorted:
+        file_list = sorted(file_list)
     print_file_list(description, file_list)
     return file_list
 
-def dependency_glob(pattern, jobname=None, paths=None, description=None):
+def dependency_glob(pattern, jobname=None, paths=None, description=None,
+                    sorted=False):
     file_list = lcatr.harness.helpers.dependency_glob(pattern, jobname=jobname,
                                                       paths=paths)
+    if sorted:
+        file_list = sorted(file_list)
     print_file_list(description, file_list)
     return file_list
 
