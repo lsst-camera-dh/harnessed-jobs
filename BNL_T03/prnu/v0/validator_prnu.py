@@ -19,6 +19,7 @@ for wl, stdev, mean in zip(prnu_results['WAVELENGTH'],
                                       pixel_stdev=stdev, pixel_mean=mean))
 results.append(siteUtils.packageVersions())
 results.append(eotestUtils.eotestCalibrations())
+results.extend(eotestUtils.eotestCalibsPersist('illumination_non_uniformity_file'))
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
