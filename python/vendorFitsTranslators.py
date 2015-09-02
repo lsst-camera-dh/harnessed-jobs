@@ -48,13 +48,14 @@ class VendorFitsTranslator(object):
             hdulist[hdu].header['DETSIZE'] = ampGeom[amp]['DETSIZE']
             hdulist[hdu].header['DATASEC'] = ampGeom[amp]['DATASEC']
             hdulist[hdu].header['DETSEC'] = ampGeom[amp]['DETSEC']
-    def _processFiles(self, test_type, image_type, pattern, 
+    def _processFiles(self, test_type, image_type, pattern, seqno_prefix=None,
                       time_stamp=None, verbose=True, skip_zero_exptime=False):
-        infiles = self._infiles(pattern)
+        my_pattern = os.path.join(self.rootdir, pattern)
+        infiles = self._infiles(my_pattern)
         if verbose and not infiles:
             print
             print "WARNING:"
-            print "No files found for TESTTYPE=%(test_type)s, IMGTYPE=%(image_type)s and file pattern %(pattern)" % locals()
+            print "No files found for TESTTYPE=%(test_type)s, IMGTYPE=%(image_type)s and file pattern %(my_pattern)s" % locals()
             print
         if time_stamp is None:
             time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -67,6 +68,8 @@ class VendorFitsTranslator(object):
                     print "skipping zero exposure frame."
                 continue
             seqno = '%03i' % iframe
+            if seqno_prefix is not None:
+                seqno = seqno_prefix + seqno
             self.translate(infile, test_type, image_type, seqno,
                            time_stamp=time_stamp, verbose=verbose)
         return time_stamp
@@ -124,10 +127,16 @@ class ItlFitsTranslator(VendorFitsTranslator):
     def trap(self, pattern='', time_stamp=None,
              verbose=True):
         raise NotImplemented("ITL trap dataset translation not implemented.")
-    def sflat_500(self, pattern='superflat2/*_superflat.*.fits', 
-                  time_stamp=None, verbose=True):
+    def sflat_500_high(self, pattern='superflat2/*_superflat.*.fits', 
+                       time_stamp=None, verbose=True):
         return self._processFiles('sflat_500', 'flat', pattern,
-                                  time_stamp=time_stamp, verbose=verbose)
+                                  time_stamp=time_stamp, verbose=verbose,
+                                  seqno_prefix='H')
+    def sflat_500_low(self, pattern='superflat1/*_superflat.*.fits', 
+                      time_stamp=None, verbose=True):
+        return self._processFiles('sflat_500', 'flat', pattern,
+                                  time_stamp=time_stamp, verbose=verbose,
+                                  seqno_prefix='L')
     def spot(self, pattern='', time_stamp=None,
              verbose=True):
         raise NotImplemented("ITL spot dataset translation not implemented.")
@@ -166,7 +175,8 @@ class ItlFitsTranslator(VendorFitsTranslator):
         self.bias(time_stamp=time_stamp)
         self.dark()
         #self.trap()
-        self.sflat_500()
+        time_stamp = self.sflat_500_high()
+        self.sflat_500_low(time_stamp=time_stamp)
         #self.spot()
         self.flat()
         self.lambda_scan()
@@ -221,10 +231,16 @@ class e2vFitsTranslator(VendorFitsTranslator):
              verbose=True):
         return self._processFiles('trap', 'ppump', pattern,
                                   time_stamp=time_stamp, verbose=verbose)
-    def sflat_500(self, pattern='*_sflath_illu_*.fits', time_stamp=None,
-                  verbose=True):
+    def sflat_500_high(self, pattern='*_sflath_illu_*.fits', time_stamp=None,
+                       verbose=True):
         return self._processFiles('sflat_500', 'flat', pattern,
-                                  time_stamp=time_stamp, verbose=verbose)
+                                  time_stamp=time_stamp, verbose=verbose,
+                                  seqno_prefix='H')
+    def sflat_500_low(self, pattern='*_sflatl_illu_*.fits', time_stamp=None,
+                      verbose=True):
+        return self._processFiles('sflat_500', 'flat', pattern,
+                                  time_stamp=time_stamp, verbose=verbose,
+                                  seqno_prefix='L')
     def spot(self, pattern='*_xtalk_illu_*.fits', time_stamp=None,
              verbose=True):
         return self._processFiles('spot', 'spot', pattern,
@@ -248,17 +264,13 @@ class e2vFitsTranslator(VendorFitsTranslator):
                                                           time_stamp=time_stamp,
                                                           verbose=verbose,
                                                           monowl_keyword='WAVELEN')
-#    def dark_defects_data(self, pattern='superflat high/PRDefs/*.fits',
-#                          time_stamp=None, verbose=True):
-#        return self._processFiles('sflat_500', 'dark_flat', pattern,
-#                                  time_stamp=time_stamp, verbose=verbose)
     def run_all(self):
         time_stamp = self.fe55()
         self.bias(time_stamp=time_stamp)
         self.dark()
         self.trap()
-        time_stamp = self.sflat_500()
+        time_stamp = self.sflat_500_high()
+        self.sflat_500_low(time_stamp=time_stamp)
         self.spot()
         self.flat()
         self.lambda_scan()
-#        self.dark_defects_data(time_stamp=time_stamp)
