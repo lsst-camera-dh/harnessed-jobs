@@ -8,7 +8,7 @@ sensor_id = siteUtils.getUnitId()
 dark_files = siteUtils.dependency_glob('*_persist*_dark_*.fits',
                                        jobname=siteUtils.getProcessName('persist_acq'),
                                        description='Dark files:',
-                                       sorted=True)
+                                       sort=True)
 
 flat = siteUtils.dependency_glob('*_persist*_flat_*.fits',
                                  jobname=siteUtils.getProcessName('persist_acq'),
