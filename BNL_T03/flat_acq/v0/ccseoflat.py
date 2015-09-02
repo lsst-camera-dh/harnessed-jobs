@@ -405,6 +405,8 @@ try:
     result = monosub.synchCommand(30,"setSlitSize",1,210);
     result = monosub.synchCommand(30,"setSlitSize",2,210);
 
+    result = arcsub.synchCommand(10,"setHeader","TestType","FLAT-DONE")
+
 except Exception, ex:
 
     print "Exception at " % time.time()
@@ -414,6 +416,8 @@ except Exception, ex:
     rply = result.getResult();
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+    result = arcsub.synchCommand(10,"setHeader","TestType","FLAT-ERR")
 
 except ScriptingTimeoutException, exx:
 
@@ -427,5 +431,7 @@ except ScriptingTimeoutException, exx:
     buff = result.getResult()
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % exx)
+
+    result = arcsub.synchCommand(10,"setHeader","TestType","FLAT-ERR")
 
 print "FLAT: END"

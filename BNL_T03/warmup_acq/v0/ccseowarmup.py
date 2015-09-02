@@ -18,18 +18,23 @@ try:
     tssub  = CCS.attachSubsystem("%s" % ts);
     print "attaching PDU subsystem"
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
+    print "attaching Lamp subsystem"
+    lampsub = CCS.attachSubsystem("%s/Lamp" % ts );
 
     time.sleep(3.)
 
     cdir = tsCWD
 
+# turn off the lamp
+    result = lampsub.synchCommand(100000,"setLAmpPowerEnable",False);
+
 # turn off power to the cryotiger
     result = pdusub.synchCommand(120,"setOutletState",cryo_outlet,False);
     rply = result.getResult();
 
-# move to TS idle state
+# move to TS idle state ... this will set the cryocon to warm
     print "setting acquisition state"
-    result = tssub.synchCommand(60,"setTSIdle");
+    result = tssub.synchCommand(100000,"setTSIdle");
     rply = result.getResult();
 
 except Exception, ex:

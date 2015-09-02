@@ -296,7 +296,7 @@ try:
 
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_lambda_%3.3d_%3.3d_flat_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
+                fitsfilename = "%s_lambda_flat_%3.3d_%3.3d_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
                 print "fitsfilename = %s" % fitsfilename
 

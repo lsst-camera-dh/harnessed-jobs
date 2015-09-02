@@ -164,28 +164,13 @@ def fitsAverage(filename):
     if (os.path.getsize(filename) < 35000000):
         print "File %s appears to be bogus." % filename
         return 0
-    hdulist = pf.open(filename, mode='update')
+    hdulist = pf.open(filename, mode='readonly')
     avg = 0.0
     segcount = 0
     for i in range(16):
         hdr=hdulist[i+1].header
         if 'AVERAGE' in hdr.keys(): 
             avg = avg + float(hdr['AVERAGE'])
-        else :
-            print "AVERAGE is not there for segment %d so we will calculate and put it there" % i
-            segavg = 0.0
-            nvals = 0
-            nx2 = hdr['NAXIS2']
-            for ix2 in range (nx2):
-#                print "working on column %d" % ix2
-                for val in hdulist[i+1].data[ix2] :
-#                    print "val = %f" % float(val)
-                    segavg = segavg + float(val)
-                    nvals = nvals + 1
-            segavg = segavg / nvals
-            hdr.update("AVERAGE", segavg)
-            print "AVERAGE set to %f for %d values" % (segavg,nvals)
-            avg = avg + segavg
         segcount = segcount+1
     avg = avg / segcount
     hdulist.close()
@@ -200,9 +185,9 @@ def hdrsummary(filename,outfile):
     outfl = open(outfile,"a")
     hdulist = pf.open(filename, mode='readonly')
 
-    avg = fitsAverage(filename)
-    outfl.write("%s\n" % filename);
-    outfl.write("Average image pixel count = %f \n" % avg);
+#    avg = fitsAverage(filename)
+    outfl.write("filename: %s\n" % filename);
+#    outfl.write("Average image pixel count = %f \n" % avg);
 
     phdr=hdulist[0].header
     try:
@@ -216,9 +201,20 @@ def hdrsummary(filename,outfile):
         outfl.write("Exposure time       = %f\n" % phdr['EXPTIME'])
     except:
         outfl.write("Exposure time       = N/A\n")
+    avgsum = 0.
+    nseg = 0.
     for i in range(16):
         hdr=hdulist[i+1].header
-        outfl.write("%15s | AVG= %9.3f | AVGBIAS= %9.3f | WITHOUTBIAS= %9.3f | STDBIAS= %9.3f\n" % (hdr['EXTNAME'],hdr['AVERAGE'],hdr['AVGBIAS'],hdr['AVWOBIAS'],hdr['STDVBIAS']))
+        try:
+            outfl.write("%15s | AVG= %9.3f | AVGBIAS= %9.3f | STDBIAS= %9.3f\n" % (hdr['EXTNAME'],hdr['AVERAGE'],hdr['AVGBIAS'],hdr['STDVBIAS']))
+            avgsum = avgsum + hdr['AVERAGE']
+            nseg = nseg + 1.0
+        except:
+            print "MISSING DATA FOR HDU %d" % i
+            outfl.write("MISSING DATA FOR HDU %d" % i)
+    if (nseg>0.0) :
+        avg = avgsum / nseg
+        outfl.write("Average image pixel count = %f \n" % avg);
     hdulist.close()
     outfl.close()
 
@@ -317,10 +313,10 @@ def updateFitsHeaders(acqfilelist, summaryFile="summary.txt"):
 #               addPDvals(fitsfile, bsfile, "AMP1.MEAS_TIMES", "AMP1", tstamp)
 #           except:
 #               raise RuntimeError("Problem running addDPvals on %s for %s" % (bsfile,fitsfile))
-        try:
-            print fitsAverage(fitsfile)
-        except:
-            raise RuntimeError("Problem running fitsAverage for %s" % fitsfile)
+#        try:
+#            print fitsAverage(fitsfile)
+#        except:
+#            raise RuntimeError("Problem running fitsAverage for %s" % fitsfile)
         try:
             hdrsummary(fitsfile, summaryFile)
         except:

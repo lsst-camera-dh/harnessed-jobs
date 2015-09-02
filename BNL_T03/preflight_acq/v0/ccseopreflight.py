@@ -75,7 +75,7 @@ try:
     buff = result.getResult()
 
 # move TS to ready state
-    result = tssub.synchCommand(60,"setTSReady");
+    result = tssub.synchCommand(60,"setTSIdle");
     reply = result.getResult();
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
@@ -269,7 +269,7 @@ try:
     fp.close();
 
 # move TS to ready state                    
-    tssub.synchCommand(60,"setTSReady");
+    tssub.synchCommand(900,"setTSReady");
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
@@ -284,7 +284,7 @@ try:
 except Exception, ex:
 
 # move TS to ready state                    
-    tssub.synchCommand(60,"setTSReady");
+    tssub.synchCommand(60,"setTSIdle");
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
@@ -295,7 +295,7 @@ except Exception, ex:
 except ScriptingTimeoutException, ex:
 
 # move TS to ready state                    
-    tssub.synchCommand(60,"setTSReady");
+    tssub.synchCommand(60,"setTSIdle");
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);

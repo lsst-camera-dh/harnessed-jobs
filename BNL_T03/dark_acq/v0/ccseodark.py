@@ -250,6 +250,8 @@ try:
     fp.write(`istate`+"\n");
     
     fp.close();
+
+    result = arcsub.synchCommand(10,"setHeader","TestType","DARK-DONE")
     
 # move TS to idle state
                         
@@ -269,5 +271,7 @@ except Exception, ex:
     buff = result.getResult()
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+    result = arcsub.synchCommand(10,"setHeader","TestType","DARK-ERR")
 
 print "DARK: END"

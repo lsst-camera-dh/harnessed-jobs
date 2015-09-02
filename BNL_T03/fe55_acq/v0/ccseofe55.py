@@ -144,6 +144,7 @@ try:
     
 # take bias images
             print "set controller for bias exposure"
+            arcsub.synchCommand(10,"setParameter","Fe55","0");
             arcsub.synchCommand(10,"setParameter","Light","0");
             arcsub.synchCommand(10,"setParameter","ExpTime","0");
  
@@ -152,7 +153,6 @@ try:
 
             print "start bias exposure loop"
 
-            arcsub.synchCommand(10,"setParameter","Fe55","1");
             for i in range(bcount):
                 timestamp = time.time()
 
@@ -280,6 +280,7 @@ try:
 
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
+    result = arcsub.synchCommand(10,"setHeader","TestType","FE55-DONE")
 
 except Exception, ex:                                                     
 
@@ -289,6 +290,8 @@ except Exception, ex:
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+    result = arcsub.synchCommand(10,"setHeader","TestType","FE55-ERR")
 
 #except ScriptingTimeoutException, ex:                                                     
 

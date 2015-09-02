@@ -25,11 +25,6 @@ try:
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
-#    print "attaching XED subsystem"
-#    xedsub   = CCS.attachSubsystem("%s/Fe55" % ts);
-
-# retract the Fe55 arm
-#    xedsub.synchCommand(30,"retractFe55");
 
     time.sleep(3.)
 
@@ -39,7 +34,7 @@ try:
 
 
 # move TS to ready state
-    result = tssub.synchCommand(60,"setTSReady");
+    result = tssub.synchCommand(10000,"setTSReady");
     reply = result.getResult();
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();

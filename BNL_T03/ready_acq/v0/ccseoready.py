@@ -42,10 +42,10 @@ try:
     buff = result.getResult()
 
 # move TS to idle state
-    result = tssub.synchCommand(60,"setTSIdle");
+    result = tssub.synchCommand(900,"setTSIdle");
     reply = result.getResult();
-#    result = tssub.synchCommand(120,"goTestStand");
-#    rply = result.getResult();
+    result = tssub.synchCommand(120,"goTestStand");
+    rply = result.getResult();
 
     print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
 
@@ -58,20 +58,21 @@ try:
     print "Powering on the CCD"
     result = arcsub.synchCommand(30,"powerOnCCD");
     reply = result.getResult();
-    time.sleep(60.);
+    time.sleep(30.);
+
     arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
-    arcsub.synchCommand(10,"setParameter","Fe55","1");
+    arcsub.synchCommand(10,"setParameter","Fe55","0");
 
 # the first image is usually bad so throw it away
-    print "Throwing away the first image"
-    arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-    reply = result.getResult();
+#    print "Throwing away the first image"
+#    arcsub.synchCommand(10,"setFitsFilename","");
+#    result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+#    reply = result.getResult();
 
-    print "Images will now automatically display in the DS9 window"
-    arcsub.synchCommand(10,"setSendImagesToDS9",True);
+#    print "Images will now automatically display in the DS9 window"
+#    arcsub.synchCommand(10,"setSendImagesToDS9",True);
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -110,8 +111,10 @@ try:
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
-    bcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_BCOUNT', default='1'))
+#    bcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_BCOUNT', default='1'))
+    bcount = 3
     imcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_IMCOUNT', default='1'))
+    imcount = 1
 
     seq = 0
 
@@ -150,23 +153,27 @@ try:
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(bcount):
                 timestamp = time.time()
-                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
-                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+#                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+                arcsub.synchCommand(10,"setFitsFilename","");
 
                 print "Ready to take bias image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
+#                result = arcsub.synchCommand(500,"waitForExpoEnd");
+#                rply = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
 
     time.sleep(4.)
 ################################## Fe55  ################################3
-    for exptime in [1000,3000] :
+    for iexp in range(1) :
             arcsub.synchCommand(10,"setParameter","Light","0");
+            arcsub.synchCommand(10,"setParameter","Fe55","1");
+
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-            exptime = 3.0
+            exptime = 10.0
             print "exposure time = %f" % exptime
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
@@ -183,10 +190,10 @@ try:
             result = arcsub.synchCommand(10,"setHeader","TestType","READYFe55")
             result = arcsub.synchCommand(10,"setHeader","ImageType","READYFe55")
 
-            print "throw away first image after all parameters set"
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-            flnthrow = result.getResult();
+#            print "throw away first image after all parameters set"
+#            arcsub.synchCommand(10,"setFitsFilename","");
+#            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+#            flnthrow = result.getResult();
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
@@ -206,7 +213,7 @@ try:
 
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_fe55_%d_%3.3d_fe55_%d_${TIMESTAMP}.fits" % (ccd,exptime,seq,i+1)
+                fitsfilename = "%s_fe55_%d_${TIMESTAMP}.fits" % (ccd,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       
@@ -324,7 +331,7 @@ try:
 
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_lambda_%3.3d_%3.3d_lambda_%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
+                fitsfilename = "%s_lambda_%3.3d_%d_${TIMESTAMP}.fits" % (ccd,int(wl),i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       
@@ -383,6 +390,8 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
 
+    result = arcsub.synchCommand(10,"setHeader","TestType","READY-DONE")
+
     print "            TEST ACQUISITIONS COMPLETED"
 
 except Exception, ex:
@@ -390,10 +399,13 @@ except Exception, ex:
 
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
+    result = arcsub.synchCommand(10,"setHeader","TestType","READY-Err")
+
 except ScriptingTimeoutException, ex:
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
     raise Exception("There was an ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
+    result = arcsub.synchCommand(10,"setHeader","TestType","READY-Err")
 
 print "TS3_ready: COMPLETED"
