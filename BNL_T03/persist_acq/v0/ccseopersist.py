@@ -18,6 +18,8 @@ try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
     tssub  = CCS.attachSubsystem("%s" % ts);
+    print "attaching Bias subsystem"
+    biassub   = CCS.attachSubsystem("%s/Bias" % ts);
     print "attaching PD subsystem"
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
@@ -29,34 +31,16 @@ try:
     
     cdir = tsCWD
     
-# Initialization
-    print "doing initialization"
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
 
-    result = pdsub.synchCommand(10,"softReset");
-    buff = result.getResult()
+    ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-# move TS to ready state
-    result = tssub.synchCommand(60,"setTSReady");
-    reply = result.getResult();
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
+    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
 
-    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
-
-    print "Loading configuration file into the Archon controller"
-    result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
-    reply = result.getResult();
-    print "Applying configuration"
-    result = arcsub.synchCommand(25,"applyConfig");
-    reply = result.getResult();
-    print "Powering on the CCD"
-    result = arcsub.synchCommand(30,"powerOnCCD");
-    reply = result.getResult();
-    time.sleep(60.);
-    arcsub.synchCommand(10,"setAcqParam","Nexpo");
-    arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Fe55","0")
-    arcsub.synchCommand(10,"setFetch_timeout",500000);
 
     print "Setting the current ranges on the Bias and PD devices so they don't overflow when the full power of the lamp is bearing down on the diodes"
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -67,37 +51,6 @@ try:
     rply = result.getResult()
     result =monosub.synchCommand(30,"setWave",0.);  # full spectrum blast
     rply = result.getResult()
-
-# move to TS acquisition state
-    print "setting acquisition state"
-    result = tssub.synchCommand(120,"setTSTEST");
-    rply = result.getResult();
-
-#check state of ts devices
-    print "wait for ts state to become ready";
-    tsstate = 0
-    starttim = time.time()
-    while True:
-        print "checking for test stand to be ready for acq";
-        result = tssub.synchCommand(10,"isTestStandReady");
-        tsstate = result.getResult();
-# the following line is just for test situations so that there would be no waiting
-        tsstate=1;
-        if ((time.time()-starttim)>240):
-            print "Something is wrong ... we will never make it to a runnable state"
-            exit
-        if tsstate!=0 :
-            break
-        time.sleep(5.)
-
-#put in acquisition state
-    print "go teststand go"
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
-
-# get the glowing vacuum gauge off
-    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
-    rply = result.getResult();
 
 # wait
     for i in range(10):

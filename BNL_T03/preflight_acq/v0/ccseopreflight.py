@@ -33,77 +33,20 @@ try:
 
     cdir = tsCWD
 
-    result = tssub.synchCommand(10,"getCCSVersions");
-    ccsversions = result.getResult()
-    ccsvfiles = open("%s/ccsversion" % cdir,"w");
-    ccsvfiles.write("%s" % ccsversions)
-    ccsvfiles.close()
-#    print "ccsversions = %s" % ccsversions
-    ssys = ""
-
     ts_version = ""
     archon_version = ""
     ts_revision = ""
     archon_revision = ""
-    for line in str(ccsversions).split("\t"):
-        tokens = line.split()
-        if (len(tokens)>2) :
-            if ("ts" in tokens[2]) :
-                ssys = "ts"
-            if ("archon" in tokens[2]) :
-                ssys = "archon"
-#            print "tokens[1] = %s " % tokens[1]
-            if (tokens[1] == "Version:") :
-                print "%s - version = %s" % (ssys,tokens[2])
-                if (ssys == "ts") :
-                    ts_version = tokens[2]
-                if (ssys == "archon") :
-                    archon_version = tokens[2]
-            if (len(tokens)>3) :
-                if (tokens[2] == "Rev:") :
-                    print "%s - revision = %s" % (ssys,tokens[3])
-                    if (ssys == "ts") :
-                        ts_revision = tokens[3]
-                    if (ssys == "archon") :
-                        archon_revision = tokens[3]
-#                print "tokens[2] = %s " % tokens[2]
-#       print "\nCCSVersions line = %s \n" % line
 
-# Initialization
+    ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    result = pdsub.synchCommand(10,"softReset");
-    buff = result.getResult()
+    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,"setTSIdle","setTSIdle")
 
-# move TS to ready state
-    result = tssub.synchCommand(60,"setTSIdle");
-    reply = result.getResult();
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
-
-    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
-
-    if (doarch) :
-        print "Loading configuration file into the Archon controller"
-        result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
-        reply = result.getResult();
-        print "Applying configuration"
-        result = arcsub.synchCommand(25,"applyConfig");
-        reply = result.getResult();
-        print "Powering on the CCD"
-        result = arcsub.synchCommand(30,"powerOnCCD");
-        reply = result.getResult();
-        time.sleep(60.);
-        arcsub.synchCommand(10,"setAcqParam","Nexpo");
-        arcsub.synchCommand(10,"setParameter","Expo","1");
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
     pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
-
-# get the glowing vacuum gauge off
-    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
-    rply = result.getResult();
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
@@ -248,7 +191,7 @@ try:
 
                 if (doarch) :
                     result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
-#/home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/pd-values_1434501729-for-seq-0-exp-1.txt /home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/NoCCD1_lambda_400_000_lambda_1_20150616204212.fits MP time pd 123.00
+
                     fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
             seq = seq + 1

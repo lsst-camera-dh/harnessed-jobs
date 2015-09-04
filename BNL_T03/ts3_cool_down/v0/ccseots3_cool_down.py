@@ -32,6 +32,13 @@ try:
 
 # Initialization
 
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
+
+    ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
+
 
 # move TS to ready state
     result = tssub.synchCommand(10000,"setTSReady");
@@ -48,5 +55,14 @@ except ScriptingTimeoutException, ex:
 
     raise Exception("There was an ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
+    istate=0;
+    result = tssub.synchCommandLine(10,"getstate");
+    istate=result.getResult();
+    fp.write(`istate`+"\n");
+    fp.write("%s\n" % ts_version);
+    fp.write("%s\n" % ts_revision);
+    fp.write("%s\n" % archon_version);
+    fp.write("%s\n" % archon_revision);
+    fp.close();
 
 print "ts3_cool_down: COMPLETED"

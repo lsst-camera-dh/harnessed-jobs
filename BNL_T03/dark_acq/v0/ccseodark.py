@@ -15,6 +15,8 @@ try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
     tssub  = CCS.attachSubsystem("%s" % ts);
+    print "attaching Bias subsystem"
+    biassub   = CCS.attachSubsystem("%s/Bias" % ts);
     print "attaching PD subsystem"
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
@@ -25,68 +27,18 @@ try:
     arcsub  = CCS.attachSubsystem("%s" % archon);
     
     cdir = tsCWD
-    
-# Initialization
-    print "doing initialization"
 
-    result = pdsub.synchCommand(10,"softReset");
-    buff = result.getResult()
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
 
-# move TS to ready state
-    result = tssub.synchCommand(60,"setTSReady");
-    reply = result.getResult();
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
+    ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
+    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
 
-    print "Loading configuration file into the Archon controller"
-    result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
-    reply = result.getResult();
-    print "Applying configuration"
-    result = arcsub.synchCommand(25,"applyConfig");
-    reply = result.getResult();
-    print "Powering on the CCD"
-    result = arcsub.synchCommand(30,"powerOnCCD");
-    reply = result.getResult();
-    time.sleep(3.);
-    arcsub.synchCommand(10,"setAcqParam","Nexpo");
-    arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","0");
-
-    time.sleep(60.)
-
-# move to TS acquisition state
-    print "setting acquisition state"
-    result = tssub.synchCommand(10,"setTSTEST");
-    rply = result.getResult();
-
-#check state of ts devices
-    print "wait for ts state to become ready";
-    tsstate = 0
-    starttim = time.time()
-    while True:
-        print "checking for test stand to be ready for acq";
-        result = tssub.synchCommand(10,"isTestStandReady");
-        tsstate = result.getResult();
-# the following line is just for test situations so that there would be no waiting
-        tsstate=1;
-        if ((time.time()-starttim)>240):
-            print "Something is wrong ... we will never make it to a runnable state"
-            exit
-        if tsstate!=0 :
-            break
-        time.sleep(5.)
-
-#put in acquisition state
-    print "go teststand go"
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
-
-# get the glowing vacuum gauge off
-    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
-    rply = result.getResult();
 
 # wait until its dark .... very dark
     time.sleep(30.)
@@ -248,6 +200,10 @@ try:
     result = tssub.synchCommandLine(10,"getstate");
     istate=result.getResult();
     fp.write(`istate`+"\n");
+    fp.write("%s\n" % ts_version);
+    fp.write("%s\n" % ts_revision);
+    fp.write("%s\n" % archon_version);
+    fp.write("%s\n" % archon_revision);
     
     fp.close();
 

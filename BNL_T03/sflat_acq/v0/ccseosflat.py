@@ -16,6 +16,8 @@ try:
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
     tssub  = CCS.attachSubsystem("%s" % ts);
+    print "attaching Bias subsystem"
+    biassub   = CCS.attachSubsystem("%s/Bias" % ts);
     print "attaching PD subsystem"
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
@@ -29,115 +31,22 @@ try:
 
     cdir = tsCWD
     
-# record the CCS versions being used                                            
-
-    result = tssub.synchCommand(10,"getCCSVersions");
-    ccsversions = result.getResult()
-    ccsvfiles = open("%s/ccsversion" % cdir,"w");
-    ccsvfiles.write("%s" % ccsversions)
-    ccsvfiles.close()
-
-    ssys = ""
     ts_version = ""
     archon_version = ""
     ts_revision = ""
     archon_revision = ""
-    for line in str(ccsversions).split("\t"):
-        tokens = line.split()
-        if (len(tokens)>2) :
-            if ("ts" in tokens[2]) :
-                ssys = "ts"
-            if ("archon" in tokens[2]) :
-                ssys = "archon"
 
-            if (tokens[1] == "Version:") :
-                print "%s - version = %s" % (ssys,tokens[2])
-                if (ssys == "ts") :
-                    ts_version = tokens[2]
-                if (ssys == "archon") :
-                    archon_version = tokens[2]
-            if (len(tokens)>3) :
-                if (tokens[2] == "Rev:") :
-                    print "%s - revision = %s" % (ssys,tokens[3])
-                    if (ssys == "ts") :
-                        ts_revision = tokens[3]
-                    if (ssys == "archon") :
-                        archon_revision = tokens[3]
+    ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
+    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
 
-
-# Initialization
-    print "doing initialization"
-
-    result = pdsub.synchCommand(10,"softReset");
-    buff = result.getResult()
-
-# move TS to ready state
-    result = tssub.synchCommand(60,"setTSReady");
-    reply = result.getResult();
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
-
-    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
-
-    print "Loading configuration file into the Archon controller"
-    result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
-    reply = result.getResult();
-    print "Applying configuration"
-    result = arcsub.synchCommand(25,"applyConfig");
-    reply = result.getResult();
-    print "Powering on the CCD"
-    result = arcsub.synchCommand(30,"powerOnCCD");
-    reply = result.getResult();
-    time.sleep(60.);
-    arcsub.synchCommand(10,"setAcqParam","Nexpo");
-    arcsub.synchCommand(10,"setParameter","Expo","1");
-    
-# the first image is usually bad so throw it away
-    print "Throwing away the first image"
-    arcsub.synchCommand(10,"setFitsFilename","");
-    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-    reply = result.getResult();
 
     print "Setting the current ranges on the Bias and PD devices"
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
     pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
-# move to TS acquisition state
-    print "setting acquisition state"
-    result = tssub.synchCommand(500,"setTSTEST");
-    rply = result.getResult();
-
-    
-    
-#check state of ts devices
-    print "wait for ts state to become ready";
-    tsstate = 0
-    starttim = time.time()
-    while True:
-        print "checking for test stand to be ready for acq";
-        result = tssub.synchCommand(10,"isTestStandReady");
-        tsstate = result.getResult();
-# the following line is just for test situations so that there would be no waiting
-        tsstate=1;
-        if ((time.time()-starttim)>240):
-            print "Something is wrong ... we will never make it to a runnable state"
-            exit
-        if tsstate!=0 :
-            break
-        time.sleep(5.)
-
-# ramp the bias
-    print "go teststand go"
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
-    
     seq = 0  # image pair number in sequence
     
-# get the glowing vacuum gauge off
-    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
-    rply = result.getResult();
-
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_HILIM', default='120.0'))
     bcount = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default = "5"))
@@ -364,7 +273,10 @@ try:
     result = tssub.synchCommandLine(10,"getstate");
     istate=result.getResult();
     fp.write(`istate`+"\n");
-    
+    fp.write("%s\n" % ts_version);
+    fp.write("%s\n" % ts_revision);
+    fp.write("%s\n" % archon_version);
+    fp.write("%s\n" % archon_revision);    
     fp.close();
     
 # move TS to idle state

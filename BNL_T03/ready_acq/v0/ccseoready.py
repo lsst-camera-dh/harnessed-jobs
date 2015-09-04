@@ -36,40 +36,19 @@ try:
 
     cdir = tsCWD
 
-# Initialization
+    ts_version = ""
+    archon_version = ""
+    ts_revision = ""
+    archon_revision = ""
 
-    result = pdsub.synchCommand(10,"softReset");
-    buff = result.getResult()
+    ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-# move TS to idle state
-    result = tssub.synchCommand(900,"setTSIdle");
-    reply = result.getResult();
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
+    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,"setTSIdle","setTSIdle")
 
-    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
 
-    print "Loading configuration file into the Archon controller"
-    result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
-    reply = result.getResult();
-    print "Applying configuration"
-    result = arcsub.synchCommand(25,"applyConfig");
-    reply = result.getResult();
-    print "Powering on the CCD"
-    result = arcsub.synchCommand(30,"powerOnCCD");
-    reply = result.getResult();
-    time.sleep(30.);
-
-    arcsub.synchCommand(10,"setAcqParam","Nexpo");
-    arcsub.synchCommand(10,"setParameter","Expo","1");
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
-# the first image is usually bad so throw it away
-#    print "Throwing away the first image"
-#    arcsub.synchCommand(10,"setFitsFilename","");
-#    result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-#    reply = result.getResult();
 
 #    print "Images will now automatically display in the DS9 window"
 #    arcsub.synchCommand(10,"setSendImagesToDS9",True);
@@ -77,37 +56,6 @@ try:
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
     pdsub.synchCommand(10,"setCurrentRange",0.0002)
-
-# move to TS acquisition state
-    print "setting acquisition state"
-    result = tssub.synchCommand(60,"setTSTEST");
-    rply = result.getResult();
-
-#check state of ts devices
-    print "wait for ts state to become ready";
-    tsstate = 0
-    starttim = time.time()
-    while True:
-        print "checking for test stand to be ready for acq";
-        result = tssub.synchCommand(10,"isTestStandReady");
-        tsstate = result.getResult();
-# the following line is just for test situations so that there would be no waiting
-#        tsstate=1;
-        if ((time.time()-starttim)>4000):
-            print "Something is wrong ... we will never make it to a runnable state"
-            exit
-        if tsstate!=0 :
-            break
-        time.sleep(5.)
-
-#put in acquisition state
-    print "Since this is just a readiness check, we will NOT ramp the bias "
-#    result = tssub.synchCommand(120,"goTestStand");
-#    rply = result.getResult();
-
-# get the glowing vacuum gauge off
-    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
-    rply = result.getResult();
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
@@ -190,10 +138,6 @@ try:
             result = arcsub.synchCommand(10,"setHeader","TestType","READYFe55")
             result = arcsub.synchCommand(10,"setHeader","ImageType","READYFe55")
 
-#            print "throw away first image after all parameters set"
-#            arcsub.synchCommand(10,"setFitsFilename","");
-#            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-#            flnthrow = result.getResult();
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*1.10 ;
@@ -246,7 +190,7 @@ try:
 
 
                 result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
-#/home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/pd-values_1434501729-for-seq-0-exp-1.txt /home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/NoCCD1_lambda_400_000_lambda_1_20150616204212.fits MP time pd 123.00
+
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
 # reset timeout to something reasonable for a regular command
@@ -307,11 +251,11 @@ try:
 
                 print "Setting the monochrmator wavelength and filter"
                 print "You should HEAR some movement"
-                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                result = monosub.synchCommand(90,"setWaveAndFilter",wl);
                 rply = result.getResult()
                 time.sleep(4.)
                 print "Verifying wavelength setting of the monochromator"
-                result = monosub.synchCommand(30,"getWave");
+                result = monosub.synchCommand(90,"getWave");
                 rwl = result.getResult()
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
@@ -361,7 +305,7 @@ try:
 
 
                 result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
-#/home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/pd-values_1434501729-for-seq-0-exp-1.txt /home/ts3prod/jobHarness/jh_stage/e2v-CCD/NoCCD1/ready_acq/v0/180/NoCCD1_lambda_400_000_lambda_1_20150616204212.fits MP time pd 123.00
+
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
 # reset timeout to something reasonable for a regular command
@@ -377,6 +321,10 @@ try:
     result = tssub.synchCommandLine(10,"getstate");
     istate=result.getResult();
     fp.write(`istate`+"\n");
+    fp.write("%s\n" % ts_version);
+    fp.write("%s\n" % ts_revision);
+    fp.write("%s\n" % archon_version);
+    fp.write("%s\n" % archon_revision);
     fp.close();
 
 # move TS to ready state                    
