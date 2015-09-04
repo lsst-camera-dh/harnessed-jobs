@@ -1,4 +1,5 @@
 import os
+import shutil
 import socket
 import numpy as np
 import lsst.eotest.sensor as sensorTest
@@ -47,17 +48,21 @@ def getEotestCalibs():
     pars = siteUtils.Parfile(getEotestCalibsFile(), getTestStandHostName())
     return pars
 
-def getSystemNoise():
+def getSystemNoise(gains):
     """
     Return the system noise for each amplifier channel.  The data are
-    read from the local file given in site-specific eotest
+    read from the local file given in the site-specific eotest
     calibrations file.
     """
     pars = getEotestCalibs()
     if pars['system_noise_file'] is None:
         return None
     data = np.recfromtxt(pars['system_noise_file'], names=('amp', 'noise'))
-    return dict([x for x in zip(data['amp'], data['noise'])])
+    sys_noise = {}
+    # Multiply by gain to obtain noise in e- rms.
+    for amp, noise in zip(data['amp'], data['noise']):
+        sys_noise[amp] = gains[amp]*noise
+    return sys_noise
 
 def eotest_abspath(path):
     if path is None:
@@ -100,3 +105,20 @@ def eotestCalibrations():
     kwds['eotest_host'] = getTestStandHostName()
     result = lcatr.schema.valid(lcatr.schema.get('eotest_calibrations'), **kwds)
     return result
+
+def eotestCalibsPersist(*keys):
+    """
+    Loop through specified list of keys in eotest calibration config
+    file and persist as lcatr.schema.filerefs.  Return the list of
+    filerefs.
+    """
+    pars = getEotestCalibs()
+    results = []
+    for key in keys:
+        filename = pars[key]
+        if filename is not None:
+            if not os.path.isfile(filename):
+                raise RuntimeError("eotest calibration parameter %s = %s is not a valid file" % (key, filename))
+            shutil.copy(filename, '.')
+            results.append(lcatr.schema.fileref.make(os.path.basename(filename)))
+    return results

@@ -31,7 +31,7 @@ def obs_time_cmp(file1, file2):
     return 0
 
 def annotate_acq(start_time, test_type, yposfrac=0.8, xoffset=0,
-                 color='k', size=12):
+                 color='k', size=10):
     xmin, xmax, ymin, ymax = pylab.axis()
     try:
         xpos = start_time + xoffset
@@ -39,7 +39,7 @@ def annotate_acq(start_time, test_type, yposfrac=0.8, xoffset=0,
         xpos = start_time - datetime.timedelta(minutes=xoffset)
     ypos = yposfrac*(ymax - ymin) + ymin
     pylab.plot([start_time, start_time], [ymin, ymax], 'r:')
-    pylab.annotate(" " + test_type, (xpos, ypos), #rotation='-90',
+    pylab.annotate(" " + test_type, (xpos, ypos), rotation='-90',
                    horizontalalignment='left', color=color, size=size)
 
 class Trending(object):
@@ -230,7 +230,7 @@ class EoAcqFrame(object):
             self.imaging[amp] = segdata[datasec['ymin']-1:datasec['ymax']-1,
                                         datasec['xmin']-1:datasec['xmax']-1]
             self.overscan[amp] = segdata[datasec['ymin']-1:datasec['ymax']-1,
-                                         datasec['xmax']-1:naxis1]
+                                         datasec['xmax']:naxis1]
 
 if __name__ == '__main__':
     root_path = lambda x : os.path.join('/nfs/farm/g/lsst/u1/mirror/BNL-test/test/ITL-CCD/ITL-113-10-360Khz-test12', x)

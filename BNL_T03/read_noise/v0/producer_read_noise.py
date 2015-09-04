@@ -15,7 +15,7 @@ bias_files = siteUtils.dependency_glob('*_fe55_fe55_*.fits',
                                        jobname=siteUtils.getProcessName('fe55_acq'),
                                        description='Fe55 files for read noise:')
 gains = eotestUtils.getSensorGains()
-system_noise = eotestUtils.getSystemNoise()
+system_noise = eotestUtils.getSystemNoise(gains)
 if system_noise is None:
     print 
     print "WARNING: The system noise file is not given in"
