@@ -158,12 +158,6 @@ try:
 # do in-job flux calibration
             arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
-# dispose of first image
-#            arcsub.synchCommand(10,"setFitsFilename","");
-#            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-#            rply = result.getResult();
-
-
             result  = arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             flncal = result.getResult();
@@ -184,10 +178,10 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
-            nreads = exptime*60/nplc + 200
+            nreads = exptime*60/nplc + 60
             if (nreads > 3000):
                 nreads = 3000
-                nplc = exptime*60/(nreads-200)
+                nplc = exptime*60/(nreads-60)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
@@ -214,11 +208,13 @@ try:
                 print "fitsfilename = %s" % fitsfilename
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(0.2);
+                time.sleep(0.5);
 
                 print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
                 print "after click click at %f" % time.time()
 
                 print "done with exposure # %d" % i
@@ -230,7 +226,7 @@ try:
                 tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
-                time.sleep(10.)
+#                time.sleep(10.)
 
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
                 result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));

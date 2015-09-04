@@ -8,6 +8,7 @@ from org.lsst.ccs.scripting import *
 from java.lang import Exception
 import sys
 import time
+import eolib
 
 CCS.setThrowExceptions(True);
 
