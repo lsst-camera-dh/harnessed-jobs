@@ -22,8 +22,9 @@ class VendorFitsTranslator(object):
         self.lsst_num = lsst_num
         self.rootdir = rootdir
         self.outputBaseDir = outputBaseDir
-        self._infiles = lambda x : sorted(glob.glob(os.path.join(rootdir, x)))
         self.outfiles = []
+    def _infiles(self, x):
+        return sorted(glob.glob(os.path.join(self.rootdir, x)))
     def _writeFile(self, hdulist, local_vars, verbose=True):
         outfile = "%(lsst_num)s_%(test_type)s_%(image_type)s_%(seqno)s_%(time_stamp)s.fits" % local_vars
         outdir = os.path.join(self.outputBaseDir, local_vars['test_type'],
@@ -94,6 +95,12 @@ class ItlFitsTranslator(VendorFitsTranslator):
     def __init__(self, lsst_num, rootdir, outputBaseDir='.'):
         super(ItlFitsTranslator, self).__init__(lsst_num, rootdir,
                                                 outputBaseDir)
+        # Identify the directory containing the subdirectories with
+        # the data for the various tests.
+        my_rootdir = rootdir.rstrip('/') # remove any trailing slashes
+        my_rootdir = subprocess.check_output('find %s/ -name superflat1 -print'
+                                             % my_rootdir, shell=True)
+        self.rootdir = os.path.split(my_rootdir)[0]
     def translate(self, infile, test_type, image_type, seqno, time_stamp=None,
                   verbose=True):
         try:
