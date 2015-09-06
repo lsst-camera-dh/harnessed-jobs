@@ -1,4 +1,5 @@
 import os
+eobj = None
 try:
     #
     # Check for expected environment variables.
@@ -32,13 +33,18 @@ try:
     import DataCatalog
     import PythonBinding
     import ccsTools
-    import eolib
+    try:
+        import eolib
+    except ImportError, eobj:
+        print "Error importing eolib:"
+        print eobj
+        
     import eotestUtils
     import harnessedJobs
     import hdrtools
     import siteUtils
 
-    if 'schema_path' in locals():
+    if 'schema_path' in locals() and eobj is None:
         print "The harnessed-jobs set up appears OK."
     else:
         print "The harnessed-jobs set up otherwise appears OK."
