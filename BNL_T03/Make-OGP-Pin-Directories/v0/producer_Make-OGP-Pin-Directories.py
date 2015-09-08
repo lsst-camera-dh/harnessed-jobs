@@ -14,10 +14,12 @@ ccd = os.environ["LCATR_UNIT_ID"]
 topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
 print "Creating the top level directory for the CCD at %s" % topccddir
 
-pindir = "%s/LateralPin/" % topccddir
+pindir = "%s/LateralPosition/" % topccddir
 print "Creating directory for lateral pin results. Location is %s" % pindir
 
-pindatedir = "%s%s" % (pindir,time.strftime("%Y%m%d-%HH%MM"))
+tm = time.strftime("%Y%m%d-%HH%MM")
+
+pindatedir = "%s%s" % (pindir,tm)
 print "Creating dated lateral pin directory for the CCD at %s" % pindatedir
 os.makedirs(pindatedir)
 os.system("chmod 777 %s" %  pindatedir)
@@ -60,3 +62,10 @@ os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,o
 os.system("cd %s" % cwd)
 
 print "The OGP acquisition and analysis scripts have been installed."
+
+rtnnam = "%s_Pin_%s.DAT" % (ccd,tm)
+%tkMessageBox.showinfo("OGP Routine Data Output Filename", rtnnam)
+subprocess.Popen(["./showfl.py",rtnnam]);
+print "======================================="
+print "OGP Routine Data Output Filename: %s" % rtnnam
+print "======================================="

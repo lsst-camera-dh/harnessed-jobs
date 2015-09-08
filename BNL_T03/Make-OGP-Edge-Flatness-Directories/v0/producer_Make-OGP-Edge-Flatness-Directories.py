@@ -17,14 +17,16 @@ print "Creating the top level directory for the CCD at %s" % topccddir
 edgedir = "%s/EdgeScan/" % topccddir
 print "Creating directory for edge scan results. Location is %s" % edgedir
 
-flatdir = "%s/DimensionalMetrology/" % topccddir
+flatdir = "%s/Flatness/" % topccddir
 print "Creating directory for flatness results. Location is %s" % flatdir
 
-edgedatedir = "%s%s" % (edgedir,time.strftime("%Y%m%d-%HH%MM"))
+tm = time.strftime("%Y%m%d-%HH%MM")
+
+edgedatedir = "%s%s" % (edgedir,tm)
 print "Creating dated edge directory for the CCD at %s" % edgedatedir
 os.makedirs(edgedatedir)
 os.system("chmod 777 %s" %  edgedatedir)
-flatdatedir = "%s%s" % (flatdir,time.strftime("%Y%m%d-%HH%MM"))
+flatdatedir = "%s%s" % (flatdir,tm)
 print "Creating dated edge directory for the CCD at %s" % flatdatedir
 os.makedirs(flatdatedir)
 os.system("chmod 777 %s" %  flatdatedir)
@@ -68,3 +70,10 @@ os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,o
 os.system("cd %s" % cwd)
 
 print "The OGP acquisition and analysis scripts have been installed."
+rtnnam = "%s_Flat_%s.DAT" % (ccd,tm)
+#tkMessageBox.showinfo("OGP Routine Data Output Filename", rtnnam)
+subprocess.Popen(["./showfl.py",rtnnam]);
+
+print "======================================="
+print "OGP Routine Data Output Filename: %s" % rtnnam
+print "======================================="

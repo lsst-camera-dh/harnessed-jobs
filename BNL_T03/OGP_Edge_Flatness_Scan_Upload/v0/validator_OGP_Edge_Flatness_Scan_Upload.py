@@ -33,12 +33,13 @@ print "looking for links to edge, flatness and absolute height files in %s and %
 #os.sys("chmod 644 %s/*.*" % theogpedgedir)
 #os.sys("chmod 644 %s/*.*" % theogpflatdir)
 #edgefiles = glob.glob("%s/*.*" % theogpedgedir)
-edgefiles = glob.glob("EdgeScan/*.*")
+os.system("chmod 644 */*/*.*")
+edgefiles = glob.glob("EdgeScan/*/*.*")
 #for fl in edgefiles :
 #    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
 #    os.system("chmod 644 %s" % fl)
 #flatfiles = glob.glob("%s/*.*" % theogpflatdir)
-flatfiles = glob.glob("Flatness/*.*")
+flatfiles = glob.glob("Flatness/*/*.*")
 #for fl in flatfiles :
 #    os.chmod(fl,stat.S_IRGRP+stat.S_IREAD+stat.S_IWRITE)
 #    os.system("chmod 644 %s" % fl)
@@ -68,12 +69,12 @@ lcatr.schema.validate_file()
 
 # make a button showing the name that should be used for the output filename
 #E2V-CCD250-82-5-G42-14041-08-01_DimMet_20150817-16H23M.DAT
-ccd = os.environ["LCATR_UNIT_ID"]
-dateddir = glob.glob("Flatness/*")
-dirdate = dateddir[0].strip("/")
-top = Tkinter.Tk()
-M = Tkinter.Button(top, text ="Please use the following filename as the specification of the output filename\n%s_Flat_%s.DAT" % (ccd,dirdate), bg = "green")
-M=Tkinter.Button(top,text="filename")
-M.pack()
-top.title('OGP Routine Output Filename')
-top.mainloop()
+#ccd = os.environ["LCATR_UNIT_ID"]
+#dateddir = glob.glob("Flatness/*")
+#dirdate = dateddir[0].strip("/")
+#top = Tkinter.Tk()
+#M = Tkinter.Button(top, text ="Please use the following filename as the specification of the output filename\n%s_Flat_%s.DAT" % (ccd,dirdate), bg = "green")
+#M=Tkinter.Button(top,text="filename")
+#M.pack()
+#top.title('OGP Routine Output Filename')
+#top.mainloop()

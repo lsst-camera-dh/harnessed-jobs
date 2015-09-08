@@ -156,7 +156,8 @@ def EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1="setTSRe
     buff = result.getResult()
 
 # move TS to ready state
-    result = tssub.synchCommand(60,state1);
+    print "setting teststand to state: %s" % state1
+    result = tssub.synchCommand(300,state1);
     reply = result.getResult();
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
@@ -182,7 +183,7 @@ def EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1="setTSRe
 # move to TS acquisition state
     print "setting acquisition state"
 
-    result = tssub.synchCommand(60,state2);
+    result = tssub.synchCommand(240,state2);
     rply = result.getResult();
 
 #check state of ts devices
