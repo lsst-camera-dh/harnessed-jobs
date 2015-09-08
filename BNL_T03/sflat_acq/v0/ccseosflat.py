@@ -86,6 +86,9 @@ try:
         if ((len(tokens) > 0) and (tokens[0] == 'sflat')):
             wl = int(tokens[1])
             target = int(tokens[2])
+            lohiflux = "L"
+            if (target>10000) :
+                lohiflux = "H"
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='FLAT', use_nd=False)
     
             imcount = int(tokens[3])
@@ -229,7 +232,7 @@ try:
 # start acquisition
 
                 timestamp = time.time()
-                fitsfilename = "%s_sflat_%3.3d_%3.3d_flat%d_${TIMESTAMP}.fits" % (ccd,int(wl),seq,i+1)
+                fitsfilename = "%s_sflat_%4.4d_flat%d_%s%3.3d_${TIMESTAMP}.fits" % (ccd,int(wl),i+1,lohiflux,seq)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       
