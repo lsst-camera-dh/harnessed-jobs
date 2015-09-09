@@ -246,4 +246,8 @@ except ScriptingTimeoutException, ex:
     result = pdsub.synchCommand(10,"softReset");
     raise Exception("There was a ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
+# make sure we leave the power to the sensor OFF
+    result = arcsub.synchCommand(30,"powerOffCCD");
+
+
 print "preflight_acq: COMPLETED"

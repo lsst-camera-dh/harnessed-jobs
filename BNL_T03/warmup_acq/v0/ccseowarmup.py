@@ -26,16 +26,28 @@ try:
     cdir = tsCWD
 
 # turn off the lamp
+    print "TURNING OFF THE LAMP"
     result = lampsub.synchCommand(100000,"setLAmpPowerEnable",False);
 
 # turn off power to the cryotiger
+    print "TURNING OFF THE POWER TO THE POLYCOLD"
     result = pdusub.synchCommand(120,"setOutletState",cryo_outlet,False);
     rply = result.getResult();
 
+# set bias voltage off
+    print "TURNING OFF THE BACKPLANE BIAS VOLTAGE"
+    result = biassub.synchCommand(30,"SetVoltage",0.0);
+
+# make sure we leave the power to the sensor OFF
+    print "POWERING OFF THE CCD"
+    result = arcsub.synchCommand(30,"powerOffCCD");
+
 # move to TS idle state ... this will set the cryocon to warm
-    print "setting acquisition state"
+    print "SETTING STATE OF TESTSTAND TO IDLE"
     result = tssub.synchCommand(100000,"setTSIdle");
     rply = result.getResult();
+
+
 
 except Exception, ex:
 

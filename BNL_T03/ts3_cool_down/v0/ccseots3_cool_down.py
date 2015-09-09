@@ -23,6 +23,8 @@ try:
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "attaching PDU subsystem"
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
+    print "attaching Cryo subsystem"
+    cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
 
@@ -40,9 +42,40 @@ try:
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
 
+# turn on power to the cryotiger
+    print "TURNING ON POWER TO THE POLYCOLD!"
+    result = pdusub.synchCommand(120,"setOutletState",cryo_outlet,True);
+    rply = result.getResult();
+
 # move TS to ready state
     result = tssub.synchCommand(10000,"setTSReady");
     reply = result.getResult();
+
+#check state of ts devices
+    print "wait for ts state to become ready";
+    tsstate = 0
+    starttim = time.time()
+    fpfiles = open("%s/cooldown.dat" % cdir,"w");
+
+    while True:
+        print "checking for test stand to be ready for acq";
+        result = tssub.synchCommand(10,"isTestStandReady");
+        tsstate = result.getResult();
+        result = cryosub.synchCommand(20,"getTemp","B");
+        ctemp = result.getResult();
+        tstat = "time = %f , T = %f\n" % (time.time(),ctemp)
+        print tstat
+        fpfiles.write(tstat)
+# the following line is just for test situations so that there would be no waiting
+        tsstate=1;
+        if ((time.time()-starttim)>9600):
+            print "Something is wrong ... we will never make it to a runnable state"
+            exit
+        if tsstate!=0 :
+            break
+        time.sleep(5.)
+
+    fpfiles.close()
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
 

@@ -7,7 +7,6 @@ import os
 
 ccsProducer('ready_acq', 'ccseoready.py')
 
-
 apptxt = "Please check the FLAT image that is about to be projected in ds9\nfor correct bias regions.\nClick on this window when ready."
 
 print apptxt
@@ -32,9 +31,7 @@ topf.mainloop()
 fe55files = sorted(glob.glob('*fe55*.fits'))
 os.system("ds9 -scale datasec no -scale histequ %s" % fe55files[0])
 
-apptxt = "The job is finished. Please click on this window and return to the eTraveler page to complete the form."
-
-print apptxt
+apptxt = "The job is finished.\nClick on this button then\nreturn to the eTraveler page to complete the readiness verification form."
 topd = Tkinter.Tk()
 d = Tkinter.Button(topd, text = apptxt, command = topd.destroy, bg = "yellow", font = ("Helvetica",24))
 d.pack()

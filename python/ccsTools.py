@@ -44,6 +44,10 @@ class CcsSetup(OrderedDict):
             self['vac_outlet']=os.getenv('CCS_VAC_OUTLET')
 # there is no default for vac_outlet - if there is a script that needs
 # it and it has not been defined then I want it to crash
+        if os.environ.has_key('CCS_CRYO_OUTLET'):
+            self['cryo_outlet']=os.getenv('CCS_CRYO_OUTLET')
+# there is no default for cryo_outlet - if there is a script that needs
+# it and it has not been defined then I want it to crash
         self['tsCWD'] = _quote(os.getcwd())
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
@@ -80,6 +84,9 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=False, verbose=True):
     output = open("%s.log" % jobName, "w")
     output.write(result.getOutput())
     output.close()
+
+    print "purge fluxcal fits files"
+    os.system("rm -v fluxcal*.fits")
 
 def convert_unix_time(millisecs):
     """
@@ -158,6 +165,7 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     files = files+glob.glob('*log*')
     files = files+glob.glob('*summary*')
     files = files+glob.glob('*.png')
+    files = files+glob.glob('*.dat')
     print "The files that will be registered in lims from %s are:" % os.getcwd()
     for line in files :
         print "%s" % line

@@ -223,6 +223,9 @@ try:
             flux = flux * 0.50
 
             exptime = target/flux
+
+#            exptime = 4.0
+
             print "exposure time = %f" % exptime
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 

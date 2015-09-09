@@ -54,24 +54,22 @@ try:
 #    reply = result.getResult();
 
 
-    arcsub.synchCommand(10,"setAcqParam","Nexpo");
+#    arcsub.synchCommand(10,"setAcqParam","Nexpo");
     arcsub.synchCommand(10,"setParameter","Expo","1");
 
     print "set expo to 1"
 
 #    biassub.synchCommand(10,"setCurrentRange",0.000000002)
 #    pdsub.synchCommand(10,"setCurrentRange",0.000002)
-#    biassub.synchCommand(10,"setCurrentRange",0.000000002)
-#    pdsub.synchCommand(10,"setCurrentRange",0.000002)
-    biassub.synchCommand(10,"setCurrentRange",0.0000002)
-    pdsub.synchCommand(10,"setCurrentRange",0.00002)
+    biassub.synchCommand(10,"setCurrentRange",0.000000002)
+    pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
     print "set current ranges"
 
 # move to TS acquisition state
     print "setting acquisition state"
-#    result = tssub.synchCommand(60,"setTSTEST");
-#    rply = result.getResult();
+    result = tssub.synchCommand(60,"setTSTEST");
+    rply = result.getResult();
 
 
 # get the glowing vacuum gauge off
@@ -96,10 +94,6 @@ try:
     print "set filter position"
     result = monosub.synchCommand(60,"setFilter",2);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",1,420);
-    rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",2,420);
-    rply = result.getResult()
 
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
@@ -115,8 +109,8 @@ try:
 #    wl=500. - wlstep
 #    for idx in range(2):
 #        wl = wl + wlstep
-#    for wl in [473.4, 473.4, 881.9, 881.9] :
-    for wl in range(300,1100,10):
+    for wl in [473.4, 473.4, 881.9, 881.9] :
+#    for wl in range(455,500,1):
 
         exptime = 25.
         nreads = 3000
