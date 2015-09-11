@@ -34,10 +34,11 @@ class VendorFitsTranslator(object):
         except OSError:
             pass
         outfile = os.path.join(outdir, outfile)
-        if verbose:
-            print "writing", outfile
-        hdulist.writeto(outfile, clobber=True, checksum=True)
-        self.outfiles.append(os.path.relpath(outfile))
+        if os.path.relpath(outfile) not in self.outfiles:
+            if verbose:
+                print "writing", outfile
+            hdulist.writeto(outfile, checksum=True)
+            self.outfiles.append(os.path.relpath(outfile))
     def _setAmpGeom(self, hdulist):
         detxsize = 8*hdulist[1].header['NAXIS1']
         detysize = 2*hdulist[1].header['NAXIS2']
@@ -131,7 +132,7 @@ class ItlFitsTranslator(VendorFitsTranslator):
         return self._processFiles('dark', 'dark', pattern,
                                   time_stamp=time_stamp, verbose=verbose,
                                   skip_zero_exptime=True)
-    def trap(self, pattern='', time_stamp=None,
+    def trap(self, pattern='pocketpump/*_pocketpump*.fits', time_stamp=None,
              verbose=True):
         raise NotImplemented("ITL trap dataset translation not implemented.")
     def sflat_500_high(self, pattern='superflat2/*_superflat.*.fits', 
@@ -165,10 +166,10 @@ class ItlFitsTranslator(VendorFitsTranslator):
             if key == 0 or len(infiles) < 2:
                 # Skip zero exposure frames and groups with only one frame.
                 continue
-            seqno = '%06.1f_flat1' % key
+            seqno = '%09.4f_flat1' % key
             self.translate(infiles[0], 'flat', 'flat', seqno,
                            time_stamp=time_stamp, verbose=verbose)
-            seqno = '%06.1f_flat2' % key
+            seqno = '%09.4f_flat2' % key
             self.translate(infiles[1], 'flat', 'flat', seqno,
                            time_stamp=time_stamp, verbose=verbose)
         return time_stamp
