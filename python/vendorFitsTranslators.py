@@ -134,7 +134,21 @@ class ItlFitsTranslator(VendorFitsTranslator):
                                   skip_zero_exptime=True)
     def trap(self, pattern='pocketpump/*_pocketpump*.fits', time_stamp=None,
              verbose=True):
-        raise NotImplemented("ITL trap dataset translation not implemented.")
+        if time_stamp is None:
+            time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        infiles = self._infiles(os.path.join(self.rootdir, pattern))
+        image_type = lambda x : pyfits.open(x)[0].header['OBJECT']
+        infiles = dict([(image_type(item), item) for item in infiles])
+        self.translate(infiles['pocketpump first bias'], 'trap', 'bias', '000',
+                       time_stamp=time_stamp, verbose=verbose)
+        self.translate(infiles['pocket pump'], 'trap', 'ppump', '000',
+                       time_stamp=time_stamp, verbose=verbose)
+        self.translate(infiles['pocketpump second bias'], 'trap', 'bias', '001',
+                       time_stamp=time_stamp, verbose=verbose)
+        self.translate(infiles['pocket pump reference flat'],
+                       'trap', 'flat', '000',
+                       time_stamp=time_stamp, verbose=verbose)
+        return time_stamp
     def sflat_500_high(self, pattern='superflat2/*_superflat.*.fits', 
                        time_stamp=None, verbose=True):
         return self._processFiles('sflat_500', 'flat', pattern,
@@ -182,7 +196,7 @@ class ItlFitsTranslator(VendorFitsTranslator):
         time_stamp = self.fe55()
         self.bias(time_stamp=time_stamp)
         self.dark()
-        #self.trap()
+        self.trap()
         time_stamp = self.sflat_500_high()
         self.sflat_500_low(time_stamp=time_stamp)
         #self.spot()
