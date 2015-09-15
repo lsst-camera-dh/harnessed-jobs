@@ -20,9 +20,18 @@ if pd_ratio_file is None:
     print "Using instead", pd_ratio_file
     print
     sys.stdout.flush()
+correction_image = eotestUtils.getIlluminationNonUniformityImage()
+if correction_image is None:
+    print 
+    print "WARNING: The correction image file is not given in"
+    print "config/%s/eotest_calibrations.cfg." % siteUtils.getSiteName()
+    print "No correction for non-uniform illumination will be applied."
+    print
+    sys.stdout.flush()
 
 mask_files = eotestUtils.glob_mask_files()
 gains = eotestUtils.getSensorGains()
 
 task = sensorTest.QeTask()
-task.run(sensor_id, lambda_files, pd_ratio_file, mask_files, gains)
+task.run(sensor_id, lambda_files, pd_ratio_file, mask_files, gains,
+         correction_image=correction_image)
