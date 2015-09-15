@@ -107,7 +107,7 @@ try:
             reply = result.getResult();
 
             result = arcsub.synchCommand(10,"setCCDnum",ccd)
-            result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT")
+            result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT_500")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
             for i in range(bcount):
                 timestamp = time.time()
@@ -206,7 +206,7 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT")
+            result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT_500")
             result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
             print "Throwing away the first image"
@@ -232,7 +232,7 @@ try:
 # start acquisition
 
                 timestamp = time.time()
-                fitsfilename = "%s_sflat_%4.4d_flat%d_%s%3.3d_${TIMESTAMP}.fits" % (ccd,int(wl),i+1,lohiflux,seq)
+                fitsfilename = "%s_sflat_%4.4d_flat_%s%3.3d_${TIMESTAMP}.fits" % (ccd,int(wl),lohiflux,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       
