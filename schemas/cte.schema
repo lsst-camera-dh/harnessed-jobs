@@ -3,6 +3,8 @@
     'schema_name' : 'cte',
     'schema_version' : 0,
     'amp' : int,
-    'cti_serial' : float,
-    'cti_parallel' : float
+    'cti_high_serial' : float,
+    'cti_high_parallel' : float,
+    'cti_low_serial' : float,
+    'cti_low_parallel' : float
 }
