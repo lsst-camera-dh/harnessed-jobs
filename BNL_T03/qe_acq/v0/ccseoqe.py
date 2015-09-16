@@ -38,7 +38,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
+    eolib.EOSetup(tssub,CCSCCDTYPE,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
 
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
@@ -264,6 +264,8 @@ try:
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
+
+    result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA-END")
 
 except Exception, ex:
 

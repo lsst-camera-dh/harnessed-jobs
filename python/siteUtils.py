@@ -11,6 +11,9 @@ import harnessedJobs as hj
 def getUnitId():
     return os.environ['LCATR_UNIT_ID']
 
+def getUnitType():
+    return os.environ['LCATR_UNIT_TYPE']
+
 def getCcdVendor():
     unit_id = getUnitId()
     vendor = unit_id.split('-')[0]

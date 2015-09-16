@@ -46,7 +46,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
+    eolib.EOSetup(tssub,CCSCCDTYPE,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
 
     print "Setting the current ranges on the Bias and PD devices"
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -64,7 +64,7 @@ try:
 
     seq = 0  # image pair number in sequence
 
-    monosub.synchCommand(30,"setFilter",1);
+    monosub.synchCommand(30,"setFilter",3);
 
 
     ccd = CCDID
@@ -157,7 +157,7 @@ try:
                 try:
                     print "Setting monochromator lambda = %8.2f" % wl
                     try:
-                        result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                        result = monosub.synchCommand(60,"setWaveAndFilter",wl);
 # result = monosub.synchCommand(200,"setWave",wl);
                         rply = result.getResult()
                         time.sleep(4.0)

@@ -36,7 +36,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
+    eolib.EOSetup(tssub,CCSCCDTYPE,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
 
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","0");

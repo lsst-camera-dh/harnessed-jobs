@@ -147,7 +147,7 @@ def EOgetCCSVersions(tssub,cdir):
     return(ts_version,archon_version,ts_revision,archon_revision)
 ###############################################################################
 # EOjobPrep: perform setup need from running standard EO jobs
-def EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1="setTSReady",state2="setTSTEST"):
+def EOSetup(tssub,ccdtype,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1="setTSReady",state2="setTSTEST"):
 
 # Initialization
     print "doing initialization"
@@ -163,6 +163,7 @@ def EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1="setTSRe
     rply = result.getResult();
 
     print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
+    arcsub.synchCommand(10,"setDefaultCCDTypeName",ccdtype);
 
     print "initializing archon controller with file %s" % acffile
     print "Loading configuration file into the Archon controller"
@@ -196,7 +197,7 @@ def EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1="setTSRe
         tsstate = result.getResult();
 # the following line is just for test situations so that there would be no waiting                                         
         tsstate=1;
-        if ((time.time()-starttim)>240):
+        if ((time.time()-starttim)>10800):
             print "Something is wrong ... we will never make it to a runnable state"
             exit
         if tsstate!=0 :
