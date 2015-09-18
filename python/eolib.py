@@ -147,7 +147,7 @@ def EOgetCCSVersions(tssub,cdir):
     return(ts_version,archon_version,ts_revision,archon_revision)
 ###############################################################################
 # EOjobPrep: perform setup need from running standard EO jobs
-def EOSetup(tssub,ccdtype,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1="setTSReady",state2="setTSTEST"):
+def EOSetup(tssub,ccdtype,cdir,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1="setTSReady",state2="setTSTEST"):
 
 # Initialization
     print "doing initialization"
@@ -173,7 +173,7 @@ def EOSetup(tssub,ccdtype,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1=
     result = arcsub.synchCommand(25,"applyConfig");
     reply = result.getResult();
     print "Powering on the CCD"
-    result = arcsub.synchCommand(30,"powerOnCCD");
+    result = arcsub.synchCommand(60,"powerOnCCD");
     reply = result.getResult();
     time.sleep(30.);
 
@@ -191,18 +191,29 @@ def EOSetup(tssub,ccdtype,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1=
     print "wait for ts state to become ready";
     tsstate = 0
     starttim = time.time()
+#    fpfiles = open("%s/temperatureDuringWaitForReady.dat" % cdir,"w");
+
     while True:
         print "checking for test stand to be ready for acq";
         result = tssub.synchCommand(10,"isTestStandReady");
         tsstate = result.getResult();
+#        result = cryosub.synchCommand(20,"getTemp","B");
+#        ctemp = result.getResult();
+#        tstat = "time = %f , T = %f\n" % (time.time(),ctemp)
+#        print tstat
+#        fpfiles.write(tstat)
+
 # the following line is just for test situations so that there would be no waiting                                         
-        tsstate=1;
+#        tsstate=1;
         if ((time.time()-starttim)>10800):
             print "Something is wrong ... we will never make it to a runnable state"
             exit
         if tsstate!=0 :
             break
         time.sleep(5.)
+
+#    fpfiles.close()
+
 #put in acquisition state
     print "We are ready to go! Ramping the BP bias voltage now."
     result = tssub.synchCommand(120,"goTestStand");

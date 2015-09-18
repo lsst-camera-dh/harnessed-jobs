@@ -43,7 +43,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,"setTSIdle","setTSIdle")
+    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,"setTSWarm","setTSWarm")
 
 
     arcsub.synchCommand(10,"setParameter","Light","0");
