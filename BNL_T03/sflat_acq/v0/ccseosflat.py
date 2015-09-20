@@ -38,7 +38,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
+    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub)
 
 
     print "Setting the current ranges on the Bias and PD devices"
@@ -122,47 +122,16 @@ try:
 # =========================================================================    
 # take light exposures
             result = arcsub.synchCommand(10,"setParameter","Light","1");
-#            result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
     
             print "setting the monochromator wavelength"
 
             if (wl!=owl) :
-                try:
-                    print "Setting monochromator lambda = %8.2f" % wl
-                    try:
-                        result = monosub.synchCommand(30,"setWaveAndFilter",wl);
-# result = monosub.synchCommand(200,"setWave",wl);
-                        rply = result.getResult()
-                        time.sleep(4.0)
-                    except CommandRejectedException, er:
-                        print "set wave attempt rejected, try again ..."
-                        time.sleep(10.0)
-                        try:
-                            result = monosub.synchCommand(300,"setWave",wl);
-                            rply = result.getResult()
-                            time.sleep(4.0)
-                        except CommandRejectedException, er:
-                            print "set wave attempt rejected again, one last try after a long wait again ..."
-                            time.sleep(60.0)
-                            print "here we go ... its gotta work this time .... right?"
-                            result = monosub.synchCommand(300,"setWave",wl);
-                            rply = result.getResult()
-                            print "we survived a near crash"
-                            time.sleep(4.0)
-                    result = monosub.synchCommand(300,"getWave");
-                    rwl = result.getResult()
-                except ScriptingTimeoutException, ex:
-                    print "Failed to get monochromator to respond. Try one more time"
-                    try:
-                        time.sleep(30.)
-                        result = monosub.synchCommand(300,"getWave");
-                        rwl = result.getResult()
-                    except ScriptingTimeoutException, ex:
-                        print "Failed to get monochromator to respond. Skipping to the next step."
-                        continue
-
+                print "Setting monochromator lambda = %8.2f" % wl
+                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                rwl = result.getResult()
+                time.sleep(10.0)
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
                 result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)

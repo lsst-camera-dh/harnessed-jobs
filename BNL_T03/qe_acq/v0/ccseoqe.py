@@ -38,7 +38,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
+    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub)
 
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
@@ -91,27 +91,9 @@ try:
 
             print "setting the monochromator wavelength to %f" % wl
 #            if (exptime > lo_lim):
-            result = monosub.synchCommand(500,"setWaveAndFilter",wl);
-            rply = result.getResult()
+            result = monosub.synchCommand(1000,"setWaveAndFilter",wl);
+            rwl = result.getResult()
             time.sleep(10.)
-            try:
-                result = monosub.synchCommand(200,"getWave");
-                rwl = result.getResult()
-            except ScriptingTimeoutException, ex:
-                try:
-                    print "failed once to do getWave ... try again"
-                    time.sleep(10.)
-                    result = monosub.synchCommand(200,"getWave");
-                    rwl = result.getResult()
-                except ScriptingTimeoutException, ex:
-                    print "failed yet again to do getWave ... try one last time"
-                    time.sleep(60.)
-                    try:
-                        result = monosub.synchCommand(200,"getWave");
-                        rwl = result.getResult()
-                    except ScriptingTimeoutException, ex:
-                        print "ALERT ALERT ALERT ... SKIPPING A WAVELENGTH SETTING DUE TO NO wl RESPONSE FROM MONOCHROMATOR"
-                        continue
             if (abs(wl-rwl)>1.0) :
                 print "ALERT ALERT ALERT MONOCHROMATOR APPEARS NOT TO HAVE REACHED THE DESIRED WAVELENGTH"
                 print "request wl = %f" % wl

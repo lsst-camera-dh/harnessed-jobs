@@ -40,7 +40,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,"setTSWarm","setTSWarm")
+    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSWarm","setTSWarm")
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -114,18 +114,8 @@ try:
                 print "Setting the monochromator wavelength and filter"
 #                print "You should HEAR some movement"
                 result = monosub.synchCommand(120,"setWaveAndFilter",wl);
-                rply = result.getResult()
-                time.sleep(4.)
-                try:
-                    print "Verifying wavelength setting of the monochromator"
-                    result = monosub.synchCommand(20,"getWave");
-                    rwl = result.getResult()
-                except ScriptingTimeoutException, ex:
-                    print "first getWave attempt failed. Trying one more time ..."
-                    time.sleep(4.)
-                    result = monosub.synchCommand(20,"getWave");
-                    rwl = result.getResult()
-
+                rwl = result.getResult()
+                time.sleep(10.)
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
 

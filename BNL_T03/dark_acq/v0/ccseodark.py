@@ -36,7 +36,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
+    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub)
 
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","0");
@@ -109,8 +109,7 @@ try:
 
 
             print "start dark image exposure loop"
-#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
-#            arcsub.synchCommand(10,"setAndApplyParam","ExpTime",str(int(exptime*1000)));
+
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
 

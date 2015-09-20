@@ -41,7 +41,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub)
+    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub)
 
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","0");
@@ -136,10 +136,8 @@ try:
             print "setting the monochromator wavelength"
 #            if (exptime > lo_lim):
             result = monosub.synchCommand(30,"setWaveAndFilter",wl);
-            rply = result.getResult()
-            time.sleep(4.)
-            result = monosub.synchCommand(30,"getWave");
             rwl = result.getResult()
+            time.sleep(10.)
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
             result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)

@@ -146,83 +146,19 @@ def EOgetCCSVersions(tssub,cdir):
 #       print "\nCCSVersions line = %s \n" % line
     return(ts_version,archon_version,ts_revision,archon_revision)
 ###############################################################################
-# EOjobPrep: perform setup need from running standard EO jobs
-def EOSetup(tssub,ccdtype,cdir,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,state1="setTSReady",state2="setTSTEST"):
+# EOSetup: perform setup need from running standard EO jobs
+def EOSetup(tssub,ccdtype,cdir,acffile,vac_outlet,arcsub,state1="setTSReady",state2="setTSTEST"):
 
-# Initialization
-    print "doing initialization"
 
-    result = pdsub.synchCommand(10,"softReset");
-    buff = result.getResult()
-
-# move TS to ready state
-    print "setting teststand to state: %s" % state1
-    result = tssub.synchCommand(300,state1);
+# Pre Archon TS Initialization
+    result = tssub.synchCommand(300,"eoSetupPreCfg",state1);
     reply = result.getResult();
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
-
-    print "test stand in ready state, now the controller will be configured. time = %f" % time.time()
-    arcsub.synchCommand(10,"setDefaultCCDTypeName",ccdtype);
-
-    print "initializing archon controller with file %s" % acffile
-    print "Loading configuration file into the Archon controller"
-    result = arcsub.synchCommand(20,"setConfigFromFile",acffile);
+# Archon Initialization
+    result = arcsub.synchCommand(500,"eoSetup",acffile,ccdtype);
     reply = result.getResult();
-    print "Applying configuration"
-    result = arcsub.synchCommand(25,"applyConfig");
+# Post Archon TS Initialization
+    result = tssub.synchCommand(11000,"eoSetupPostCfg",vac_outlet,state2);
     reply = result.getResult();
-    print "Powering on the CCD"
-    result = arcsub.synchCommand(60,"powerOnCCD");
-    reply = result.getResult();
-    time.sleep(30.);
-
-    print "set controller parameters for an exposure with the shutter closed"
-    arcsub.synchCommand(10,"setAcqParam","Nexpo");
-    arcsub.synchCommand(10,"setParameter","Expo","1");
-    arcsub.synchCommand(10,"setFetch_timeout",500000);
-# move to TS acquisition state
-    print "setting acquisition state"
-
-    result = tssub.synchCommand(240,state2);
-    rply = result.getResult();
-
-#check state of ts devices
-    print "wait for ts state to become ready";
-    tsstate = 0
-    starttim = time.time()
-#    fpfiles = open("%s/temperatureDuringWaitForReady.dat" % cdir,"w");
-
-    while True:
-        print "checking for test stand to be ready for acq";
-        result = tssub.synchCommand(10,"isTestStandReady");
-        tsstate = result.getResult();
-#        result = cryosub.synchCommand(20,"getTemp","B");
-#        ctemp = result.getResult();
-#        tstat = "time = %f , T = %f\n" % (time.time(),ctemp)
-#        print tstat
-#        fpfiles.write(tstat)
-
-# the following line is just for test situations so that there would be no waiting                                         
-#        tsstate=1;
-        if ((time.time()-starttim)>10800):
-            print "Something is wrong ... we will never make it to a runnable state"
-            exit
-        if tsstate!=0 :
-            break
-        time.sleep(5.)
-
-#    fpfiles.close()
-
-#put in acquisition state
-    print "We are ready to go! Ramping the BP bias voltage now."
-    result = tssub.synchCommand(120,"goTestStand");
-    rply = result.getResult();
-# get the glowing vacuum gauge off
-    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
-    rply = result.getResult();
-# it takes time for the glow to fade
-    time.sleep(5.)
 
 
 
