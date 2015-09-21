@@ -13,19 +13,11 @@ lambda_files = siteUtils.dependency_glob('*_lambda_flat_*.fits',
 pd_ratio_file = eotestUtils.getPhotodiodeRatioFile()
 if pd_ratio_file is None:
     pd_ratio_file = os.path.join(os.environ['EOTEST_DIR'], 'data', 'qe',
-                                 'BNL', 'pd_ratio_2015-08-29.txt')
+                                 'BNL', 'pd_ratio_2015-09-17.txt')
     print 
     print "WARNING: The test-stand specific photodiode ratio file is"
     print "not given in config/%s/eotest_calibrations.cfg." % siteUtils.getSiteName()
     print "Using instead", pd_ratio_file
-    print
-    sys.stdout.flush()
-correction_image = eotestUtils.getIlluminationNonUniformityImage()
-if correction_image is None:
-    print 
-    print "WARNING: The correction image file is not given in"
-    print "config/%s/eotest_calibrations.cfg." % siteUtils.getSiteName()
-    print "No correction for non-uniform illumination will be applied."
     print
     sys.stdout.flush()
 
@@ -33,5 +25,4 @@ mask_files = eotestUtils.glob_mask_files()
 gains = eotestUtils.getSensorGains()
 
 task = sensorTest.QeTask()
-task.run(sensor_id, lambda_files, pd_ratio_file, mask_files, gains,
-         correction_image=correction_image)
+task.run(sensor_id, lambda_files, pd_ratio_file, mask_files, gains)
