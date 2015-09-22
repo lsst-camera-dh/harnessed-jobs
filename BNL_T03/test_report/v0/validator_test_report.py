@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+import os
 import glob
+import shutil
 import lcatr.schema
 import siteUtils
 
@@ -14,6 +16,21 @@ test_report = '%s_eotest_report.pdf' % sensor_id
 results.append(lcatr.schema.fileref.make(test_report))
 
 results.append(siteUtils.packageVersions())
+
+#
+# CCS configuration files
+#
+config_dir = siteUtils.configDir()
+ccs_configs = os.path.join(config_dir, 'acq.cfg')
+shutil.copy(ccs_configs, '.')
+results.append(lcatr.schema.fileref.make(os.path.basename(ccs_configs)))
+for line in open(ccs_configs):
+    if line.find('=') == -1:
+        continue
+    tokens = line.strip().split('=')
+    filename = os.path.join(config_dir, tokens[1].strip())
+    shutil.copy(filename, '.')
+    results.append(lcatr.schema.fileref.make(os.path.basename(filename)))
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

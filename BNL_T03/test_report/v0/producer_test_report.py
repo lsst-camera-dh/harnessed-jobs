@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import shutil
 from collections import OrderedDict
 
@@ -172,20 +173,22 @@ pylab.savefig('%s_persistence.png' % sensor_id)
 qa_plot_files = processName_dependencyGlob('%s_*.png' % sensor_id,
                                            jobname='qa_plots')
 
-# CCS config files
-config_dir = siteUtils.configDir()
-ccs_configs = os.path.join(config_dir, 'acq.cfg')
-ccs_config_files = OrderedDict()
-for line in ccs_configs:
-    if line.find('=') == -1:
-        continue
-    tokens = line.strip().split('=')
-    ccs_config_files[tokens[0].strip()] = os.path.join(config_dir,
-                                                       tokens[1].strip())
+# Software versions
+software_versions = OrderedDict()
+summary_lims_file = processName_dependencyGlob('summary.lims',
+                                               jobname='fe55_analysis')[0]
+foo = json.loads(open(summary_lims_file).read())
+for result in foo:
+    if result['schema_name'] == 'package_versions':
+        for key, value in result.items():
+            if key == 'schema_version':
+                continue
+            if key.endswith('_version'):
+                software_versions[key] = value
 
 # Create the test report pdf.
 report = sensorTest.EOTestReport(plots, wl_file_path,
                                  qa_plot_files=qa_plot_files,
-                                 ccs_config_files=ccs_config_files)
+                                 software_versions=software_versions)
 report.make_pdf()
 
