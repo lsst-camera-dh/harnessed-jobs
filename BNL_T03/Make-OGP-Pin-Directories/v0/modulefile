@@ -1,3 +1,0 @@
-#%Module1.0 #-*-tcl-*-#
-source "$::env(LCATR_MODULES)/lcatr.tcl"
-lcatr_package producer_Make-OGP-Pin-Directories.py validator_Make-OGP-Pin-Directories.py
