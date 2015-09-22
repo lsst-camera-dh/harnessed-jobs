@@ -28,7 +28,6 @@ results.append(eotestUtils.eotestCalibrations())
 results.extend(eotestUtils.eotestCalibsPersist('system_noise_file'))
 
 files = glob.glob('*read_noise?*.fits')
-files.append(read_noise_file)
 data_products = [lcatr.schema.fileref.make(item) for item in files]
 results.extend(data_products)
 

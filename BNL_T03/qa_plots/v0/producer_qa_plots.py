@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import shutil
 from collections import OrderedDict
 
 #  This is needed so that pylab can write to .matplotlib

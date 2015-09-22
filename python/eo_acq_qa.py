@@ -44,7 +44,6 @@ def annotate_acq(start_time, test_type, yposfrac=0.8, xoffset=0,
 
 class Trending(object):
     def __init__(self, ylabel):
-        self.times = []
         self.ylabel = ylabel
         self.test_types = OrderedDict()
     def add_test_type(self, mjd_obs, test_type):
@@ -57,7 +56,6 @@ class Trending(object):
         self.plot_dates(**kwds)
         pylab.xticks(rotation='22')
         frame = pylab.gca()
-#        frame.xaxis.set_major_locator(MinuteLocator(byminute=range(0, 60, 5)))
         frame.xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
         pylab.ylabel(self.ylabel)
         if not show_xlabels:
@@ -68,6 +66,7 @@ class Trending(object):
 class FrameTrending(Trending):
     def __init__(self, ylabel):
         super(FrameTrending, self).__init__(ylabel)
+        self.times = []
         self.values = []
     def add_value(self, mjd_obs, value=None):
         self.times.append(mjd_obs)
@@ -84,13 +83,12 @@ class FrameTrending(Trending):
 class AmpTrending(Trending):
     def __init__(self, ylabel):
         super(AmpTrending, self).__init__(ylabel)
+        self.amp_times = dict([(amp, []) for amp in range(1, 17)])
         self.values = dict([(amp, []) for amp in range(1, 17)])
     def add_value(self, amp, mjd_obs, value):
-        if mjd_obs not in self.times:
-            self.times.append(mjd_obs)
+        self.amp_times[amp].append(mjd_obs)
         self.values[amp].append(value)
     def plot_dates(self, **kwds):
-        my_times = np.array(self.times)
         # Set the color_cycle to use 16 different colors
         try:
             my_cmap = kwds['cmap']
@@ -107,6 +105,7 @@ class AmpTrending(Trending):
             pass
 
         for amp in self.values.keys():
+            my_times = np.array(self.amp_times[amp])
             # plot_date has bug such that it does not cycle through
             # the color_cycle.  Setting the fmt keyword forces it to
             # do so.  See
