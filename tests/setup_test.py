@@ -4,7 +4,8 @@ try:
     #
     # Check for expected environment variables.
     #
-    os.environ['SITENAME']
+    slac_site = 'SLAC'
+    site = os.environ['SITENAME']
     os.environ['HARNESSEDJOBSDIR']
     try:
         schema_path = os.environ['LCATR_SCHEMA_PATH']
@@ -30,7 +31,9 @@ try:
 
     import lsst.eotest
 
-    import DataCatalog
+    if slac_site == site:
+        import DataCatalog
+
     import PythonBinding
     import ccsTools
     try:
