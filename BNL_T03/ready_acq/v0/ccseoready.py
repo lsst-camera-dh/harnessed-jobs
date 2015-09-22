@@ -43,7 +43,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,acffile,vac_outlet,arcsub,biassub,pdsub,pdusub,"setTSIdle","setTSIdle")
+    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSWarm","setTSWarm")
 
 
     arcsub.synchCommand(10,"setParameter","Light","0");
@@ -207,24 +207,27 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
+            do_in_job_flux = false
 # do in-job flux cal
-            arcsub.synchCommand(10,"setParameter","ExpTime","2000");
+            if (do_in_job_flux) :
+                arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-            rply = result.getResult();
-            arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                rply = result.getResult();
+                arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
 
-            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-            flncal = result.getResult();
-            result = arcsub.synchCommand(10,"getFluxStats",flncal);
-            flux = float(result.getResult());
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                flncal = result.getResult();
+                result = arcsub.synchCommand(10,"getFluxStats",flncal);
+                flux = float(result.getResult());
 
-            flux = flux * 0.50
+                flux = flux * 0.50
 
-            exptime = target/flux
-
-#            exptime = 4.0
+                exptime = target/flux
+            else :
+# for now we have decided to use a fixed time
+                exptime = 4.0
 
             print "exposure time = %f" % exptime
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
@@ -255,11 +258,8 @@ try:
                 print "Setting the monochrmator wavelength and filter"
                 print "You should HEAR some movement"
                 result = monosub.synchCommand(90,"setWaveAndFilter",wl);
-                rply = result.getResult()
-                time.sleep(4.)
-                print "Verifying wavelength setting of the monochromator"
-                result = monosub.synchCommand(90,"getWave");
                 rwl = result.getResult()
+                time.sleep(10.)
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
 

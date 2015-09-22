@@ -52,6 +52,16 @@ class CcsSetup(OrderedDict):
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
         self._read(os.path.join(siteUtils.getJobDir(), configFile))
+        CCDTYPE = _quote(siteUtils.getUnitType())
+        print "CCDTYPE = %s" % CCDTYPE
+        if ("ITL" in CCDTYPE) :
+            print "setting CCSCCDTYPE"
+            self['CCSCCDTYPE'] = _quote("ITL")
+            self['acffile'] = self['itl_acffile']
+        if ("e2v" in CCDTYPE) :
+            self['CCSCCDTYPE'] = _quote("e2v")
+            self['acffile'] = self['e2v_acffile']
+
     def _read(self, configFile):
         if configFile is None:
             return
@@ -78,7 +88,11 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=False, verbose=True):
         os.mkdir("bias")
 
     ccs = CcsJythonInterpreter("ts")
-    setup = CcsSetup('%s.cfg' % jobName)
+#    setup = CcsSetup('%s.cfg' % jobName)
+# change to using a single config from the main config directory
+    configDir = siteUtils.configDir()
+    setup = CcsSetup('%s/acq.cfg' % configDir )
+
     result = ccs.syncScriptExecution(siteUtils.jobDirPath(ccsScript), setup(),
                                      verbose=verbose)
     output = open("%s.log" % jobName, "w")

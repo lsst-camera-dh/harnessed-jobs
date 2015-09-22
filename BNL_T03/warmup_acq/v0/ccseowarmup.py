@@ -20,6 +20,10 @@ try:
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "attaching Lamp subsystem"
     lampsub = CCS.attachSubsystem("%s/Lamp" % ts );
+    print "attaching Bias subsystem"
+    biassub = CCS.attachSubsystem("%s/Bias" % ts );
+    print "Attaching archon subsystem"
+    arcsub  = CCS.attachSubsystem("%s" % archon);
 
     time.sleep(3.)
 
@@ -27,7 +31,7 @@ try:
 
 # turn off the lamp
     print "TURNING OFF THE LAMP"
-    result = lampsub.synchCommand(100000,"setLAmpPowerEnable",False);
+    result = lampsub.synchCommand(100000,"setLampPowerEnable",False);
 
 # turn off power to the cryotiger
     print "TURNING OFF THE POWER TO THE POLYCOLD"
@@ -36,7 +40,7 @@ try:
 
 # set bias voltage off
     print "TURNING OFF THE BACKPLANE BIAS VOLTAGE"
-    result = biassub.synchCommand(30,"SetVoltage",0.0);
+    result = biassub.synchCommand(30,"setVoltage",0.0);
 
 # make sure we leave the power to the sensor OFF
     print "POWERING OFF THE CCD"
