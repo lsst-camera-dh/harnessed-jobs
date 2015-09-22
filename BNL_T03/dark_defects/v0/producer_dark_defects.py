@@ -4,7 +4,7 @@ import siteUtils
 import eotestUtils
 
 sensor_id = siteUtils.getUnitId()
-sflat_files = siteUtils.dependency_glob('*_sflat_500*.fits',
+sflat_files = siteUtils.dependency_glob('*_sflat_500_flat_H*.fits',
                                         jobname=siteUtils.getProcessName('sflat_acq'),
                                         description='Superflat files:')
 mask_files = eotestUtils.glob_mask_files()

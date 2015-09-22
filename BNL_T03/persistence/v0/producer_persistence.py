@@ -5,12 +5,12 @@ import siteUtils
 import eotestUtils
 
 sensor_id = siteUtils.getUnitId()
-dark_files = siteUtils.dependency_glob('*_persist*_dark_*.fits',
+dark_files = siteUtils.dependency_glob('*_persistence_dark_*.fits',
                                        jobname=siteUtils.getProcessName('persist_acq'),
                                        description='Dark files:',
                                        sort=True)
 
-flat = siteUtils.dependency_glob('*_persist*_flat_*.fits',
+flat = siteUtils.dependency_glob('*_persistence_flat_*.fits',
                                  jobname=siteUtils.getProcessName('persist_acq'),
                                  description='Flat file:')[0]
 
