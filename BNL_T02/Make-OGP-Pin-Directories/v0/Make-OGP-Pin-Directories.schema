@@ -1,0 +1,6 @@
+# -*- python -*-
+{
+    'schema_name' : 'Make-OGP-Directories',
+    'schema_version' : 0,
+    'stat' : int,
+}

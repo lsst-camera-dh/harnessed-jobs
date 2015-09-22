@@ -1,0 +1,7 @@
+# -*- python -*-
+{
+    'schema_name' : 'Scan-and-Ingest-Vendor-Data',
+    'schema_version' : 0,
+    'stat' : int,
+}
+

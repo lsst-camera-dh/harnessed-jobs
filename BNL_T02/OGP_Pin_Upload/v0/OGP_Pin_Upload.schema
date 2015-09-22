@@ -1,0 +1,7 @@
+# -*- python -*-
+{
+    'schema_name' : 'Collect-OGP-Results',
+    'schema_version' : 0,
+    'stat' : int,
+}
+
