@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import shutil
+from collections import OrderedDict
 
 #  This is needed so that pylab can write to .matplotlib
 os.environ['MPLCONFIGDIR'] = os.curdir
@@ -167,7 +168,24 @@ persistence_file = processName_dependencyGlob('%s_persistence.fits' % sensor_id,
 plots.persistence(infile=persistence_file)
 pylab.savefig('%s_persistence.png' % sensor_id)
 
+# QA plots
+qa_plot_files = processName_dependencyGlob('%s_*.png' % sensor_id,
+                                           jobname='qa_plots')
+
+# CCS config files
+config_dir = siteUtils.configDir()
+ccs_configs = os.path.join(config_dir, 'acq.cfg')
+ccs_config_files = OrderedDict()
+for line in ccs_configs:
+    if line.find('=') == -1:
+        continue
+    tokens = line.strip().split('=')
+    ccs_config_files[tokens[0].strip()] = os.path.join(config_dir,
+                                                       tokens[1].strip())
+
 # Create the test report pdf.
-report = sensorTest.EOTestReport(plots, wl_file_path)
+report = sensorTest.EOTestReport(plots, wl_file_path,
+                                 qa_plot_files=qa_plot_files,
+                                 ccs_config_files=ccs_config_files)
 report.make_pdf()
 
