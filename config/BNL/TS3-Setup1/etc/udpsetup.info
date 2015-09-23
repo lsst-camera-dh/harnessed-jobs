@@ -1,0 +1,8 @@
+org.lsst.ccs.jgroups.ALL.UDP.bind_addr
+
+If you want to have two sets of JGroup channels on the same network, they will have to have different port numbers assigned. The default ones are set via these properties in udp_ccs.properties:
+
+org.lsst.ccs.jgroups.LOG.UDP.mcast_port=26969
+org.lsst.ccs.jgroups.STATUS.UDP.mcast_port=36969
+org.lsst.ccs.jgroups.COMMAND.UDP.mcast_port=46969
+130.199.47.171
