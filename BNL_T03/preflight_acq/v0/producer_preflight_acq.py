@@ -9,7 +9,7 @@ import pyfits
 import glob
 
 print "starting widget for checking and starting the CCS apps"
-subprocess.Popen(["gnome-terminal","--geometry=1x1","--working-directory=/home/ts3prod/prod/bin/","--command=/home/ts3prod/prod/bin/settitle /home/ts3prod/prod/bin/checktsappswidget"]);
+subprocess.Popen(["gnome-terminal","--geometry=1x1","--working-directory=/opt/lsst/redhat6-x86_64-64bit-gcc44/dev/ccs/ccs-dev/bin/","--command=/opt/lsst/redhat6-x86_64-64bit-gcc44/dev/ccs/ccs-dev/bin/settitle /opt/lsst/redhat6-x86_64-64bit-gcc44/dev/ccs/ccs-dev/bin/checktsappswidget"]);
 
 
 foundjython = False

@@ -65,6 +65,16 @@ try:
     print "set filter position"
     monosub.synchCommand(30,"setFilter",1); # open position
 
+    for i in range(2):
+        timestamp = time.time()
+        arcsub.synchCommand(10,"setFitsFilename","");
+        print "Ready to take bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+        fitsfilename = result.getResult();
+        print "after click click at %f" % time.time()
+        time.sleep(0.2)
+
+
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
     fp = open(acqcfgfile,"r");
@@ -113,7 +123,7 @@ try:
 
                 print "Setting the monochromator wavelength and filter"
 #                print "You should HEAR some movement"
-                result = monosub.synchCommand(120,"setWaveAndFilter",wl);
+                result = monosub.synchCommand(240,"setWaveAndFilter",wl);
                 rwl = result.getResult()
                 time.sleep(10.)
                 print "publishing state"
@@ -149,7 +159,7 @@ try:
                     result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(0.2);
+                time.sleep(1.0);
  
                 if (doarch) :
                     print "Taking an image now. time = %f" % time.time()
@@ -179,7 +189,7 @@ try:
                 pdsub.synchCommand(1000,"setTimeout",10.);
 
                 if (doarch) :
-                    result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+                    result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
 
                     fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
