@@ -207,7 +207,7 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-            do_in_job_flux = false
+            do_in_job_flux = False
 # do in-job flux cal
             if (do_in_job_flux) :
                 arcsub.synchCommand(10,"setParameter","ExpTime","2000");
