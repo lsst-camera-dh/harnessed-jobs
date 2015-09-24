@@ -1,11 +1,16 @@
 import os
 import shutil
 import socket
+import datetime
 import numpy as np
+import astropy.io.fits as pyfits
 import lsst.eotest.sensor as sensorTest
 import lcatr.schema
 from lcatr.harness.helpers import dependency_glob
 import siteUtils
+
+def utc_now_isoformat():
+    return datetime.datetime.utcnow().isoformat()
 
 def getSensorGains(jobname='fe55_analysis'):
     sensor_id = siteUtils.getUnitId()
@@ -122,3 +127,21 @@ def eotestCalibsPersist(*keys):
             shutil.copy(filename, '.')
             results.append(lcatr.schema.fileref.make(os.path.basename(filename)))
     return results
+
+def addHeaderData(fitsfile, **kwds):
+    fits_obj = pyfits.open(fitsfile, do_not_scale_image_data=True)
+    try:
+        hdu = kwds['hdu']
+    except KeyError:
+        hdu = 0
+    for key, value in kwds.items():
+        if key == 'clobber':
+            continue
+        fits_obj[hdu].header[key] = siteUtils.cast(value)
+    try:
+        clobber = kwds['clobber']
+    except KeyError:
+        clobber = True
+    # Preserve bitpix for all image extensions since astropy.io.fits 
+    # always chage
+    fits_obj.writeto(fitsfile, clobber=clobber)

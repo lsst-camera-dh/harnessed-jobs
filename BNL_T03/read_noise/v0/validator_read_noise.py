@@ -28,6 +28,11 @@ results.append(eotestUtils.eotestCalibrations())
 results.extend(eotestUtils.eotestCalibsPersist('system_noise_file'))
 
 files = glob.glob('*read_noise?*.fits')
+for fitsfile in files:
+    eotestUtils.addHeaderData(fitsfile, LSST_NUM=sensor_id, TESTTYPE='FE55',
+                              DATE=eotestUtils.utc_now_isoformat(),
+                              CCD_MANU=siteUtils.getCcdVendor().upper())
+
 data_products = [lcatr.schema.fileref.make(item) for item in files]
 results.extend(data_products)
 

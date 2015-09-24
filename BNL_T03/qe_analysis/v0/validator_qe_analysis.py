@@ -24,6 +24,11 @@ for band in QE:
 
 results.extend(eotestUtils.eotestCalibsPersist('photodiode_ratio_file'))
 qe_files = glob.glob('*QE*.*')
+for item in qe_files:
+    if item.endswith('.fits'):
+        eotestUtils.addHeaderData(item, LSST_NUM=sensor_id, TESTTYPE='LAMBDA',
+                                  DATE=eotestUtils.utc_now_isoformat(),
+                                  CCD_MANU=siteUtils.getCcdVendor().upper())
 results.extend([lcatr.schema.fileref.make(item) for item in qe_files])
 
 lcatr.schema.write_file(results)

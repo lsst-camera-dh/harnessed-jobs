@@ -8,6 +8,19 @@ import lcatr.schema
 import lcatr.harness.helpers
 import harnessedJobs as hj
 
+def cast(value):
+    if value == 'None':
+        return None
+    try:
+        if value.find('.') == -1 and value.find('e') == -1:
+            return int(value)
+        else:
+            return float(value)
+    except ValueError:
+        # Cannot cast as either int or float so just return the
+        # value as-is (presumably a string).
+        return value
+
 def getUnitId():
     return os.environ['LCATR_UNIT_ID']
 
@@ -15,7 +28,7 @@ def getUnitType():
     return os.environ['LCATR_UNIT_TYPE']
 
 def getCcdVendor():
-    unit_id = getUnitId()
+    unit_id = getUnitType()
     vendor = unit_id.split('-')[0]
     if vendor not in ('ITL', 'E2V', 'e2v'):
         raise RuntimeError("Unrecognized CCD vendor for unit id %s" % unit_id)
@@ -154,16 +167,4 @@ class Parfile(dict):
         parser = ConfigParser.ConfigParser()
         parser.read(infile)
         for key, value in parser.items(section):
-            self[key] = self._cast(value)
-    def _cast(self, value):
-        if value == 'None':
-            return None
-        try:
-            if value.find('.') == -1 and value.find('e') == -1:
-                return int(value)
-            else:
-                return float(value)
-        except ValueError:
-            # Cannot cast as either int or float so just return the
-            # value as-is (presumably a string).
-            return value
+            self[key] = cast(value)
