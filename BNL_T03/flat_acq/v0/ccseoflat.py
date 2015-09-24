@@ -72,8 +72,8 @@ try:
 
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
-    result = monosub.synchCommand(30,"setSlitSize",1,210);
-    result = monosub.synchCommand(30,"setSlitSize",2,210);
+    result = monosub.synchCommand(30,"setSlitSize",1,222);
+    result = monosub.synchCommand(30,"setSlitSize",2,222);
 # removing for test with no SW change
 #    result = monosub.synchCommand(30,"setSlitSize",1,48);
 #    result = monosub.synchCommand(30,"setSlitSize",2,48);
