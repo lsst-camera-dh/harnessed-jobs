@@ -201,7 +201,7 @@ try:
 # start acquisition
 
                 timestamp = time.time()
-                fitsfilename = "%s_sflat_%4.4d_flat_%s%3.3d_${TIMESTAMP}.fits" % (ccd,int(wl),lohiflux,i+1)
+                fitsfilename = "%s_sflat_%3.3d_flat_%s%3.3d_${TIMESTAMP}.fits" % (ccd,int(wl),lohiflux,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       
