@@ -151,7 +151,7 @@ def EOSetup(tssub,ccdtype,cdir,acffile,vac_outlet,arcsub,state1="setTSReady",sta
 
 
 # Pre Archon TS Initialization
-    result = tssub.synchCommand(300,"eoSetupPreCfg",state1);
+    result = tssub.synchCommand(11000,"eoSetupPreCfg",state1);
     reply = result.getResult();
 # Archon Initialization
     result = arcsub.synchCommand(500,"eoSetup",acffile,ccdtype);

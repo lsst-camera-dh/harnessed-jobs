@@ -54,6 +54,12 @@ try:
     pcount = float(eolib.getCfgVal(acqcfgfile, 'PPUMP_BCOUNT', default = "25"))
     imcount = 2
     
+    print "setting the monochromator wavelength"
+#            if (exptime > lo_lim):
+    result = monosub.synchCommand(120,"setWaveAndFilter",wl);
+    rwl = result.getResult()
+    time.sleep(10.)
+
 #number of PLCs between readings
     nplc = 1
     
@@ -133,11 +139,6 @@ try:
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-            print "setting the monochromator wavelength"
-#            if (exptime > lo_lim):
-            result = monosub.synchCommand(30,"setWaveAndFilter",wl);
-            rwl = result.getResult()
-            time.sleep(10.)
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
             result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
