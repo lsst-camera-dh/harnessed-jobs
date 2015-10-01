@@ -7,7 +7,7 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "Lateral\ pos\ metrology.RTN"
+ogpscriptname = "Lateral_pos_metrology.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 

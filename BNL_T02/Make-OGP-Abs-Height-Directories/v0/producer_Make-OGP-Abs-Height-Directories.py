@@ -7,7 +7,7 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "CCDb\ Abs\ Hgt\ robust.RTN"
+ogpscriptname = "CCDb_Abs_Hgt_robust.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 

@@ -7,7 +7,7 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "CCDa\ Edge\ scan\ Abs\ hgt\ Flatness\ robust.RTN"
+ogpscriptname = "CCDa_Edge_scan_Abs_hgt_Flatness_robust.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
