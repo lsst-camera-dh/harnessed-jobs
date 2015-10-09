@@ -141,8 +141,13 @@ class ItlFitsTranslator(VendorFitsTranslator):
         infiles = dict([(image_type(item), item) for item in infiles])
         self.translate(infiles['pocketpump first bias'], 'trap', 'bias', '000',
                        time_stamp=time_stamp, verbose=verbose)
-        self.translate(infiles['pocket pump'], 'trap', 'ppump', '000',
-                       time_stamp=time_stamp, verbose=verbose)
+        try:
+            infiles['pocket pump']
+            self.translate(infiles['pocket pump'], 'trap', 'ppump', '000',
+                           time_stamp=time_stamp, verbose=verbose)
+        except KeyError:
+            self.translate(infiles['pocketpumped flat'], 'trap', 'ppump', '000',
+                           time_stamp=time_stamp, verbose=verbose)
         self.translate(infiles['pocketpump second bias'], 'trap', 'bias', '001',
                        time_stamp=time_stamp, verbose=verbose)
         self.translate(infiles['pocket pump reference flat'],
