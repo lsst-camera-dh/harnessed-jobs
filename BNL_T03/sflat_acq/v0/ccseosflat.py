@@ -102,9 +102,9 @@ try:
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-            print "set filter position"
-            result = monosub.synchCommand(60,"setFilter",1); # open position
-            reply = result.getResult();
+#            print "set filter position"
+#            result = monosub.synchCommand(60,"setFilter",1); # open position
+#            reply = result.getResult();
 
             result = arcsub.synchCommand(10,"setCCDnum",ccd)
             result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT_500")
@@ -129,7 +129,7 @@ try:
 
             if (wl!=owl) :
                 print "Setting monochromator lambda = %8.2f" % wl
-                result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+                result = monosub.synchCommand(60,"setWaveAndFilter",wl);
                 rwl = result.getResult()
                 time.sleep(10.0)
                 print "publishing state"
@@ -201,7 +201,7 @@ try:
 # start acquisition
 
                 timestamp = time.time()
-                fitsfilename = "%s_sflat_%4.4d_flat_%s%3.3d_${TIMESTAMP}.fits" % (ccd,int(wl),lohiflux,i+1)
+                fitsfilename = "%s_sflat_%3.3d_flat_%s%3.3d_${TIMESTAMP}.fits" % (ccd,int(wl),lohiflux,i+1)
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       

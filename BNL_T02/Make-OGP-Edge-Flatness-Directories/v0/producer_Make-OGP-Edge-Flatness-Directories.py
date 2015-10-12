@@ -7,7 +7,7 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "CCDb\ Flatness\ Edge\ scan\ new\ jig\ robust.RTN"
+ogpscriptname = "CCDb_Flatness_Edge_scan_new_jig_robust.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
@@ -72,7 +72,7 @@ os.system("cd %s" % cwd)
 print "The OGP acquisition and analysis scripts have been installed."
 rtnnam = "%s_Flat_%s.DAT" % (ccd,tm)
 #tkMessageBox.showinfo("OGP Routine Data Output Filename", rtnnam)
-subprocess.Popen(["./showfl.py",rtnnam]);
+subprocess.Popen(["/home/LSSTuser/lsst/showfl.py",rtnnam]);
 
 print "======================================="
 print "OGP Routine Data Output Filename: %s" % rtnnam
