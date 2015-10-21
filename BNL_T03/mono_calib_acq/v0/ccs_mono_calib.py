@@ -5,7 +5,7 @@
 ###############################################################################
 
 from org.lsst.ccs.scripting import *
-from org.lsst.ccs.bus import CommandRejectedException
+from org.lsst.ccs.messaging import CommandRejectedException
 from java.lang import Exception
 import sys
 import time
@@ -63,8 +63,8 @@ try:
 #    pdsub.synchCommand(10,"setCurrentRange",0.000002)
 #    biassub.synchCommand(10,"setCurrentRange",0.000000002)
 #    pdsub.synchCommand(10,"setCurrentRange",0.000002)
-    biassub.synchCommand(10,"setCurrentRange",0.0000002)
-    pdsub.synchCommand(10,"setCurrentRange",0.00002)
+    biassub.synchCommand(10,"setCurrentRange",0.00000002)
+    pdsub.synchCommand(10,"setCurrentRange",0.00000020)
 
     print "set current ranges"
 
@@ -96,9 +96,9 @@ try:
     print "set filter position"
     result = monosub.synchCommand(60,"setFilter",2);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",1,420);
+    result = monosub.synchCommand(60,"setSlitSize",1,48);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",2,420);
+    result = monosub.synchCommand(60,"setSlitSize",2,48);
     rply = result.getResult()
 
 # go through config file looking for 'qe' instructions
@@ -111,12 +111,13 @@ try:
     print "setting location of fits exposure directory"
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-#    wlstep = 323.
-#    wl=500. - wlstep
-#    for idx in range(2):
-#        wl = wl + wlstep
+    wlstep = 0.3
+#    wl=810. - wlstep
+    wl=460.7 - wlstep
+    for idx in range(75):
+        wl = wl + wlstep
 #    for wl in [473.4, 473.4, 881.9, 881.9] :
-    for wl in range(300,1100,10):
+#    for wl in range(440.,441.,0.3):
 
         exptime = 25.
         nreads = 3000
@@ -130,22 +131,22 @@ try:
 #        monosub.synchCommand(30,"setWaveAndFilter",wl);
             print "Setting monochromator lambda = %8.2f" % wl
             try:
-                result = monosub.synchCommand(200,"setWave",wl);
+                result = monosub.synchCommand(600,"setWave",wl);
                 rply = result.getResult()
                 time.sleep(4.0)
             except CommandRejectedException, er:
                 print "set wave attempt rejected, try again ..."
-                time.sleep(10.0)
+                time.sleep(30.0)
                 try:
-                    result = monosub.synchCommand(300,"setWave",wl);
+                    result = monosub.synchCommand(600,"setWave",wl);
                     rply = result.getResult()
                     time.sleep(4.0)
                 except CommandRejectedException, er:
                     print "set wave attempt rejected again, one last try after a long wait again ..."
-                    time.sleep(60.0)
+                    time.sleep(120.0)
                     try:
                         print "here we go ... its gotta work this time .... right?"
-                        result = monosub.synchCommand(300,"setWave",wl);
+                        result = monosub.synchCommand(600,"setWave",wl);
                         rply = result.getResult()
                         print "we survived a near crash"
                         time.sleep(4.0)
@@ -189,7 +190,7 @@ try:
 
 # start acquisition
             timestamp = time.time()
-            fitsfilename = "%s_lambda_%3.3d_%3.3d_lambda_%d_${TIMESTAMP}.fits" % ("mono_calib",int(wl),seq,i+1)
+            fitsfilename = "%s_lambda_%4.4d_%3.3d_lambda_%d_${TIMESTAMP}.fits" % ("mono_calib",int(wl*10.),seq,i+1)
             arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
             result = arcsub.synchCommand(10,"setHeader","TestType","MonoCalib")
 
@@ -241,7 +242,7 @@ try:
 #            biassub.synchCommand(1000,"setTimeout",10.);
 
             result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
-            result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdbiasfilename),fitsfilename,"AMP2","AMP2_MEAS_TIMES","AMP2_A_CURRENT",timestamp)
+            result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdbiasfilename),fitsfilename,"AMP2.MEAS_TIMES","AMP2_MEAS_TIMES","AMP2_A_CURRENT",timestamp)
 
             fpfiles.write("%s %s/%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,cdir,pdbiasfilename,timestamp))
 

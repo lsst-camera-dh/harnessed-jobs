@@ -7,7 +7,7 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "CCDb\ Abs\ Hgt\ robust.RTN"
+ogpscriptname = "CCDb_Abs_Hgt_robust.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
@@ -65,7 +65,7 @@ print "The OGP acquisition and analysis scripts have been installed."
 
 rtnnam = "%s_AbsZ_%s.DAT" % (ccd,tm)
 #tkMessageBox.showinfo("OGP Routine Data Output Filename", rtnnam)
-subprocess.Popen(["./showfl.py",rtnnam]);
+subprocess.Popen(["/home/LSSTuser/lsst/showfl.py",rtnnam]);
 
 print "======================================="
 print "OGP Routine Data Output Filename: %s" % rtnnam

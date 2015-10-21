@@ -7,7 +7,7 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "Lateral\ pos\ metrology.RTN"
+ogpscriptname = "Lateral_pos_metrology.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
@@ -64,8 +64,8 @@ os.system("cd %s" % cwd)
 print "The OGP acquisition and analysis scripts have been installed."
 
 rtnnam = "%s_Pin_%s.DAT" % (ccd,tm)
-%tkMessageBox.showinfo("OGP Routine Data Output Filename", rtnnam)
-subprocess.Popen(["./showfl.py",rtnnam]);
+#tkMessageBox.showinfo("OGP Routine Data Output Filename", rtnnam)
+subprocess.Popen(["/home/LSSTuser/lsst/showfl.py",rtnnam]);
 print "======================================="
 print "OGP Routine Data Output Filename: %s" % rtnnam
 print "======================================="

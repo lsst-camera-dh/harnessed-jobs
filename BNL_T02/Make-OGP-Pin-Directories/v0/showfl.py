@@ -10,7 +10,7 @@ top = Tkinter.Tk()
 
 global A
 
-msg = args[1]
+msg = sys.argv[1]
 
 def toclipboard(themsg):
     os.system("cat > /dev/clipboard %s" % themsg)
@@ -21,4 +21,5 @@ A = Tkinter.Button(top, text ="click to copy %s to clipboard" % msg, command = l
 A.pack()
 top.title('OGP output data filename')
 #top.after_idle(callclean)
+
 top.mainloop()
