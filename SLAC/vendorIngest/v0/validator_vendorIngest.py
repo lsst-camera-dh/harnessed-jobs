@@ -27,7 +27,7 @@ class VendorResults(object):
         failures = OrderedDict()
         analyses = ('fe55_analysis', 'read_noise', 'bright_defects',
                     'dark_defects', 'traps', 'dark_current', 'cte',
-                    'prnu', 'flat_pairs', 'ptc', 'qe_analysis')
+                    'prnu', 'flat_pairs', 'ptc', 'qe_analysis', 'metrology')
         for analysis in analyses:
             try:
                 exec('my_results = self.%s()' % analysis)
@@ -54,7 +54,8 @@ class ItlResults(VendorResults):
                         'traps' : 'traps.txt',
                         'flat_pairs' : 'linearity.txt',
                         'prnu' : 'prnu.txt',
-                        'qe_analysis' : 'qe.txt'}
+                        'qe_analysis' : 'qe.txt',
+                        'metrology' : 'metrology.txt'}
     def __init__(self, rootdir):
         super(ItlResults, self).__init__()
         command = 'find %(rootdir)s/ -name \*.txt -print' % locals()
@@ -229,6 +230,20 @@ class ItlResults(VendorResults):
             results.append(validate(job, band=band,
                                     QE=np.average(qe_results[band])))
         return results
+    def metrology(self):
+        job = 'metrology'
+        test_results = {}
+        test_results['mounting_grade'] = dict(self[job].items('Mounting'))['grade']
+        kwds = dict(self[job].items('Height'))
+        test_results['height_grade'] = kwds['grade']
+        kwds.update(dict(self[job].items('Flatness')))
+        test_results['flatness_grade'] = kwds['grade']
+        schema_keys = 'znom zmean zmedian zsdev flatnesshalfband flatnessfullband fsdev fmin fmax'.split()
+        # Omit key/value pairs not in the schema.
+        for key in schema_keys:
+            test_results[key] = kwds[key]
+        results = [validate('metrology_vendorIngest', **test_results)]
+        return results
 
 class e2vResults(VendorResults):
     def __init__(self, rootdir):
@@ -375,6 +390,8 @@ class e2vResults(VendorResults):
             results.append(validate(job, band=band,
                                     QE=np.average(qe_results[band])))
         return results
+    def metrology(self):
+        return []
 
 if __name__ == '__main__':
     results = [siteUtils.packageVersions()]
