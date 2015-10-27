@@ -10,7 +10,8 @@ from datacat import client_from_config_file
 from datacat.model import Folder
 import argparse
 
-remote_hosts = {'SLAC' : 'rhel6-64.slac.stanford.edu'}
+remote_hosts = {'SLAC' : 'rhel6-64.slac.stanford.edu',
+                'slac.lca.archive' : 'rhel6-64.slac.stanford.edu'}
 
 ## Command line arguments
 parser = argparse.ArgumentParser(description='Find archived data in the LSST  data Catalog. These include CCD test stand and vendor data files.')
@@ -96,8 +97,8 @@ class DatasetList(list):
                 continue
             for location in dataset.locations:
                 if location.site == self.site:
+                    my_full_paths.append(str(location.resource))
                     break
-            my_full_paths.append(str(location.resource))
         return my_full_paths
     def download(self, site='SLAC', rootpath='.', nfiles=None, dryrun=True,
                  job_id=None, job_name=None, clobber=False):
@@ -140,7 +141,8 @@ class DataCatalogException(RuntimeError):
 
 class DataCatalog(object):
     def __init__(self, folder=None, experiment="LSST",
-                 mode="dev", remote_login=None, site='SLAC', config_url=None):
+                 mode="dev", remote_login=None, site='SLAC', config_url=None,
+                 use_newest_subfolder=True):
         self.folder = folder
         if remote_login is None:
             self.remote_login = os.getlogin()
@@ -153,6 +155,12 @@ class DataCatalog(object):
             # Override the computed value.
             my_config_url = config_url
         self.client = datacat.Client(my_config_url)
+        if use_newest_subfolder:
+            self.folder = self.find_newest_subfolder(folder)
+    def find_newest_subfolder(self, folder_root):
+        children = sorted([c for c in self.client.children(folder_root)
+                           if is_valid_folder(c)], key=lambda c : c.name)
+        return children[-1].path
     def find_datasets(self, query, folder=None, job_id=None, job_name=None,
                       datacat_search_patterns = (None, '**')):
         """
