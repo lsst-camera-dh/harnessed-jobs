@@ -120,8 +120,8 @@ try:
 
     wlstep = 10.
 #    wl=815. - wlstep
-    wl=310. - wlstep
-    for idx in range(80):
+    wl=1030. - wlstep
+    for idx in range(8):
         wl = wl + wlstep
 #    for wl in [473.4, 473.4, 881.9, 881.9] :
 #    for wl in range(440.,441.,0.3):
@@ -133,10 +133,10 @@ try:
         arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # adjust timeout because we will be waiting for the data to become ready
-        mywait = nplc/60.*nreads*1.10 ;
+        mywait = nplc/60.*nreads*1.20 ;
         print "Setting timeout to %f s" % mywait
 
-        result = monosub.synchCommand(30,"setWaveAndFilter",wl);
+        result = monosub.synchCommand(200,"setWaveAndFilter",wl);
         rwl = result.getResult()
         print "The wl retrieved from the monochromator is rwl = %f" % rwl
         result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
