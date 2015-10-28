@@ -218,7 +218,7 @@ try:
                 timestamp = time.time()
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(0.5);
+                time.sleep(1.5);
 
 # start acquisition
                 print "set fits filename"
