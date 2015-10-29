@@ -194,10 +194,10 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
-            nreads = exptime*60/nplc + 60
+            nreads = (exptime+2.0)*60/nplc
             if (nreads > 3000):
                 nreads = 3000
-                nplc = exptime*60/(nreads-60)
+                nplc = (exptime+2.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
                 
             result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
@@ -218,7 +218,7 @@ try:
                 timestamp = time.time()
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(1.5);
+                time.sleep(1.0);
 
 # start acquisition
                 print "set fits filename"

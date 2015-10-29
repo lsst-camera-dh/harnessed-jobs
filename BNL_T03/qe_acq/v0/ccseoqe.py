@@ -162,7 +162,7 @@ try:
                 exptime = lo_lim
             print "adjusted exposure time = %f" % exptime
 
-            exptime = 0.30
+#            exptime = 0.30
 
 
 # prepare to readout diodes
@@ -187,6 +187,18 @@ try:
             print "Setting timeout to %f s" % mywait
             pdsub.synchCommand(1000,"setTimeout",mywait);
 
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#                arcsub.synchCommand(10,"setParameter","ExpTime","300");
+
+#            result = arcsub.synchCommand(10,"setFitsFilename","");
+#            print "Ready to take clearing bias image. time = %f" % time.time()
+#            result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+#            rply = result.getResult()
+#            result = arcsub.synchCommand(500,"waitForExpoEnd");
+#            rply = result.getResult();
+
+
+
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
 
@@ -202,9 +214,7 @@ try:
                 print "fitsfilename = %s" % fitsfilename
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(1.5);
-
-                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+                time.sleep(1.0);
 
                 print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
