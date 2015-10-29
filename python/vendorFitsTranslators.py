@@ -174,6 +174,10 @@ class ItlFitsTranslator(VendorFitsTranslator):
     def spot(self, pattern='', time_stamp=None,
              verbose=True):
         raise NotImplemented("ITL spot dataset translation not implemented.")
+    def linearity(self, pattern='linearity/*linearity.*.fits', time_stamp=None,
+                  verbose=True):
+        return self._processFiles('linearity', 'flat', pattern,
+                                  time_stamp=time_stamp, verbose=verbose)
     def flat(self, pattern='ptc/*_ptc.*.fits', time_stamp=None,
              verbose=True):
         if time_stamp is None:
@@ -213,6 +217,7 @@ class ItlFitsTranslator(VendorFitsTranslator):
         self.sflat_500_low(time_stamp=time_stamp)
         #self.spot()
         self.flat()
+        self.linearity()
         self.lambda_scan()
 
 class e2vFitsTranslator(VendorFitsTranslator):
