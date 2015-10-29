@@ -9,7 +9,6 @@ import pyfits
 import glob
 
 print "starting widget for checking and starting the CCS apps"
-subprocess.Popen(["gnome-terminal","--geometry=1x1","--working-directory=/opt/lsst/redhat6-x86_64-64bit-gcc44/dev/ccs/ccs-dev/bin/","--command=/opt/lsst/redhat6-x86_64-64bit-gcc44/dev/ccs/ccs-dev/bin/settitle /opt/lsst/redhat6-x86_64-64bit-gcc44/dev/ccs/ccs-dev/bin/checktsappswidget"]);
 
 
 foundjython = False
@@ -39,7 +38,8 @@ if (not (foundjython and foundts and foundarchon)) :
 #    A = Tkinter.Button(top, text = apptxt, command = lambda : startappsmsg(apptxt), bg = "red")
     A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = "red", font = ("Helvetica",24))
     A.pack()
-    top.title('Please start missing CCS apps')
+    top.title('Please start missing CCS apps using the widget that will appear after you click on this button.')
+    subprocess.Popen(["gnome-terminal","--geometry=1x1","--working-directory=$CCS_BIN_DIR","--command=/usr/bin/ccsapps"]);
     top.mainloop()
 else:
     print "All required CCS apps running"
