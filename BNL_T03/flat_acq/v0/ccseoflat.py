@@ -144,11 +144,18 @@ try:
                 print "Ready to take bias image. time = %f" % time.time()
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
+
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
                 print "after click click at %f" % time.time()
-                time.sleep(0.2)
+
+                time.sleep(1.0)
 # ===========================================================================
+            time.sleep(2.0)
+
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
+
 #            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
@@ -163,15 +170,26 @@ try:
                 result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
 # do in-job flux calibration
-                arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
 # dispose of first image
+                arcsub.synchCommand(10,"setParameter","Light","1");
+                arcsub.synchCommand(10,"setParameter","ExpTime","2000");
+                
+#                arcsub.synchCommand(10,"setFitsFilename","chk1.fits");
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                fitsfilename = result.getResult();
+                
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
+                
+                time.sleep(2.0)
                 arcsub.synchCommand(10,"setFitsFilename","");
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 rply = result.getResult();
-
+                
                 arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
-
+            
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 flncal = result.getResult();
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
@@ -194,10 +212,15 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
-            nreads = (exptime+2.0)*60/nplc
+            if (exptime>0.5) :
+                nplc = 1.0
+            else :
+                nplc = 0.20
+
+            nreads = (exptime+4.0)*60/nplc
             if (nreads > 3000):
                 nreads = 3000
-                nplc = (exptime+2.0)*60/nreads
+                nplc = (exptime+4.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
                 
             result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
@@ -205,11 +228,19 @@ try:
 
 
 # adjust timeout because we will be waiting for the data to become ready
-            mywait = nplc/60.*nreads*1.10 ;
+            mywait = nplc/60.*nreads*2.00 ;
             print "Setting timeout to %f s" % mywait
             pdsub.synchCommand(1000,"setTimeout",mywait);
 
             print "starting acquisition step for lambda = %8.2f with exptime %8.2f s" % (wl, exptime)
+
+            print "throw away first image"
+            result = arcsub.synchCommand(10,"setFitsFilename","");
+            print "Ready to take disposable image. time = %f" % time.time()
+            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+            fitsfilename = result.getResult();
+            result = arcsub.synchCommand(500,"waitForExpoEnd");
+            rply = result.getResult();
 
             for i in range(imcount):
 
@@ -218,7 +249,7 @@ try:
                 timestamp = time.time()
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(1.0);
+                time.sleep(2.0);
 
 # start acquisition
                 print "set fits filename"

@@ -55,8 +55,8 @@ try:
     ccd = CCDID
     print "Working on CCD %s" % ccd
 
-    print "set filter position"
-    monosub.synchCommand(30,"setFilter",1); # open position
+#    print "set filter position"
+#    monosub.synchCommand(30,"setFilter",1); # open position
 
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
@@ -128,17 +128,24 @@ try:
                 result = arcsub.synchCommand(500,"waitForExpoEnd");
                 rply = result.getResult();
                 print "after click click at %f" % time.time()
-                time.sleep(0.2)
+                time.sleep(1.0)
 
 
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+            arcsub.synchCommand(10,"setFitsFilename","");
+            arcsub.synchCommand(10,"setParameter","ExpTime","2000"); 
 
+            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+            fitsfilename = result.getResult();
+            result = arcsub.synchCommand(500,"waitForExpoEnd");
+            rply = result.getResult();
+            print "after click click at %f" % time.time()
+            time.sleep(2.0)
 
 # do in-job flux calibration
-            arcsub.synchCommand(10,"setParameter","ExpTime","2000");
 
             result  = arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
@@ -183,21 +190,21 @@ try:
 
 
 # adjust timeout because we will be waiting for the data to become ready
-            mywait = nplc/60.*nreads*1.10 ;
+            mywait = nplc/60.*nreads*2.00 ;
             print "Setting timeout to %f s" % mywait
             pdsub.synchCommand(1000,"setTimeout",mywait);
 
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 #                arcsub.synchCommand(10,"setParameter","ExpTime","300");
 
-#            result = arcsub.synchCommand(10,"setFitsFilename","");
-#            print "Ready to take clearing bias image. time = %f" % time.time()
-#            result = arcsub.synchCommand(20,"exposeAcquireAndSave");
-#            rply = result.getResult()
-#            result = arcsub.synchCommand(500,"waitForExpoEnd");
-#            rply = result.getResult();
+            result = arcsub.synchCommand(10,"setFitsFilename","");
+            print "Ready to take clearing bias image. time = %f" % time.time()
+            result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+            rply = result.getResult()
+            result = arcsub.synchCommand(500,"waitForExpoEnd");
+            rply = result.getResult();
 
-
+            time.sleep(4.0)
 
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
