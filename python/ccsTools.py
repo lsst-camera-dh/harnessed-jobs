@@ -100,7 +100,7 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=False, verbose=True):
     output.close()
 
     print "purge fluxcal fits files"
-    os.system("rm -v fluxcal*.fits")
+#    os.system("rm -v fluxcal*.fits")
 
 def convert_unix_time(millisecs):
     """
