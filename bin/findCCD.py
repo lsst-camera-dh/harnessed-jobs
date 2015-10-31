@@ -10,9 +10,10 @@ parser.add_argument('-f','--filter',default=None,help="FT1 metadata filter strin
 ##   The following are 'convenience options' which could also be specified in the filter string
 parser.add_argument('-t','--timestamp',default=None,help="(metadata) File timestamp (default=%(default)s)")
 parser.add_argument('-s','--sensorID', default=None,help="(metadata) Sensor ID (default=%(default)s)")
-parser.add_argument('-T','--TestName', default=None,help="(metadata) test type (default=%(default)s)")
+parser.add_argument('-T','--TestName', default='',help="(metadata) test type (default=%(default)s)")
 parser.add_argument('-c','--CCDType', default="ITL",help="(metadata) CCD vendor type (default=%(default)s)")
 parser.add_argument('-S','--site', default="slac.lca.archive",help="File location (default=%(default)s) ")
+parser.add_argument('-F','--FType', default='',help="File type (default all) ")
 
 ## Limit dataCatalog search to specified parts of the catalog
 parser.add_argument('-g','--group',default=None,help="Limit search to specified dataCat group (default=%(default)s)")
@@ -46,7 +47,11 @@ folder = '/LSST/'
 use_latest_activity = True
 
 if (args.mirrorName == 'BNL-prod' or args.mirrorName == 'BNL-test'):
-        folder = folder + 'mirror/' + sourceMap[args.mirrorName] + args.CCDType + '-CCD/' + sensorID + '/' + args.TestName + '/v0/'
+        folder = folder + 'mirror/' + sourceMap[args.mirrorName] + args.CCDType + '-CCD/' + sensorID + '/'
+	if args.TestName != '':
+		folder += args.TestName + '/v0/'
+	else:
+		use_latest_activity = False
 elif (args.mirrorName == 'vendorCopy-prod' or args.mirrorName == 'vendorCopy-test'):
         folder = folder + '/mirror/' + sourceMap[args.mirrorName] + args.CCDType + '-CCD/' + sensorID + '/vendorIngest/'
 elif (args.mirrorName == 'vendor-prod'):
@@ -69,10 +74,12 @@ datasets = datacatalog.find_datasets(query)
 print "%i datasets found\n" % len(datasets)
 
 nfiles = 75
+print "Requested ftype - " + args.FType
 if args.debug:
         print "File paths for first %i files at %s:" % (nfiles, site)
         for item in datasets.full_paths()[:nfiles]:
-            print item
+		if (args.FType == '') or (args.FType != '' and item.endswith(args.FType)): 
+		    print item
 
 print
 
@@ -81,7 +88,8 @@ if args.outputFile != None and len(datasets)>0:
         print 'Writing output file ',args.outputFile,'...'
         ofile = open(args.outputFile,'w')
         for line in datasets.full_paths():
-            ofile.write(line+'\n')
+	    if (args.FType == '') or (args.FType != '' and line.endswith(args.FType)): 
+		    ofile.write(line+'\n')
             pass
         ofile.close()
 elif args.outputFile != None:
