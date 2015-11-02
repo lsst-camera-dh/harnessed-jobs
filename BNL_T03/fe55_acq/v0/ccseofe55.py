@@ -138,12 +138,17 @@ try:
                     icount = imcount
                     arcsub.synchCommand(10,"setParameter","Fe55","1");
 
-                for i in range(icount):
-                    print "Throwing away the first image"
-                    arcsub.synchCommand(10,"setFitsFilename","");
-                    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                    reply = result.getResult();
+                print "Throwing away the first image"
+                arcsub.synchCommand(10,"setFitsFilename","");
+                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
+                reply = result.getResult();
 
+                time.sleep(2.0)
+
+                result = arcsub.synchCommand(10,"setHeader","TestType","FE55")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","FE55")
+
+                for i in range(icount):
 
 # prepare to readout diodes                                                                              
 # adjust timeout because we will be waiting for the data to become ready
@@ -164,8 +169,6 @@ try:
 # start acquisition
                     fitsfilename = "%s_fe55_%s_%3.3d_${TIMESTAMP}.fits" % (ccd,itypename,i+1)
                     result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-                    result = arcsub.synchCommand(10,"setHeader","TestType","FE55")
-                    result = arcsub.synchCommand(10,"setHeader","ImageType","FE55")
     
                     print "Ready to take image. time = %f" % time.time()
 
