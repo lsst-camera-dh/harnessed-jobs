@@ -40,7 +40,7 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSWarm","setTSWarm")
+    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSIdle","setTSIdle")
 
     print "Setting the current ranges on the Bias and PD devices"
     biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -227,7 +227,7 @@ try:
 except Exception, ex:
 
 # move TS to ready state                    
-    tssub.synchCommand(60,"setTSWarm");
+    tssub.synchCommand(60,"setTSIdle");
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
@@ -237,8 +237,8 @@ except Exception, ex:
 
 except ScriptingTimeoutException, ex:
 
-# move TS to ready state                    
-    tssub.synchCommand(60,"setTSWarm");
+# move TS to idle state                    
+#    tssub.synchCommand(60,"setTSIdle");
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
