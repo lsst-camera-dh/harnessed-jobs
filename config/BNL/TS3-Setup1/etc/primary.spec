@@ -21,6 +21,7 @@ CCDTEMP     Float   ${ts/ccdtemperature}        Measured temperature (deg C)
 CCDBSS      Float   ${ts/ccdbiasvoltage}        CCD bias voltage
 MONDIODE    Float   ${ts/photodiodecurrent}     Current in the monitoring diode (nA)
 MONOWL      Float   ${MonochromatorWavelength}  Monochromator wavelength (nm)
+PIXRATE     Float   ${PixelReadRate}            Rate for pixel reads
 FILTER      String  ${ts/TSState/filter}        Name of the filter
 FILTPOS     Integer ${ts/filter1position}       Filter position
 EXPTIME     Float   ${ExposureTime}             Exposure Time in Seconds
