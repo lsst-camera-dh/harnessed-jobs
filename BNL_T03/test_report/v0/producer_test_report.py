@@ -190,9 +190,19 @@ for result in foo:
             if key.endswith('_version'):
                 software_versions[key] = value
 
+# Test Stand configuration (extracted from one of the pixel data FITS headers)
+teststand_config = OrderedDict()
+fits_header = pyfits.open(wl_files[0])[0].header
+for key in 'CCDBSS TEMP_SET CTLRCFG PIXRATE TSTAND'.split():
+    try:
+        teststand_config[key] = fits_header[key]
+    except KeyError:
+        print "missing", key, " in FITS header of", os.path.basename(wl_files[0])
+
 # Create the test report pdf.
 report = sensorTest.EOTestReport(plots, wl_file_path,
                                  qa_plot_files=qa_plot_files,
-                                 software_versions=software_versions)
+                                 software_versions=software_versions,
+                                 teststand_config=teststand_config)
 report.make_pdf()
 
