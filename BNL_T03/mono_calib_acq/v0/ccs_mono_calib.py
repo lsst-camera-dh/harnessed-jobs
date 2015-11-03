@@ -54,34 +54,32 @@ try:
 #    reply = result.getResult();
 
 
-    arcsub.synchCommand(10,"setAcqParam","Nexpo");
-    arcsub.synchCommand(10,"setParameter","Expo","1");
+    arcsub.synchCommand(10,"setAcqParam","Expo");
+    arcsub.synchCommand(10,"setParameter","Nexpo","1");
 
     print "set expo to 1"
+
+    for i in range(2):
+        timestamp = time.time()
+        result = arcsub.synchCommand(10,"setFitsFilename","");
+        print "Ready to take clearing bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        rply = result.getResult()
+        result = arcsub.synchCommand(500,"waitForExpoEnd");
+        rply = result.getResult();
+    time.sleep(2.0);
 
 #    biassub.synchCommand(10,"setCurrentRange",0.000000002)
 #    pdsub.synchCommand(10,"setCurrentRange",0.000002)
 #    biassub.synchCommand(10,"setCurrentRange",0.000000002)
 #    pdsub.synchCommand(10,"setCurrentRange",0.000002)
     biassub.synchCommand(10,"setCurrentRange",0.00000002)
-    pdsub.synchCommand(10,"setCurrentRange",0.00000020)
+    pdsub.synchCommand(10,"setCurrentRange",  0.00002000)
 
     print "set current ranges"
 
 # move to TS acquisition state
     print "setting acquisition state"
-#    result = tssub.synchCommand(60,"setTSTEST");
-#    rply = result.getResult();
-
-
-# get the glowing vacuum gauge off
-#    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
-#    rply = result.getResult();
-
-#    lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
-#    hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
-#    bcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_BCOUNT', default='1'))
-#    imcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_IMCOUNT', default='1'))
 
     seq = 0
 
@@ -93,12 +91,12 @@ try:
 
     monosub.synchCommand(60,"setTimeout",300.);
 
-    print "set filter position"
-    result = monosub.synchCommand(60,"setFilter",2);
+#    print "set filter position"
+#    result = monosub.synchCommand(60,"setFilter",3);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",1,48);
+    result = monosub.synchCommand(60,"setSlitSize",1,420);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",2,48);
+    result = monosub.synchCommand(60,"setSlitSize",2,420);
     rply = result.getResult()
 
 # go through config file looking for 'qe' instructions
@@ -111,54 +109,37 @@ try:
     print "setting location of fits exposure directory"
     arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-    wlstep = 0.3
-#    wl=810. - wlstep
-    wl=460.7 - wlstep
-    for idx in range(75):
+
+#def my_range(start, end, step):
+#    while start <= end:
+#        yield start
+#        start += step
+#
+#for x in my_range(1, 10, 0.5):
+#    print x
+
+    wlstep = 10.
+#    wl=815. - wlstep
+    wl=1030. - wlstep
+    for idx in range(8):
         wl = wl + wlstep
 #    for wl in [473.4, 473.4, 881.9, 881.9] :
 #    for wl in range(440.,441.,0.3):
+
+
 
         exptime = 25.
         nreads = 3000
         arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # adjust timeout because we will be waiting for the data to become ready
-        mywait = nplc/60.*nreads*1.10 ;
+        mywait = nplc/60.*nreads*1.20 ;
         print "Setting timeout to %f s" % mywait
 
-        try:
-#        monosub.synchCommand(30,"setWaveAndFilter",wl);
-            print "Setting monochromator lambda = %8.2f" % wl
-            try:
-                result = monosub.synchCommand(600,"setWave",wl);
-                rply = result.getResult()
-                time.sleep(4.0)
-            except CommandRejectedException, er:
-                print "set wave attempt rejected, try again ..."
-                time.sleep(30.0)
-                try:
-                    result = monosub.synchCommand(600,"setWave",wl);
-                    rply = result.getResult()
-                    time.sleep(4.0)
-                except CommandRejectedException, er:
-                    print "set wave attempt rejected again, one last try after a long wait again ..."
-                    time.sleep(120.0)
-                    try:
-                        print "here we go ... its gotta work this time .... right?"
-                        result = monosub.synchCommand(600,"setWave",wl);
-                        rply = result.getResult()
-                        print "we survived a near crash"
-                        time.sleep(4.0)
-                    except CommandRejectedException, et:
-                        print "crash burn and live another step"
-                        time.sleep(30.0)
-                        continue
-            result = monosub.synchCommand(300,"getWave");
-            rwl = result.getResult()
-        except ScriptingTimeoutException, ex:
-            print "Failed to get monochromator to respond. Skipping to the next wavelength step."
-            continue
+        result = monosub.synchCommand(200,"setWaveAndFilter",wl);
+        rwl = result.getResult()
+        print "The wl retrieved from the monochromator is rwl = %f" % rwl
+        result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
         print "the wavelength read back is %f for seq %d" % (rwl,seq)
         print "publishing state"

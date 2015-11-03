@@ -218,11 +218,12 @@ try:
                 timestamp = time.time()
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(0.5);
+                time.sleep(1.5);
 
 # start acquisition
                 print "set fits filename"
-                fitsfilename = "%s_flat_%4.4d_%4.4d_flat%d_${TIMESTAMP}.fits" % (ccd,int(exptime*1000),seq,i+1)
+#                fitsfilename = "%s_flat_%4.4d_%4.4d_flat%d_${TIMESTAMP}.fits" % (ccd,int(exptime*1000),seq,i+1)
+                fitsfilename = "%s_flat_%07.2f_flat%d_${TIMESTAMP}.fits" % (ccd,exptime,i+1)
                 result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
                 print "Ready to take image. time = %f" % time.time()

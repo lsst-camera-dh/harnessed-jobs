@@ -50,7 +50,7 @@ try:
     seq = 0
 
 #number of PLCs between readings
-    nplc = 1
+    nplc = 1.0
 
     ccd = CCDID
     print "Working on CCD %s" % ccd
@@ -143,8 +143,13 @@ try:
             result  = arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
             result = arcsub.synchCommand(200,"exposeAcquireAndSave");
             flncal = result.getResult();
+            result = arcsub.synchCommand(500,"waitForExpoEnd");
+            rply = result.getResult();
+ 
             result = arcsub.synchCommand(10,"getFluxStats",flncal);
             flux = float(result.getResult());
+
+            time.sleep(2.0)
 
 # scale 
 #            flux = flux * 0.50
@@ -157,13 +162,20 @@ try:
                 exptime = lo_lim
             print "adjusted exposure time = %f" % exptime
 
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+            exptime = 0.30
+
 
 # prepare to readout diodes
-            nreads = exptime*60/nplc + 60
+            if (exptime>0.5) :
+                nplc = 1.0
+            else :
+                nplc = 0.25
+
+
+            nreads = (exptime+2.0)*60/nplc
             if (nreads > 3000):
                 nreads = 3000
-                nplc = exptime*60/(nreads-60)
+                nplc = (exptime+2.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
@@ -190,7 +202,9 @@ try:
                 print "fitsfilename = %s" % fitsfilename
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(0.5);
+                time.sleep(1.5);
+
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
                 print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
