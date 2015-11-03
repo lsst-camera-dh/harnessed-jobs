@@ -47,8 +47,8 @@ try:
     result = arcsub.synchCommand(30,"powerOffCCD");
 
 # move to TS idle state ... this will set the cryocon to warm
-    print "SETTING STATE OF TESTSTAND TO IDLE"
-    result = tssub.synchCommand(100000,"setTSIdle");
+    print "SETTING STATE OF TESTSTAND TO WARM"
+    result = tssub.synchCommand(100000,"setTSWarm");
     rply = result.getResult();
 
 
