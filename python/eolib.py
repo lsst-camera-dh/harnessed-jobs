@@ -161,6 +161,10 @@ def EOSetup(tssub,ccdtype,cdir,acffile,vac_outlet,arcsub,state1="setTSReady",sta
     result = tssub.synchCommand(11000,"eoSetupPostCfg",vac_outlet,state2);
     reply = result.getResult();
 
+    result = arcsub.synchCommand(10,"getKpixRate");
+    kpixrate = result.getResult();
+
+    result = arcsub.synchCommand(10,"setHeader","PixelReadRate",kpixrate)
 
 
 
