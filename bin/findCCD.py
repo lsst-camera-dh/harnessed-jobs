@@ -14,6 +14,7 @@ parser.add_argument('-T','--TestName', default='',help="(metadata) test type (de
 parser.add_argument('-c','--CCDType', default="ITL",help="(metadata) CCD vendor type (default=%(default)s)")
 parser.add_argument('-S','--site', default="slac.lca.archive",help="File location (default=%(default)s) ")
 parser.add_argument('-F','--FType', default='',help="File type (default all) ")
+parser.add_argument('-q','--qType', default='',help="query type - report or blank (default all) ")
 
 ## Limit dataCatalog search to specified parts of the catalog
 parser.add_argument('-g','--group',default=None,help="Limit search to specified dataCat group (default=%(default)s)")
@@ -53,7 +54,13 @@ if (args.mirrorName == 'BNL-prod' or args.mirrorName == 'BNL-test'):
 	else:
 		use_latest_activity = False
 elif (args.mirrorName == 'vendorCopy-prod' or args.mirrorName == 'vendorCopy-test'):
-        folder = folder + '/mirror/' + sourceMap[args.mirrorName] + args.CCDType + '-CCD/' + sensorID + '/vendorIngest/'
+        folder = folder + 'mirror/' + sourceMap[args.mirrorName] + args.CCDType + '-CCD/' + sensorID
+	if args.TestName != '':
+		folder += '/' + args.TestName + '/v0/'
+	elif args.qType == '':
+		folder += '/vendorIngest/v0/'
+	else:
+		folder += '/test_report_offline/v0/'
 elif (args.mirrorName == 'vendor-prod'):
         folder = folder + sourceMap[args.mirrorName] + args.CCDType  + '/' + sensorID + '/Prod/'
 elif (args.mirrorName == 'vendor-test'):
@@ -66,6 +73,7 @@ elif (args.mirrorName == 'SAWG-BNL'):
 print folder
         
 query = args.XtraOpts
+
 site = args.site
 
 datacatalog = DataCatalog(folder=folder, experiment='LSST', site=site, use_newest_subfolder=use_latest_activity)
@@ -97,4 +105,4 @@ elif args.outputFile != None:
         pass
 
 
-datasets.download(dryrun=args.dryRun, clobber=False, nfiles=nfiles)
+#datasets.download(dryrun=args.dryRun, clobber=False, nfiles=nfiles)
