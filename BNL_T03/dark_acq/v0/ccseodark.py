@@ -75,6 +75,9 @@ try:
     print "Scanning config file for DARK specifications";
     fp = open(acqcfgfile,"r");
     fpfiles = open("%s/acqfilelist" % cdir,"w");
+
+    result = arcsub.synchCommand(10,"setFetch_timeout",5000000)
+
     
     for line in fp:
         tokens = str.split(line)
@@ -88,6 +91,15 @@ try:
 #            arcsub.synchCommand(10,"setAndApplyParam","ExpTime","0");
 
             result = arcsub.synchCommand(10,"setCCDnum",ccd)
+
+            print "Tossing an image"
+            result = arcsub.synchCommand(10,"setFitsFilename","")
+            result = arcsub.synchCommand(900,"exposeAcquireAndSave");
+            fitsfilename = result.getResult();
+            result = arcsub.synchCommand(900,"waitForExpoEnd");
+            rply = result.getResult();
+
+            print "moving on to bias images"
 
             bcount = 3
             for i in range(bcount):
@@ -120,12 +132,18 @@ try:
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = arcsub.synchCommand(10,"setFetch_timeout",5000000)
+
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+            print "Tossing an image before taking a dark frame"
+            result = arcsub.synchCommand(10,"setFitsFilename","")
+            result = arcsub.synchCommand(900,"exposeAcquireAndSave");
+            fitsfilename = result.getResult();
+            result = arcsub.synchCommand(900,"waitForExpoEnd");
+            rply = result.getResult();
 
 
             for i in range(imcount):
 
-                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # adjust timeout because we will be waiting for the data to become ready both
 # at the accumbuffer stage and the readbuffer stage
