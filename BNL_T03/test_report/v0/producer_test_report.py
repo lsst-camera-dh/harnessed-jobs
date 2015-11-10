@@ -140,6 +140,9 @@ detresp_file = processName_dependencyGlob('%s_det_response.fits' % sensor_id,
 plots.linearity(ptc_file=ptc_file, detresp_file=detresp_file)
 pylab.savefig('%s_linearity.png' % sensor_id)
 
+plots.linearity_resids(ptc_file=ptc_file, detresp_file=detresp_file)
+pylab.savefig('%s_linearity_resids.png' % sensor_id)
+
 # Full well plots
 plots.full_well(ptc_file=ptc_file, detresp_file=detresp_file)
 pylab.savefig('%s_full_well.png' % sensor_id)
