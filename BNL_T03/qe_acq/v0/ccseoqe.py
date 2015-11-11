@@ -69,7 +69,7 @@ try:
         timestamp = time.time()
         result = arcsub.synchCommand(10,"setFitsFilename","");
         print "Ready to take clearing bias image. time = %f" % time.time()
-        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        result = arcsub.synchCommand(500,"exposeAcquireAndSave");
         rply = result.getResult()
         result = arcsub.synchCommand(500,"waitForExpoEnd");
         rply = result.getResult();

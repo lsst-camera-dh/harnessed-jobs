@@ -213,8 +213,9 @@ try:
                     result = pdsub.synchCommand(900,"readBuffer","%s/%s" % (cdir,pdfilename));
                     buff = result.getResult()
                     print "Finished getting readings at %f" % time.time()
-    
-                    result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+
+                    if (exptime > 0.0) :
+                        result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
                     fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
                     if (acqtype == 1 ) :

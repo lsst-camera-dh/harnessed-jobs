@@ -35,6 +35,10 @@ HEADVER     Integer 1                           Version number of header
 CCDGAIN     Float   2.98                        Rough guess at overall system gain (e-/DNB)
 CCDNOISE    Float   6                           Rough guess at system noise (e- rms)
 CFGFILE     String  ${ConfigFile}               Configuration file name
+CTLRID      String  ${BackPlaneID}              Controller back plane ID
+CTLRRV      Integer ${BackPlaneRev}             Controller back plane Revision
+CTLRTYP     Integer ${BackPlaneType}            Controller back plane Type
+CTLRVER     String  ${BackPlaneVersion}         Controller back plane Version
 HIERARCH.MONOCH-WAVELENG Float   ${ts/monochromatorwavelength} monochromator wavelength
 HIERARCH.MONOCH-SLIT_A   Float   ${ts/monochromatorslit1}     Width of the A slit in um
 HIERARCH.MONOCH-SLIT_B   Float   ${ts/monochromatorslit2}     Width of the B slit in um

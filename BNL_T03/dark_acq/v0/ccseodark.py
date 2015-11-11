@@ -147,7 +147,7 @@ try:
 
 # adjust timeout because we will be waiting for the data to become ready both
 # at the accumbuffer stage and the readbuffer stage
-                mywait = nplc/60.*nreads*1.10 ;
+                mywait = nplc/60.*nreads*2.00 ;
                 print "Setting timeout to %f s" % mywait
                 pdsub.synchCommand(1000,"setTimeout",mywait);
 
@@ -184,7 +184,7 @@ try:
                 time.sleep(5.)
     
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-                result = pdsub.synchCommand(1200,"readBuffer","%s/%s" % (cdir,pdfilename));
+                result = pdsub.synchCommand(1800,"readBuffer","%s/%s" % (cdir,pdfilename));
                 buff = result.getResult()
                 print "Finished getting readings at %f" % time.time()
 
@@ -195,16 +195,16 @@ try:
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
 # ====================== clear the sensor by taking a bias image =================
-                arcsub.synchCommand(10,"setParameter","ExpTime","0");
-                fitsfilename = "%s_dark_biasclear_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
-                result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-                result = arcsub.synchCommand(10,"setHeader","TestType","DARK")
-                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+#                arcsub.synchCommand(10,"setParameter","ExpTime","0");
+#                fitsfilename = "%s_dark_biasclear_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+#                result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+#                result = arcsub.synchCommand(10,"setHeader","TestType","DARK")
+#                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
 
-                print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                print "finished with bias clear %f" % time.time()
+#                print "Ready to take bias clear image. time = %f" % time.time()
+#                result = arcsub.synchCommand(20000,"exposeAcquireAndSave");
+#                fitsfilename = result.getResult();
+#                print "finished with bias clear %f" % time.time()
  
   
             seq = seq + 1

@@ -117,6 +117,8 @@ try:
                 print "Ready to take bias image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
 # =========================================================================    
@@ -148,6 +150,8 @@ try:
 
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 flncal = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
                 flux = float(result.getResult());
 
@@ -205,12 +209,14 @@ try:
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(0.2);
+                time.sleep(1.5);
     
     
                 print "Ready to take image. time = %f" % time.time()
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
                 print "after click click at %f" % time.time()
     
                 print "done with exposure # %d" % i
