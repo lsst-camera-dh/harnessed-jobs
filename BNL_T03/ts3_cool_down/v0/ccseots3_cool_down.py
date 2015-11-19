@@ -68,7 +68,7 @@ try:
         fpfiles.write(tstat)
 # the following line is just for test situations so that there would be no waiting
 #        tsstate=1;
-        if ((time.time()-starttim)>10800):
+        if ((time.time()-starttim)>(10*3600)):
             print "Something is wrong ... we will never make it to a runnable state"
             exit
         if tsstate!=0 :
