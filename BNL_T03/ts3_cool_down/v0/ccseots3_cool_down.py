@@ -48,7 +48,7 @@ try:
     rply = result.getResult();
 
 # move TS to ready state
-    result = tssub.synchCommand(10000,"setTSReady");
+    result = tssub.synchCommand(10*3600,"setTSReady");
     reply = result.getResult();
 
 #check state of ts devices
