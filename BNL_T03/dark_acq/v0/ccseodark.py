@@ -41,6 +41,8 @@ try:
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
+    bcount = float(eolib.getCfgVal(acqcfgfile, 'DARK_BCOUNT', default = "3"))
+
 # wait until its dark .... very dark
     time.sleep(30.)
 
@@ -101,7 +103,6 @@ try:
 
             print "moving on to bias images"
 
-            bcount = 3
             for i in range(bcount):
                 timestamp = time.time()
 
@@ -127,8 +128,8 @@ try:
 
 # prepare to readout diodes
             nreads = exptime*60/nplc + 200
-            if (nreads > 3000):
-                nreads = 3000
+            if (nreads > 1000):
+                nreads = 1000
                 nplc = exptime*60/(nreads-200)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
