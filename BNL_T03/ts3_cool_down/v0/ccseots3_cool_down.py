@@ -48,7 +48,7 @@ try:
     rply = result.getResult();
 
 # move TS to ready state
-    result = tssub.synchCommand(10*3600,"setTSReady");
+    result = tssub.synchCommand(10000,"setTSReady");
     reply = result.getResult();
 
 #check state of ts devices
@@ -68,7 +68,7 @@ try:
         fpfiles.write(tstat)
 # the following line is just for test situations so that there would be no waiting
 #        tsstate=1;
-        if ((time.time()-starttim)>(10*3600)):
+        if ((time.time()-starttim)>10800):
             print "Something is wrong ... we will never make it to a runnable state"
             exit
         if tsstate!=0 :
