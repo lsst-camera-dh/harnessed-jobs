@@ -2,9 +2,14 @@ import os
 import glob
 import subprocess
 from collections import OrderedDict
+import ConfigParser
 import datetime
+import scipy.constants
 import pyfits
 import lsst.eotest.sensor as sensorTest
+
+planck = scipy.constants.h  # J-s
+clight = scipy.constants.c  # m/s
 
 class VendorFitsTranslator(object):
     """
@@ -174,6 +179,10 @@ class ItlFitsTranslator(VendorFitsTranslator):
     def spot(self, pattern='', time_stamp=None,
              verbose=True):
         raise NotImplemented("ITL spot dataset translation not implemented.")
+    def linearity(self, pattern='linearity/*linearity.*.fits', time_stamp=None,
+                  verbose=True):
+        return self._processFiles('linearity', 'flat', pattern,
+                                  time_stamp=time_stamp, verbose=verbose)
     def flat(self, pattern='ptc/*_ptc.*.fits', time_stamp=None,
              verbose=True):
         if time_stamp is None:
@@ -199,11 +208,55 @@ class ItlFitsTranslator(VendorFitsTranslator):
             self.translate(infiles[1], 'flat', 'flat', seqno,
                            time_stamp=time_stamp, verbose=verbose)
         return time_stamp
+
     def lambda_scan(self, pattern='qe/*_qe.*.fits', time_stamp=None,
                     verbose=True):
-        return super(ItlFitsTranslator, self).lambda_scan(pattern,
-                                                          time_stamp=time_stamp,
-                                                          verbose=verbose)
+        time_stamp = super(ItlFitsTranslator, self).lambda_scan(pattern,
+                                                                time_stamp=time_stamp,
+                                                                verbose=verbose)
+        flux = self._compute_incident_flux()
+        sensor_id = self.lsst_num
+        command = 'find . -name %(sensor_id)s_lambda_flat*.fits -print' % locals()
+        files = subprocess.check_output(command, shell=True).split()
+        for item in files:
+            fits_obj = pyfits.open(item)
+            wl = int(fits_obj[0].header['MONOWL'])
+            fits_obj[0].header['MONDIODE_ORIG'] = fits_obj[0].header['MONDIODE']
+            fits_obj[0].header['MONDIODE'] = flux[wl]
+            fits_obj.writeto(item, clobber=True)
+        return time_stamp
+
+    def _compute_incident_flux(self):
+        #
+        # Read in qe.txt file and compute the incident fluxes as a function
+        # of wavelength.  In that file, there are two notes on computing
+        # the flux at the sensor:
+        #
+        #    Note1 = Flux @ sensor is Flux*Throughput/CalScal
+        #    Note2 = Flux is [photons/sec/mm^2@diode]
+        #
+        vendorDataDir = os.readlink('vendorData')
+        command = 'find %(vendorDataDir)s/ -name qe.txt -print' % locals()
+        qe_txt_file = subprocess.check_output(command, shell=True).split()[0]
+        parser = ConfigParser.ConfigParser()
+        parser.read(qe_txt_file)
+        CalScale = float(dict(parser.items('Info'))['calscale'])
+        data = parser.items('QE')
+        flux_at_sensor = {}
+        for key, value in data:
+            if not key.startswith('qe'):
+                continue
+            tokens = value.split()
+            wl = int(float(tokens[0])) # nm
+            flux = float(tokens[4])    # photons/s/mm^2
+            throughput = float(tokens[5])
+            # Convert to nW/cm^2
+            energy_per_photon = 1e9*planck*clight/(wl*1e-9)   # nJ
+            mm2_per_cm2 = 100.
+            lightpow = flux*energy_per_photon*mm2_per_cm2*throughput/CalScale
+            flux_at_sensor[wl] = lightpow
+        return flux_at_sensor
+
     def run_all(self):
         time_stamp = self.fe55()
         self.bias(time_stamp=time_stamp)
@@ -213,6 +266,7 @@ class ItlFitsTranslator(VendorFitsTranslator):
         self.sflat_500_low(time_stamp=time_stamp)
         #self.spot()
         self.flat()
+        self.linearity()
         self.lambda_scan()
 
 class e2vFitsTranslator(VendorFitsTranslator):
