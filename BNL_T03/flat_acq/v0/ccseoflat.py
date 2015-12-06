@@ -64,7 +64,7 @@ try:
 
     seq = 0  # image pair number in sequence
 
-    monosub.synchCommand(30,"setFilter",3);
+#    monosub.synchCommand(120,"setFilter",3);
 
 
     ccd = CCDID
@@ -87,10 +87,13 @@ try:
         timestamp = time.time()
         result = arcsub.synchCommand(10,"setFitsFilename","");
         print "Ready to take clearing bias image. time = %f" % time.time()
-        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+        result = arcsub.synchCommand(120,"exposeAcquireAndSave");
         rply = result.getResult()
+        print "waiting for exposure to complete"
+        time.sleep(0.2)
         result = arcsub.synchCommand(500,"waitForExpoEnd");
         rply = result.getResult();
+        print "done, ready for next one"
 
 
 # go through config file looking for 'flat' instructions, take the flats
@@ -324,7 +327,7 @@ try:
 
 except Exception, ex:
 
-    print "Exception at " % time.time()
+    print "Exception at %s" % ex
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
@@ -336,7 +339,7 @@ except Exception, ex:
 
 except ScriptingTimeoutException, exx:
 
-    print "ScriptingTimeoutException at %f " % time.time()
+    print "ScriptingTimeoutException at %f : %s " % (time.time(),exx)
 
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
