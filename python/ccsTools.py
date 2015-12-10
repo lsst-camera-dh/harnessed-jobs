@@ -59,7 +59,7 @@ class CcsSetup(OrderedDict):
             self['CCSCCDTYPE'] = _quote("ITL")
             self['acffile'] = self['itl_acffile']
         if ("e2v" in CCDTYPE) :
-            self['CCSCCDTYPE'] = _quote("e2v")
+            self['CCSCCDTYPE'] = _quote("E2V")
             self['acffile'] = self['e2v_acffile']
 
     def _read(self, configFile):
