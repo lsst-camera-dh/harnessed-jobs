@@ -7,7 +7,9 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "CCDb\_Flatness\_Edge\_scan\_new\_jig\_robust.RTN"
+#ogpscriptname = "CCDb\_Flatness\_Edge\_scan\_new\_jig\_robust.RTN"
+ogpscriptname1 = "ITL\_Flatness\_151117.RTN"
+ogpscriptname2 = "ITL\_EdgeScan\_151117.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
@@ -65,7 +67,8 @@ os.system("cd %s ; tar -vzxf %s.tar.gz" % (ogpscriptshome,tag))
 print "making a link to it"
 os.system("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
 
-os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname,flatdatedir))
+os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname1,flatdatedir))
+os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname2,flatdatedir))
 
 os.system("cd %s" % cwd)
 
