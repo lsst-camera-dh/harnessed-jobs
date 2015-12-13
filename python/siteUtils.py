@@ -104,8 +104,12 @@ def print_file_list(description, file_list, use_basename=False):
             print "  ", item
     sys.stdout.flush()
 
+def extractJobId(datacat_path):
+    """Extract the eTraveler job ID from the filename path."""
+    return int(os.path.basename(os.path.split(datacat_path)[0]))
+
 def datacatalog_glob(pattern, testtype=None, imgtype=None, description=None,
-                     sort=False):
+                     sort=False, job_id=None):
     sensor_id = getUnitId()
     if testtype is None or imgtype is None:
         raise RuntimeError("Both testtype and imgtype values must be provided.")
@@ -113,10 +117,16 @@ def datacatalog_glob(pattern, testtype=None, imgtype=None, description=None,
                          'TESTTYPE=="%(testtype)s"',
                          'IMGTYPE=="%(imgtype)s"')) % locals()
     datasets = datacatalog_query(query)
-    file_list = []
+    file_lists = {}
     for item in datasets.full_paths():
         if fnmatch.fnmatch(os.path.basename(item), pattern):
-            file_list.append(item)
+            my_job_id = extractJobId(item)
+            if not file_lists.has_key(my_job_id):
+                file_lists[my_job_id] = []
+            file_lists[my_job_id].append(item)
+    if job_id is None:
+        job_id = max(file_lists.keys())
+    file_list = file_lists[job_id]
     if sort:
         file_list = sorted(file_list)
     print_file_list(description, file_list)
