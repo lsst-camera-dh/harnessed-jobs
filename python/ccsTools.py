@@ -51,6 +51,7 @@ class CcsSetup(OrderedDict):
         self['tsCWD'] = _quote(os.getcwd())
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
+        self['LSSTID'] = _quote(siteUtils.getLSSTId())
         self._read(os.path.join(siteUtils.getJobDir(), configFile))
         CCDTYPE = _quote(siteUtils.getUnitType())
         print "CCDTYPE = %s" % CCDTYPE
@@ -61,6 +62,7 @@ class CcsSetup(OrderedDict):
         if ("e2v" in CCDTYPE) :
             self['CCSCCDTYPE'] = _quote("E2V")
             self['acffile'] = self['e2v_acffile']
+        print "The acffile to be used is %s" % self['acffile']
 
     def _read(self, configFile):
         if configFile is None:

@@ -150,6 +150,8 @@ def EOgetCCSVersions(tssub,cdir):
 def EOSetup(tssub,ccdtype,cdir,acffile,vac_outlet,arcsub,state1="setTSReady",state2="setTSTEST"):
 
     result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",-1.0)
+    result = arcsub.synchCommand(10,"setCCDnum",CCDID)
+    result = arcsub.synchCommand(10,"setLSSTnum",LSSTID)
 
 # Pre Archon TS Initialization
     result = tssub.synchCommand(11000,"eoSetupPreCfg",state1);

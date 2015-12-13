@@ -24,6 +24,9 @@ def cast(value):
 def getUnitId():
     return os.environ['LCATR_UNIT_ID']
 
+def getLSSTId():
+    return os.environ['LCATR_UNIT_ID']
+
 def getUnitType():
     return os.environ['LCATR_UNIT_TYPE']
 
