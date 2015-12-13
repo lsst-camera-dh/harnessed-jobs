@@ -96,20 +96,26 @@ try:
             result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
     
 # take bias images
-# 2sec for the bias
             arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
             result = arcsub.synchCommand(10,"setParameter","Light","0");
 
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
-#            print "set filter position"
-#            result = monosub.synchCommand(60,"setFilter",1); # open position
-#            reply = result.getResult();
-
             result = arcsub.synchCommand(10,"setCCDnum",ccd)
             result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT_500")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+
+# dispose of first image
+            arcsub.synchCommand(10,"setFitsFilename","");
+            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+            fitsfilename = result.getResult();
+            result = arcsub.synchCommand(500,"waitForExpoEnd");
+            rply = result.getResult();
+
+            time.sleep(0.5)
+
+# now take bias images 
             for i in range(bcount):
                 timestamp = time.time()
                 fitsfilename = "%s_sflat_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
