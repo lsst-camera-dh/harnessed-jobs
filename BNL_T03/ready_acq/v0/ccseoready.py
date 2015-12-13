@@ -43,8 +43,15 @@ try:
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSIdle","setTSIdle")
+    print "acffile = %s" % acffile
+except:
+    print "Exception in initialization"
 
+eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSIdle","setTSIdle")
+
+try:
+
+    print "setting light and fe55 to 0"
 
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","0");
