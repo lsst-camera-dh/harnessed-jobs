@@ -132,7 +132,7 @@ class DataCatalog(object):
                 resp = self.client.search(pattern_path, query=query)
             except datacat.error.DcException, eobj:
                 print "Caught datacat.error.DcException:"
-                print eobj.raw
+                print eobj
                 raise eobj
             if resp:
                 # resp has data, so no need to try remaining search patterns.

@@ -3,6 +3,7 @@ import shutil
 import socket
 import datetime
 import numpy as np
+import ConfigParser
 import astropy.io.fits as pyfits
 import lsst.eotest.sensor as sensorTest
 import lcatr.schema
@@ -50,7 +51,11 @@ def getEotestCalibs():
     """
     Return calibration file names for the current test stand.  
     """
-    pars = siteUtils.Parfile(getEotestCalibsFile(), getTestStandHostName())
+    try:
+        pars = siteUtils.Parfile(getEotestCalibsFile(), getTestStandHostName())
+    except ConfigParser.NoSectionError:
+        # Use the "default" section.
+        pars = siteUtils.Parfile(getEotestCalibsFile(), 'default')
     return pars
 
 def getSystemNoise(gains):
