@@ -218,8 +218,9 @@ try:
     fp.close();
     
 # move TS to ready state
-    result = tssub.synchCommand(60,"setTSReady");
+    result = tssub.synchCommand(200,"setTSReady");
     reply = result.getResult();
+
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
 
