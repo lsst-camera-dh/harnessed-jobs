@@ -1,3 +1,4 @@
+
 ###############################################################################
 # sflat
 # Acquire sflat images
@@ -172,12 +173,18 @@ try:
             print "adjusted exposure time = %f" % exptime
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
-# prepare to readout diodes
-            nreads = exptime*60/nplc + 200
+# prepare to readout diodes                                                                                  
+            if (exptime>0.5) :
+                nplc = 1.0
+            else :
+                nplc = 0.20
+
+            nreads = (exptime+4.0)*60/nplc
             if (nreads > 3000):
                 nreads = 3000
-                nplc = exptime*60/(nreads-200)
+                nplc = (exptime+4.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+
 
             result = arcsub.synchCommand(10,"setHeader","TestType","SFLAT_500")
             result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
@@ -230,9 +237,20 @@ try:
 # make sure the sample of the photo diode is complete
                 time.sleep(5.)
     
+
+# make sure the sample of the photo diode is complete                                                        
+#                time.sleep(1.)                                                                              
+
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-                result = pdsub.synchCommand(800,"readBuffer","%s/%s" % (cdir,pdfilename));
-                buff = result.getResult()
+
+                try:
+                    result = pdsub.synchCommand(500,"readBuffer","%s/%s" % (cdir,pdfilename));
+                    buff = result.getResult()
+                except:
+# give it one more try                                                                                       
+                    result = pdsub.synchCommand(500,"readBuffer","%s/%s" % (cdir,pdfilename));
+                    buff = result.getResult()
+
                 print "Finished getting readings at %f" % time.time()
     
                 result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
@@ -258,8 +276,9 @@ try:
     fp.close();
     
 # move TS to idle state
-                        
-    tssub.synchCommand(10,"setTSReady");
+    result = tssub.synchCommand(200,"setTSReady");
+    rply = result.getResult();
+
 # get the glowing vacuum gauge back on
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();

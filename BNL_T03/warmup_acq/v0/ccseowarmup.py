@@ -43,8 +43,11 @@ try:
     result = biassub.synchCommand(30,"setVoltage",0.0);
 
 # make sure we leave the power to the sensor OFF
-    print "POWERING OFF THE CCD"
-    result = arcsub.synchCommand(30,"powerOffCCD");
+    try:
+        print "POWERING OFF THE CCD"
+        result = arcsub.synchCommand(30,"powerOffCCD");
+    except:
+        print "Unable to power off the CCD. Perhaps the controller is already off."
 
 # move to TS idle state ... this will set the cryocon to warm
     print "SETTING STATE OF TESTSTAND TO WARM"
