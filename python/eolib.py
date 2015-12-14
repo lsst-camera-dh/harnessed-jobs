@@ -147,11 +147,11 @@ def EOgetCCSVersions(tssub,cdir):
     return(ts_version,archon_version,ts_revision,archon_revision)
 ###############################################################################
 # EOSetup: perform setup need from running standard EO jobs
-def EOSetup(tssub,ccdtype,cdir,acffile,vac_outlet,arcsub,state1="setTSReady",state2="setTSTEST"):
+def EOSetup(tssub,ccdid,ccdtype,cdir,acffile,vac_outlet,arcsub,state1="setTSReady",state2="setTSTEST"):
 
     result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",-1.0)
-    result = arcsub.synchCommand(10,"setCCDnum",CCDID)
-    result = arcsub.synchCommand(10,"setLSSTnum",LSSTID)
+    result = arcsub.synchCommand(10,"setCCDnum",ccdid)
+    result = arcsub.synchCommand(10,"setLSSTnum",ccdid)
 
 # Pre Archon TS Initialization
     result = tssub.synchCommand(11000,"eoSetupPreCfg",state1);
