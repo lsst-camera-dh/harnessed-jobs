@@ -60,6 +60,12 @@ class Trending(object):
         pylab.ylabel(self.ylabel)
         if not show_xlabels:
             frame.axes.get_xaxis().set_ticklabels([])
+        try:
+            ylog = kwds['ylog']
+        except KeyError:
+            ylog = False
+        if ylog:
+            frame.axes.set_yscale('log')
         for time, test_type in self.test_types.items():
             annotate_acq(time, test_type)
 
@@ -196,10 +202,10 @@ class TrendingObjects(object):
         figure = pylab.figure(num=my_frame_id, figsize=(8.5, 11))
         my_frame_id += 1
         pylab.subplot(4, 1, 1)
-        self['oscan mean'].plot(subtract_t0=True)
+        self['oscan mean'].plot(ylog=True)
         pylab.title(title)
         pylab.subplot(4, 1, 2)
-        self['oscan std'].plot()
+        self['oscan std'].plot(ylog=True)
         pylab.subplot(4, 1, 3)
         self['imaging mean'].plot()
         pylab.subplot(4, 1, 4)
@@ -252,19 +258,19 @@ class EoAcqFrame(object):
                                          datasec['xmax']:naxis1]
 
 if __name__ == '__main__':
-    root_path = lambda x : os.path.join('/nfs/farm/g/lsst/u1/mirror/BNL-test/test/ITL-CCD/ITL-113-10-360Khz-test12', x)
-    subdirs = (
-        'fe55_acq/v0/7017',
-        'dark_acq/v0/7018',
-        'flat_acq/v0/7027',
-        'ppump_acq/v0/7031',
-        'sflat_acq/v0/7032',
-        'qe_acq/v0/7033'
-               )
-    directories = [root_path(x) for x in subdirs]
-    test_types = [x.split('_')[0].upper() for x in subdirs]
+    root_dir = '/nfs/farm/g/lsst/u1/mirror/BNL-test/test/e2v-CCD/E2V-CCD250-049'
+    def find_subdirs(root_dir, test_types):
+        subdirs = []
+        for acq in test_types:
+            acq_folder = os.path.join(root_dir, acq + '_acq', 'v0')
+            job_id = sorted(os.listdir(acq_folder))[0]
+            subdirs.append(os.path.join(acq_folder, job_id))
+        return subdirs
+
+    test_types = 'fe55 dark flat ppump sflat qe persist'.split()
+    directories = find_subdirs(root_dir, test_types)
 
     foo = TrendingObjects()
     for dirname, test_type in zip(directories, test_types):
         foo.processDirectory(dirname, test_type)
-    foo.plot('ITL-113-10-360Khz-test12', ext='foo')
+    foo.plot('E2V-CCD250-049', ext='foo')
