@@ -39,8 +39,12 @@ try:
     archon_revision = ""
 
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
+except:
+    print "pre-setup problem!"
 
-    eolib.EOSetup(tssub,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub)
+eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub)
+
+try:
 
     print "set controller parameters for an exposure with the shutter closed"
     arcsub.synchCommand(10,"setParameter","Light","0");

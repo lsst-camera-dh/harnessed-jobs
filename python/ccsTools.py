@@ -51,6 +51,7 @@ class CcsSetup(OrderedDict):
         self['tsCWD'] = _quote(os.getcwd())
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
+        self['LSSTID'] = _quote(siteUtils.getLSSTId())
         self._read(os.path.join(siteUtils.getJobDir(), configFile))
         CCDTYPE = _quote(siteUtils.getUnitType())
         print "CCDTYPE = %s" % CCDTYPE
@@ -59,8 +60,9 @@ class CcsSetup(OrderedDict):
             self['CCSCCDTYPE'] = _quote("ITL")
             self['acffile'] = self['itl_acffile']
         if ("e2v" in CCDTYPE) :
-            self['CCSCCDTYPE'] = _quote("e2v")
+            self['CCSCCDTYPE'] = _quote("E2V")
             self['acffile'] = self['e2v_acffile']
+        print "The acffile to be used is %s" % self['acffile']
 
     def _read(self, configFile):
         if configFile is None:
@@ -99,7 +101,7 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=False, verbose=True):
     output.write(result.getOutput())
     output.close()
 
-    print "purge fluxcal fits files"
+#    print "purge fluxcal fits files"
 #    os.system("rm -v fluxcal*.fits")
 
 def convert_unix_time(millisecs):
