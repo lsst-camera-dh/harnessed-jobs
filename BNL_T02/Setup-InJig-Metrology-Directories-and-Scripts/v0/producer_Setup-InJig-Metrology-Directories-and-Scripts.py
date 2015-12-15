@@ -78,7 +78,7 @@ print "The OGP acquisition and analysis scripts have been installed."
 #dirdate = dateddir[0].strip("/")
 #dirdate = tm
 rtnnam = "%s_DimMet_%s.DAT" % (ccd,tm)
-%tkMessageBox.showinfo("OGP Routine Data Output Filename", rtnnam)
+#tkMessageBox.showinfo("OGP Routine Data Output Filename", rtnnam)
 subprocess.Popen(["/home/LSSTuser/lsst/showfl.py",rtnnam]);
 
 print "======================================="
