@@ -14,57 +14,58 @@ CCS.setThrowExceptions(True);
 
 doarch = True
 
-try:
+
 #attach CCS subsystem Devices for scripting
-    print "Attaching teststand subsystems"
-    tssub  = CCS.attachSubsystem("%s" % ts);
-    print "attaching Bias subsystem"
-    biassub = CCS.attachSubsystem("%s/Bias" % ts);
-    print "attaching PD subsystem"
-    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
-    print "attaching Mono subsystem"
-    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
-    print "attaching PDU subsystem"
-    pdusub = CCS.attachSubsystem("%s/PDU" % ts );
-    print "Attaching archon subsystem"
-    arcsub  = CCS.attachSubsystem("%s" % archon);
+print "Attaching teststand subsystems"
+tssub  = CCS.attachSubsystem("%s" % ts);
+print "attaching Bias subsystem"
+biassub = CCS.attachSubsystem("%s/Bias" % ts);
+print "attaching PD subsystem"
+pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
+print "attaching Mono subsystem"
+monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
+print "attaching PDU subsystem"
+pdusub = CCS.attachSubsystem("%s/PDU" % ts );
+print "Attaching archon subsystem"
+arcsub  = CCS.attachSubsystem("%s" % archon);
 
-    time.sleep(3.)
+time.sleep(3.)
 
-    cdir = tsCWD
+cdir = tsCWD
 
-    ts_version = ""
-    archon_version = ""
-    ts_revision = ""
-    archon_revision = ""
+ts_version = ""
+archon_version = ""
+ts_revision = ""
+archon_revision = ""
 
-    ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
+ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-    eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSIdle","setTSIdle")
+eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSIdle","setTSIdle")
 
-    print "Setting the current ranges on the Bias and PD devices"
-    biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.00002)
+print "Setting the current ranges on the Bias and PD devices"
+biassub.synchCommand(10,"setCurrentRange",0.0002)
+pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
 
-    lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
-    hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
-    bcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_BCOUNT', default='1'))
+lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
+hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
+bcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_BCOUNT', default='1'))
 #    imcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_IMCOUNT', default='1'))
-    imcount = 1
+imcount = 1
 
-    seq = 0
+seq = 0
 
 #number of PLCs between readings
-    nplc = 1
+nplc = 1
 
-    ccd = CCDID
-    result = arcsub.synchCommand(10,"setCCDnum",ccd)
-    print "Working on CCD %s" % ccd
+ccd = CCDID
+result = arcsub.synchCommand(10,"setCCDnum",ccd)
+print "Working on CCD %s" % ccd
 
-    print "set filter position"
-    monosub.synchCommand(30,"setFilter",1); # open position
+print "set filter position"
+monosub.synchCommand(30,"setFilter",1); # open position
 
+try:
     for i in range(2):
         timestamp = time.time()
         arcsub.synchCommand(10,"setFitsFilename","");
