@@ -32,6 +32,16 @@ try:
 
     cdir = tsCWD
 
+# set the scan range here:
+    wlbegin = 970.
+    wlend   = 990.
+
+    wlstep = 10.
+
+# get the glowing vacuum gauge back off
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,False);
+    rply = result.getResult();
+
 # Initialization
     print "doing initialization"
 
@@ -69,12 +79,10 @@ try:
         rply = result.getResult();
     time.sleep(2.0);
 
-#    biassub.synchCommand(10,"setCurrentRange",0.000000002)
-#    pdsub.synchCommand(10,"setCurrentRange",0.000002)
-#    biassub.synchCommand(10,"setCurrentRange",0.000000002)
-#    pdsub.synchCommand(10,"setCurrentRange",0.000002)
     biassub.synchCommand(10,"setCurrentRange",0.00000002)
-    pdsub.synchCommand(10,"setCurrentRange",  0.00002000)
+#    pdsub.synchCommand(10,"setCurrentRange",  0.0000002)
+# the following was only used for the 980 nm line
+    pdsub.synchCommand(10,"setCurrentRange",  0.000002)
 
     print "set current ranges"
 
@@ -94,9 +102,9 @@ try:
 #    print "set filter position"
 #    result = monosub.synchCommand(60,"setFilter",3);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",1,420);
+    result = monosub.synchCommand(60,"setSlitSize",1,210);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",2,420);
+    result = monosub.synchCommand(60,"setSlitSize",2,210);
     rply = result.getResult()
 
 # go through config file looking for 'qe' instructions
@@ -118,10 +126,10 @@ try:
 #for x in my_range(1, 10, 0.5):
 #    print x
 
-    wlstep = 10.
-#    wl=815. - wlstep
-    wl=1030. - wlstep
-    for idx in range(8):
+# -------------------------------------
+    wl=wlbegin - wlstep
+    nwl = int((wlend - wlbegin) / wlstep + 1)
+    for idx in range(nwl):
         wl = wl + wlstep
 #    for wl in [473.4, 473.4, 881.9, 881.9] :
 #    for wl in range(440.,441.,0.3):
@@ -133,10 +141,10 @@ try:
         arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # adjust timeout because we will be waiting for the data to become ready
-        mywait = nplc/60.*nreads*1.20 ;
+        mywait = nplc/60.*nreads*2.0 ;
         print "Setting timeout to %f s" % mywait
 
-        result = monosub.synchCommand(200,"setWaveAndFilter",wl);
+        result = monosub.synchCommand(900,"setWaveAndFilter",wl);
         rwl = result.getResult()
         print "The wl retrieved from the monochromator is rwl = %f" % rwl
         result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
@@ -244,11 +252,11 @@ try:
 
 # move TS to idle state
                     
-    tssub.synchCommand(60,"setTSReady");
+#    tssub.synchCommand(60,"setTSReady");
 
 # get the glowing vacuum gauge back on
-#    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
-#    rply = result.getResult();
+    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+    rply = result.getResult();
 
 except Exception, ex:
 
