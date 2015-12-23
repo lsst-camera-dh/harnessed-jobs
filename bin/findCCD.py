@@ -82,12 +82,12 @@ print "%i datasets found\n" % len(datasets)
 nfiles = 75
 files = []
 print "Requested ftype - " + args.FType
-for item in datasets.full_paths()[:nfiles]:
+for item in datasets.full_paths():
         if (args.FType == '') or (args.FType != '' and item.endswith(args.FType)): 
                 files.append(item)
 
 if args.Print:
-        print "File paths for first %i files at %s:" % (nfiles, site)
+        print "File paths for files at %s:" % site
         for item in files:
                 print item
 print
