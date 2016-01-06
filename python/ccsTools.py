@@ -48,6 +48,10 @@ class CcsSetup(OrderedDict):
             self['cryo_outlet']=os.getenv('CCS_CRYO_OUTLET')
 # there is no default for cryo_outlet - if there is a script that needs
 # it and it has not been defined then I want it to crash
+        if os.environ.has_key('CCS_PUMP_OUTLET'):
+            self['pump_outlet']=os.getenv('CCS_PUMP_OUTLET')
+# there is no default for pump_outlet - if there is a script that needs
+# it and it has not been defined then I want it to crash
         self['tsCWD'] = _quote(os.getcwd())
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
