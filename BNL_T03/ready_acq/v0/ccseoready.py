@@ -210,10 +210,15 @@ try:
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
-            nreads = exptime*60/nplc + 200
+            if (exptime>0.5) :
+                nplc = 1.0
+            else :
+                nplc = 0.20
+
+            nreads = (exptime+4.0)*60/nplc
             if (nreads > 3000):
                 nreads = 3000
-                nplc = exptime*60/(nreads-200)
+                nplc = (exptime+4.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             result = arcsub.synchCommand(10,"setHeader","TestType","READYLIGHT")
@@ -227,7 +232,7 @@ try:
             rply = result.getResult();
 
 # adjust timeout because we will be waiting for the data to become ready
-            mywait = nplc/60.*nreads*1.10 ;
+            mywait = nplc/60.*nreads*2.00 ;
             print "Setting timeout to %f s" % mywait
             pdsub.synchCommand(1000,"setTimeout",mywait);
 
@@ -236,11 +241,13 @@ try:
 
                 print "Setting the monochrmator wavelength and filter"
                 print "You should HEAR some movement"
-                result = monosub.synchCommand(90,"setWaveAndFilter",wl);
+                result = monosub.synchCommand(120,"setWaveAndFilter",wl);
                 rwl = result.getResult()
                 time.sleep(10.)
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
+                print "The wl retrieved from the monochromator is rwl = %f" % rwl
+                result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
                 print "getting filter wheel setting"
                 result = monosub.synchCommand(60,"getFilter");
@@ -261,7 +268,7 @@ try:
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(0.2);
+                time.sleep(2.0);
  
 
                 print "Taking an image now. time = %f" % time.time()

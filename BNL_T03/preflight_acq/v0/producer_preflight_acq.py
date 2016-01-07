@@ -75,6 +75,7 @@ else:
 ccsProducer('preflight_acq', 'ccseopreflight.py')
 
 files = sorted(glob.glob('*.fits'))
+pdfiles = sorted(glob.glob('pd-*.txt'))
 
 #for flat in flats:
 hdu1 = pyfits.open(files[2])
@@ -90,6 +91,7 @@ mondiode2 = hdr2['MONDIODE']
 filter2 = hdr2['FILTER']
 
 os.system("screen -d -m ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s &" % files[3])
+os.system("screen -d -m gnuplot -e \'pdfile=\"%s\"\' plotpdvals.gp" % pdfiles[3])
 
 apptxt = "not OK"
 diodecol = "red"

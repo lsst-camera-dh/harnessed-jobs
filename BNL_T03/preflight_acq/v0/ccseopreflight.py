@@ -107,10 +107,15 @@ try:
                 arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
 # prepare to readout diodes
-            nreads = exptime*60/nplc + 200
+            if (exptime>0.5) :
+                nplc = 1.0
+            else :
+                nplc = 0.20
+
+            nreads = (exptime+4.0)*60/nplc
             if (nreads > 3000):
                 nreads = 3000
-                nplc = exptime*60/(nreads-200)
+                nplc = (exptime+4.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
             monosub.synchCommand(60,"setTimeout",300.);
@@ -156,7 +161,7 @@ try:
                     result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(1.0);
+                time.sleep(2.0);
  
                 if (doarch) :
                     print "Taking an image now. time = %f" % time.time()
