@@ -40,6 +40,9 @@ archon_revision = ""
 
 ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
+# make sure the BSS is off
+biassub.synchCommand(10,"setVoltage",0.0)
+
 eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSIdle","setTSIdle")
 
 print "Setting the current ranges on the Bias and PD devices"
