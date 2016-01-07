@@ -20,14 +20,20 @@ os.system("pkill -f 'ccsapps'")
 
 time.sleep(10.0)
 
-subprocess.Popen(["gnome-terminal","--zoom=0.5","--title=JythonConsole","--working-directory=%s" % ccsdir,"--command=screen -S jython ./JythonConsole"]);
+ccsdir = os.getenv("CCS_BIN_DIR");
+
+#subprocess.Popen(["nohup","gnome-terminal","--zoom=0.5","--title=JythonConsole","--working-directory=%s" % ccsdir,"--command=screen -S jython ./JythonConsole","&"]);
+#time.sleep(10.0)
+#subprocess.Popen(["nohup","gnome-terminal","--zoom=0.5","--title=ts","--working-directory=%s" % ccsdir,"--command=screen -S ts ./ts","&"]);
+#subprocess.Popen(["nohup","gnome-terminal","--zoom=0.5","--title=archon","--working-directory=%s" % ccsdir,"--command=screen -S archon ./archon","&"]);
+os.system("screen -d -m gnome-terminal --zoom=0.5 --title=JythonConsole --working-directory=%s --command=\"screen -S jython ./JythonConsole\" &" % ccsdir)
 time.sleep(10.0)
-subprocess.Popen(["gnome-terminal","--zoom=0.5","--title=ts","--working-directory=%s" % ccsdir,"--command=screen -S ts ./ts"]);
-subprocess.Popen(["gnome-terminal","--zoom=0.5","--title=archon","--working-directory=%s" % ccsdir,"--command=screen -S archon ./archon"]);
+os.system("screen -d -m gnome-terminal --zoom=0.5 --title=ts --working-directory=%s --command=\"screen -S ts ./ts\" &" % ccsdir)
+os.system("screen -d -m gnome-terminal --zoom=0.5 --title=archon --working-directory=%s --command=\"screen -S archon ./archon\" &" % ccsdir)
 
-time.sleep(5.0)
+time.sleep(30.0)
 
-subprocess.Popen(["gnome-terminal","--geometry=1x1","--working-directory=$CCS_BIN_DIR","--command=/usr/bin/ccsapps"]);
+os.system("screen -d -m gnome-terminal --geometry=1x1 --working-directory=$CCS_BIN_DIR --command=/usr/bin/ccsapps &")
 
 
 foundjython = False
@@ -83,7 +89,7 @@ exptime2 = hdr2['EXPTIME']
 mondiode2 = hdr2['MONDIODE']
 filter2 = hdr2['FILTER']
 
-os.system("ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s" % files[3])
+os.system("screen -d -m ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s &" % files[3])
 
 apptxt = "not OK"
 diodecol = "red"
