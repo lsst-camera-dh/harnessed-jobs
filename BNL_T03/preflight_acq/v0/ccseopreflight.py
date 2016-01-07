@@ -82,7 +82,7 @@ try:
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
     print "Scan at a low and a high wavelength to test monochromator and filter wheel"
-    for wl in [450.,823.] :
+    for wl in [450.,450.,450.,823.] :
 
             target = float(wl)
             print "target wl = %f" % target;
@@ -93,18 +93,11 @@ try:
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
             exptime = 1.0
 
-## take bias images
             if (doarch) :
-#                result = arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
-#                arcsub.synchCommand(10,"setParameter","Light","0");
-
-                print "setting location of bias fits directory"
-                arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
-
 
 # take light exposures
                 arcsub.synchCommand(10,"setParameter","Light","1");
-                arcsub.synchCommand(10,"setParameter","Fe55","0");
+                arcsub.synchCommand(10,"setParameter","Fe55","1");
                 result = arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
                 rply = result.getResult()
                 print "setting location of fits exposure directory"

@@ -29,7 +29,7 @@ topf.title('FE55 image check')
 topf.mainloop()
 
 fe55files = sorted(glob.glob('*fe55*.fits'))
-os.system("ds9 -scale datasec yes -scale histequ -mosaicimage %s" % fe55files[0])
+os.system("ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s" % fe55files[0])
 
 apptxt = "The job is finished.\nClick on this button then\nreturn to the eTraveler page to complete the readiness verification form."
 topd = Tkinter.Tk()

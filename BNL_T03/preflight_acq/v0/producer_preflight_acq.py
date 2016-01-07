@@ -7,8 +7,27 @@ import Tkinter
 import tkMessageBox
 import pyfits
 import glob
+import os
+import time
+import subprocess
 
 print "starting widget for checking and starting the CCS apps"
+
+os.system("pkill -f '\-\-app JythonConsole'")
+os.system("pkill -f '\-app ts'")
+os.system("pkill -f '\-\-app archon'")
+os.system("pkill -f 'ccsapps'")
+
+time.sleep(10.0)
+
+subprocess.Popen(["gnome-terminal","--zoom=0.5","--title=JythonConsole","--working-directory=%s" % ccsdir,"--command=screen -S jython ./JythonConsole"]);
+time.sleep(10.0)
+subprocess.Popen(["gnome-terminal","--zoom=0.5","--title=ts","--working-directory=%s" % ccsdir,"--command=screen -S ts ./ts"]);
+subprocess.Popen(["gnome-terminal","--zoom=0.5","--title=archon","--working-directory=%s" % ccsdir,"--command=screen -S archon ./archon"]);
+
+time.sleep(5.0)
+
+subprocess.Popen(["gnome-terminal","--geometry=1x1","--working-directory=$CCS_BIN_DIR","--command=/usr/bin/ccsapps"]);
 
 
 foundjython = False
@@ -38,8 +57,9 @@ if (not (foundjython and foundts and foundarchon)) :
 #    A = Tkinter.Button(top, text = apptxt, command = lambda : startappsmsg(apptxt), bg = "red")
     A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = "red", font = ("Helvetica",24))
     A.pack()
-    top.title('Please start missing CCS apps using the widget that will appear after you click on this button.')
-    subprocess.Popen(["gnome-terminal","--geometry=1x1","--working-directory=$CCS_BIN_DIR","--command=/usr/bin/ccsapps"]);
+    top.title('Please start missing CCS apps using the widget')
+#    top.title('Please start missing CCS apps using the widget that will appear after you click on this button.')
+#    subprocess.Popen(["gnome-terminal","--geometry=1x1","--working-directory=$CCS_BIN_DIR","--command=/usr/bin/ccsapps"]);
     top.mainloop()
 else:
     print "All required CCS apps running"
@@ -51,17 +71,19 @@ ccsProducer('preflight_acq', 'ccseopreflight.py')
 files = sorted(glob.glob('*.fits'))
 
 #for flat in flats:
-hdu1 = pyfits.open(files[0])
+hdu1 = pyfits.open(files[2])
 hdr1 = hdu1[0].header
 exptime1 = hdr1['EXPTIME']
 mondiode1 = hdr1['MONDIODE']
 filter1 = hdr1['FILTER']
 
-hdu2 = pyfits.open(files[1])
+hdu2 = pyfits.open(files[3])
 hdr2 = hdu2[0].header
 exptime2 = hdr2['EXPTIME']
 mondiode2 = hdr2['MONDIODE']
 filter2 = hdr2['FILTER']
+
+os.system("ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s" % files[3])
 
 apptxt = "not OK"
 diodecol = "red"
