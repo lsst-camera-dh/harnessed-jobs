@@ -137,6 +137,16 @@ try:
             result = arcsub.synchCommand(10,"setCCDnum",ccd)
             result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+            for i in range(2):
+                timestamp = time.time()
+                arcsub.synchCommand(10,"setFitsFilename","");
+                print "Ready to take clearing bias image. time = %f" % time.time()
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                fitsfilename = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
+                print "after click click at %f" % time.time()
+
             for i in range(bcount):
                 timestamp = time.time()
 
@@ -244,9 +254,10 @@ try:
             fitsfilename = result.getResult();
             result = arcsub.synchCommand(500,"waitForExpoEnd");
             rply = result.getResult();
+            print "done waiting for for throw away image to be acquired %f" % time.time()
 
             for i in range(imcount):
-
+                print "starting image setup and PD reading accumulation at %f" % time.time()
                 print "nreads set to %d and nplc set to %f" % (int(nreads),float(nplc))
                 pdresult = pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
                 timestamp = time.time()
@@ -277,13 +288,14 @@ try:
 
 # make sure the sample of the photo diode is complete
 #                time.sleep(1.)
- 
-                print "executing readBuffer"
+
                 try:
+                    print "executing readBuffer"
                     result = pdsub.synchCommand(500,"readBuffer","%s/%s" % (cdir,pdfilename));
                     buff = result.getResult()
                 except:
 # give it one more try
+                    print "problem occurred on first readBuffer attempt ... trying once more!"
                     result = pdsub.synchCommand(500,"readBuffer","%s/%s" % (cdir,pdfilename));
                     buff = result.getResult()
 
