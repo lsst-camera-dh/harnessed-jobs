@@ -42,6 +42,12 @@ try:
     print "TURNING OFF THE BACKPLANE BIAS VOLTAGE"
     result = biassub.synchCommand(30,"setVoltage",0.0);
 
+# turn off the turbo pump
+    print "TURNING ON POWER TO THE TURBO PUMP!"
+    result = pdusub.synchCommand(120,"setOutletState",pump_outlet,True);
+    rply = result.getResult();
+
+
 # make sure we leave the power to the sensor OFF
     try:
         print "POWERING OFF THE CCD"

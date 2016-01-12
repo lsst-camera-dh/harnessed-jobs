@@ -7,7 +7,9 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "CCDa_Edge_scan_Abs_hgt_Flatness_robust.RTN"
+#ogpscriptname = "CCDa_Edge_scan_Abs_hgt_Flatness_robust.RTN"
+ogpscriptname1 = "e2v\_Flatness.RTN"
+ogpscriptname2 = "e2v\_EdgeScan.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
@@ -17,7 +19,7 @@ print "Creating the top level directory for the CCD at %s" % topccddir
 edgedir = "%s/EdgeScan/" % topccddir
 print "Creating directory for edge scan results. Location is %s" % edgedir
 
-flatdir = "%s/DimensionalMetrology/" % topccddir
+flatdir = "%s/Metrology/" % topccddir
 print "Creating directory for flatness results. Location is %s" % flatdir
 
 tm = time.strftime("%Y%m%d-%HH%MM")
@@ -65,7 +67,8 @@ os.system("cd %s ; tar -vzxf %s.tar.gz" % (ogpscriptshome,tag))
 print "making a link to it"
 os.system("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
 
-os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname,flatdatedir))
+os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname1,flatdatedir))
+os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname2,edgedatedir))
 
 os.system("cd %s" % cwd)
 
@@ -74,7 +77,7 @@ print "The OGP acquisition and analysis scripts have been installed."
 # make a button showing the name that should be used for the output filename
 #E2V-CCD250-82-5-G42-14041-08-01_DimMet_20150817-16H23M.DAT
 #ccd = os.environ["LCATR_UNIT_ID"]
-#dateddir = glob.glob("DimensionalMetrology/*")
+#dateddir = glob.glob("Flatness/*")
 #dirdate = dateddir[0].strip("/")
 #dirdate = tm
 rtnnam = "%s_DimMet_%s.DAT" % (ccd,tm)
