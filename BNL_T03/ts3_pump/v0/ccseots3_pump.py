@@ -49,7 +49,7 @@ try:
         print "checking if pressure is low enough to turn on turbo pump";
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
-        print "time = %f , T = %f\n" % (time.time(),pres)
+        print "time = %f , P = %f\n" % (time.time(),pres)
         if ((time.time()-starttim)>3600):
             print "Something is wrong ... we will never make it to a runnable state"
             exit
