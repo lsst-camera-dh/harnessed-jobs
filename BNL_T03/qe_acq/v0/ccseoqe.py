@@ -117,6 +117,17 @@ try:
 
             result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+
+            for i in range(2):
+                timestamp = time.time()
+                arcsub.synchCommand(10,"setFitsFilename","");
+                print "Ready to take clearing bias image. time = %f" % time.time()
+                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+                fitsfilename = result.getResult();
+                result = arcsub.synchCommand(500,"waitForExpoEnd");
+                rply = result.getResult();
+                print "after click click at %f" % time.time()
+
             for i in range(bcount):
                 timestamp = time.time()
                 fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
@@ -212,6 +223,15 @@ try:
                 print "call accumBuffer to start PD recording at %f" % time.time()
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
 
+                while(True) :
+                    result = pdsub.synchCommand(10,"isAccumInProgress");
+                    rply = result.getResult();
+                    print "checking for PD accumulation in progress at %f" % time.time()
+                    if rply==True :
+                        print "accumulation running"
+                        break
+                    print "accumulation hasn't started yet"
+                    time.sleep(0.25)
                 print "recording should now be in progress and the time is %f" % time.time()
 
 # start acquisition

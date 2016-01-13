@@ -137,6 +137,7 @@ try:
             result = arcsub.synchCommand(10,"setCCDnum",ccd)
             result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
             result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+
             for i in range(2):
                 timestamp = time.time()
                 arcsub.synchCommand(10,"setFitsFilename","");
@@ -260,6 +261,18 @@ try:
                 print "starting image setup and PD reading accumulation at %f" % time.time()
                 print "nreads set to %d and nplc set to %f" % (int(nreads),float(nplc))
                 pdresult = pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
+
+                while(True) :
+                    result = pdsub.synchCommand(10,"isAccumInProgress");
+                    rply = result.getResult();
+                    print "checking for PD accumulation in progress at %f" % time.time()
+                    if rply==True :
+                        print "accumulation running"
+                        break
+                    print "accumulation hasn't started yet"
+                    time.sleep(0.25)
+                print "recording should now be in progress and the time is %f" % time.time()
+
                 timestamp = time.time()
 
 # make sure to get some readings before the state of the shutter changes       
