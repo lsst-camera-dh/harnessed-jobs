@@ -158,6 +158,45 @@ pylab.savefig('%s_gains.png' % sensor_id)
 plots.noise()
 pylab.savefig('%s_noise.png' % sensor_id)
 
+# Fe55 zoom
+fe55_zoom = processName_dependencyGlob('%s_fe55_zoom.png' % sensor_id,
+                                       jobname='fe55_analysis')[0]
+print "fe55_zoom: ", fe55_zoom
+shutil.copy(fe55_zoom, '.')
+
+# Coadded bias frame
+bias_files = processName_dependencyGlob('%s_fe55_bias_*.fits' % sensor_id,
+                                        jobname='fe55_acq')
+if bias_files:
+    plots.bias_mean(bias_files)
+
+# Mosaicked image of medianed dark for bright_defects job.
+dark_bd_file = processName_dependencyGlob('%s_median_dark_bp.fits' % sensor_id,
+                                          jobname='bright_defects')[0]
+sensorTest.plot_flat(dark_bd_file,
+                     title='%s, medianed dark for bright defects analysis' % sensor_id)
+pylab.savefig('%s_medianed_dark.png' % sensor_id)
+
+# Superflat for dark defects job
+sflat_dd_file = processName_dependencyGlob('%s_median_sflat.fits' % sensor_id,
+                                           jobname='dark_defects')[0]
+sensorTest.plot_flat(sflat_dd_file,
+                     title='%s, superflat for dark defects analysis' % sensor_id)
+pylab.savefig('%s_superflat_dark_defects.png' % sensor_id)
+
+# Superflats for high and low flux levels
+superflat_files = sorted(processName_dependencyGlob('%s_superflat_*.fits' % sensor_id, jobname='cte'))
+print "superflat_files:\n", superflat_files
+for sflat_file in superflat_files:
+    flux_level = 'low'
+    if sflat_file.find('high') != -1:
+        flux_level = 'high'
+    sensorTest.plot_flat(sflat_file,
+                         title='%(sensor_id)s, CTE supeflat, %(flux_level)s flux ' % locals())
+    outfile = os.path.basename(sflat_file).replace('.fits', '.png')
+    print outfile
+    pylab.savefig(outfile)
+
 # Quantum Efficiency
 plots.qe(qe_file=qe_file)
 pylab.savefig('%s_qe.png' % sensor_id)

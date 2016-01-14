@@ -20,7 +20,16 @@ for fitsfile in output_files:
                               DATE=eotestUtils.utc_now_isoformat(),
                               CCD_MANU=siteUtils.getCcdVendor().upper())
 
-results = []
+#
+# Persist the mean bias FITS file.
+#
+bias_mean_file = glob.glob('%(sensor_id)s_mean_bias_*.fits' % locals())[0]
+results = [lcatr.schema.fileref.make(bias_mean_file)]
+
+#
+# Persist the zoom of segment 1 of the Fe55 exposure.
+#
+results.append(lcatr.schema.fileref.make('%(sensor_id)s_fe55_zoom.png' % locals()))
 
 data = sensorTest.EOTestResults(gain_file)
 amps = data['AMP']
