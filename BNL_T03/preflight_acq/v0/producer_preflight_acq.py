@@ -91,7 +91,8 @@ mondiode2 = hdr2['MONDIODE']
 filter2 = hdr2['FILTER']
 
 os.system("screen -d -m ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s &" % files[3])
-os.system("screen -d -m gnuplot -e \'pdfile=\"%s\"\' plotpdvals.gp" % pdfiles[3])
+os.system("screen -d -m gnuplot -e \'pdfile=\"%s\"\' /opt/lsst/redhat6-x86_64-64bit-gcc44/ccs-utilities/ccs-utilities-20150924/gnuplot/plotpdvals.gp" % pdfiles[3])
+os.system("screen -d -m eog pdvals.png")
 
 apptxt = "not OK"
 diodecol = "red"

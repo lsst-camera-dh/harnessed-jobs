@@ -48,18 +48,18 @@ try:
         print "checking if pressure is low enough to turn on turbo pump";
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
-        print "time = %f , T = %f\n" % (time.time(),pres)
+        print "time = %f , pressure = %11.3e\n" % (time.time(),pres)
         if ((time.time()-starttim)>3600):
             print "Something is wrong ... we will never make it to a runnable state"
             exit
-        if (pres>0.0 && pres<1.0e-3) :
+        if (pres>0.0 and pres<1.0e-3) :
             break
         time.sleep(5.)
 
 # turn on power to the PloyCold
     result = vacsub.synchCommand(20,"readPressure");
     pres = result.getResult();
-    if (pres>0.0 && pres<1.0e-3) :
+    if (pres>0.0 and pres<1.0e-3) :
         print "TURNING ON POWER TO THE POLYCOLD!"
         result = pdusub.synchCommand(120,"setOutletState",cryo_outlet,True);
         rply = result.getResult();
