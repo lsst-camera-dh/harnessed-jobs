@@ -8,8 +8,8 @@ import time
 
 
 #ogpscriptname = "CCDa_Edge_scan_Abs_hgt_Flatness_robust.RTN"
-ogpscriptname1 = "e2v\_Flatness.RTN"
-ogpscriptname2 = "e2v\_EdgeScan.RTN"
+ogpscriptname1 = "e2V\_Flat_AbsHgt.RTN"
+ogpscriptname2 = "e2V\_EdgeScan.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 

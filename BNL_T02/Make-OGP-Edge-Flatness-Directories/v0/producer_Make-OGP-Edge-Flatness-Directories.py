@@ -8,8 +8,8 @@ import time
 
 
 #ogpscriptname = "CCDb\_Flatness\_Edge\_scan\_new\_jig\_robust.RTN"
-ogpscriptname1 = "ITL\_Flatness\_151117.RTN"
-ogpscriptname2 = "ITL\_EdgeScan\_151117.RTN"
+ogpscriptname1 = "ITL\_Flatness.RTN"
+ogpscriptname2 = "ITL\_EdgeScan.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
