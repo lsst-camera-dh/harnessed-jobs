@@ -50,17 +50,17 @@ try:
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
         print "time = %f , P = %f\n" % (time.time(),pres)
-        if ((time.time()-starttim)>3600):
-            print "Something is wrong ... we will never make it to a runnable state"
+        if ((time.time()-starttim)>7200):
+            print "Something is wrong ... we will never make it to a low enough pressure for turning on the turbo pump"
             exit
-        if (pres>0.0 and pres<5.5e-2) :
+        if (pres>0.0 and pres<0.1) :
             break
         time.sleep(5.)
 
 # turn on power to the turbo pump
     result = vacsub.synchCommand(20,"readPressure");
     pres = result.getResult();
-    if (pres>0.0 and pres<5.5e-2) :
+    if (pres>0.0 and pres<0.1) :
         print "TURNING ON POWER TO THE TURBO PUMP!"
         result = pdusub.synchCommand(120,"setOutletState",pump_outlet,True);
         rply = result.getResult();

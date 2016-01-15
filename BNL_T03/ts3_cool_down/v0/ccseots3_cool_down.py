@@ -45,18 +45,18 @@ try:
 
     starttim = time.time()
     while True:
-        print "checking if pressure is low enough to turn on turbo pump";
+        print "checking if pressure is low enough to turn on PolyCold";
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
         print "time = %f , pressure = %11.3e\n" % (time.time(),pres)
-        if ((time.time()-starttim)>3600):
+        if ((time.time()-starttim)>7200):
             print "Something is wrong ... we will never make it to a runnable state"
             exit
         if (pres>0.0 and pres<1.0e-3) :
             break
         time.sleep(5.)
 
-# turn on power to the PloyCold
+# turn on power to the PolyCold
     result = vacsub.synchCommand(20,"readPressure");
     pres = result.getResult();
     if (pres>0.0 and pres<1.0e-3) :
@@ -85,7 +85,7 @@ try:
         fpfiles.write(tstat)
 # the following line is just for test situations so that there would be no waiting
 #        tsstate=1;
-        if ((time.time()-starttim)>10800):
+        if ((time.time()-starttim)>15000):
             print "Something is wrong ... we will never make it to a runnable state"
             exit
         if tsstate!=0 :

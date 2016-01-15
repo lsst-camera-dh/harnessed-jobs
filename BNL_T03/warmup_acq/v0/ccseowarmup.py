@@ -22,6 +22,8 @@ try:
     lampsub = CCS.attachSubsystem("%s/Lamp" % ts );
     print "attaching Bias subsystem"
     biassub = CCS.attachSubsystem("%s/Bias" % ts );
+    print "attaching Cryo subsystem"
+    cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
 
@@ -42,10 +44,6 @@ try:
     print "TURNING OFF THE BACKPLANE BIAS VOLTAGE"
     result = biassub.synchCommand(30,"setVoltage",0.0);
 
-# turn off the turbo pump
-    print "TURNING ON POWER TO THE TURBO PUMP!"
-    result = pdusub.synchCommand(120,"setOutletState",pump_outlet,True);
-    rply = result.getResult();
 
 
 # make sure we leave the power to the sensor OFF
@@ -59,6 +57,22 @@ try:
     print "SETTING STATE OF TESTSTAND TO WARM"
     result = tssub.synchCommand(100000,"setTSWarm");
     rply = result.getResult();
+
+# turn off the turbo pump
+    while True:
+        print "checking if the temperature is high enough to turn off turbo pump";
+        result = cryosub.synchCommand(20,"getTemp","B");
+        temp = result.getResult();
+        print "time = %f , T = %11.3e\n" % (time.time(),temp)
+        if ((time.time()-starttim)>15000):
+            print "Something is wrong ... we will never make it to a suitable state"
+            exit
+        if (temp>5.0 and temp<999.) :
+            print "TURNING OFF POWER TO THE TURBO PUMP!"
+            result = pdusub.synchCommand(120,"setOutletState",pump_outlet,False);
+            rply = result.getResult();
+            break
+        time.sleep(5.)
 
 
 
