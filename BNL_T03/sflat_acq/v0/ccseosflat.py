@@ -1,4 +1,3 @@
-
 ###############################################################################
 # sflat
 # Acquire sflat images
@@ -40,40 +39,45 @@ try:
     ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
     eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub)
+except:
+        print "Exception in initialization"
 
+# make sure all is quiescent before sending commands to the ammeters
+time.sleep(5.0)
 
-    print "Setting the current ranges on the Bias and PD devices"
+print "Setting the current ranges on the Bias and PD devices"
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
-    pdsub.synchCommand(10,"setCurrentRange",0.00002)
+pdsub.synchCommand(30,"setCurrentRange",0.00002)
 
-    seq = 0  # image pair number in sequence
+seq = 0  # image pair number in sequence
     
-    lo_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_LOLIM', default='1.0'))
-    hi_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_HILIM', default='120.0'))
-    bcount = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default = "5"))
+lo_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_LOLIM', default='1.0'))
+hi_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_HILIM', default='120.0'))
+bcount = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default = "5"))
     
 #number of PLCs between readings
-    nplc = 1
+nplc = 1
     
-    ccd = CCDID    
-    print "Working on CCD %s" % ccd
+ccd = CCDID    
+print "Working on CCD %s" % ccd
 
-    arcsub.synchCommand(10,"setParameter","Fe55","0");
+arcsub.synchCommand(10,"setParameter","Fe55","0");
 
 # clear the buffers
-    print "doing some unrecorded bias acquisitions to clear the buffers"
-    print "set controller for bias exposure"
-    arcsub.synchCommand(10,"setParameter","Light","0");
-    arcsub.synchCommand(10,"setParameter","ExpTime","0");
-    for i in range(5):
-        timestamp = time.time()
-        result = arcsub.synchCommand(10,"setFitsFilename","");
-        print "Ready to take clearing bias image. time = %f" % time.time()
-        result = arcsub.synchCommand(20,"exposeAcquireAndSave");
-        rply = result.getResult()
-        result = arcsub.synchCommand(500,"waitForExpoEnd");
-        rply = result.getResult();
+print "doing some unrecorded bias acquisitions to clear the buffers"
+print "set controller for bias exposure"
+arcsub.synchCommand(10,"setParameter","Light","0");
+arcsub.synchCommand(10,"setParameter","ExpTime","0");
+for i in range(5):
+    timestamp = time.time()
+    result = arcsub.synchCommand(10,"setFitsFilename","");
+    print "Ready to take clearing bias image. time = %f" % time.time()
+    result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+    rply = result.getResult()
+    result = arcsub.synchCommand(500,"waitForExpoEnd");
+    rply = result.getResult();
 
+try:
     
 # go through config file looking for 'sflat' instructions
     print "Scanning config file for SFLAT specifications";
