@@ -90,7 +90,7 @@ results_file = '%s_eotest_results.fits' % sensor_id
 # Wavelength scan files, which are used in the flat field plots and
 # for determining the maximum number of active pixels for the image
 # quality statistics
-wl_files = processName_dependencyGlob('*_lambda_*.fits', jobname='qe_acq')
+wl_files = processName_dependencyGlob('*_lambda_flat_*.fits', jobname='qe_acq')
 
 total_num, rolloff_mask = sensorTest.pixel_counts(wl_files[0])
 
@@ -165,10 +165,11 @@ print "fe55_zoom: ", fe55_zoom
 shutil.copy(fe55_zoom, '.')
 
 # Coadded bias frame
-bias_files = processName_dependencyGlob('%s_fe55_bias_*.fits' % sensor_id,
-                                        jobname='fe55_acq')
+bias_files = processName_dependencyGlob('%s_mean_bias_*.fits' % sensor_id,
+                                        jobname='fe55_analysis')
 if bias_files:
-    plots.bias_mean(bias_files)
+    sensorTest.plot_flat(bias_files[0], title='%s, mean bias frame' % sensor_id)
+    pylab.savefig('%s_mean_bias.png' % sensor_id)
 
 # Mosaicked image of medianed dark for bright_defects job.
 dark_bd_file = processName_dependencyGlob('%s_median_dark_bp.fits' % sensor_id,
@@ -207,7 +208,6 @@ if xtalk_file is not None:
     pylab.savefig('%s_crosstalk_matrix.png' % sensor_id)
 
 # Flat fields at wavelengths nearest the centers of the standard bands
-print wl_files
 wl_file_path = os.path.split(wl_files[0])[0]
 plots.flat_fields(wl_file_path)
 pylab.savefig('%s_flat_fields.png' % sensor_id)
