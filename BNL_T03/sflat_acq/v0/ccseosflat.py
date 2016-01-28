@@ -27,7 +27,7 @@ try:
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
 
-    time.sleep(3.)
+    time.sleep(5.)
 
     cdir = tsCWD
     
@@ -47,7 +47,7 @@ time.sleep(5.0)
 
 print "Setting the current ranges on the Bias and PD devices"
 #    biassub.synchCommand(10,"setCurrentRange",0.0002)
-pdsub.synchCommand(30,"setCurrentRange",0.00002)
+pdsub.synchCommand(60,"setCurrentRange",0.00002)
 
 seq = 0  # image pair number in sequence
     
@@ -72,7 +72,7 @@ for i in range(5):
     timestamp = time.time()
     result = arcsub.synchCommand(10,"setFitsFilename","");
     print "Ready to take clearing bias image. time = %f" % time.time()
-    result = arcsub.synchCommand(20,"exposeAcquireAndSave");
+    result = arcsub.synchCommand(60,"exposeAcquireAndSave");
     rply = result.getResult()
     result = arcsub.synchCommand(500,"waitForExpoEnd");
     rply = result.getResult();
