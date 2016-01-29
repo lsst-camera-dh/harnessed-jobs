@@ -66,7 +66,10 @@ result = arcsub.synchCommand(10,"setCCDnum",ccd)
 print "Working on CCD %s" % ccd
 
 print "set filter position"
-monosub.synchCommand(30,"setFilter",1); # open position
+try:
+    monosub.synchCommand(36,"setFilter",1); # open position
+except:
+    print "Taking longer than it should to move filter wheel to position 1. Not critical."
 
 try:
     for i in range(2):
