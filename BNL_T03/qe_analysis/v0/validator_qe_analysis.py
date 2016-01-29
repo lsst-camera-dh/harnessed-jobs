@@ -8,6 +8,7 @@ import siteUtils
 import eotestUtils
 
 results = [siteUtils.packageVersions(),
+           siteUtils.jobInfo(),
            eotestUtils.eotestCalibrations()]
 
 sensor_id = siteUtils.getUnitId()

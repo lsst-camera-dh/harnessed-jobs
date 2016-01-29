@@ -122,10 +122,7 @@ plots = sensorTest.EOTestPlots(sensor_id, results_file=results_file,
 fe55_file = processName_dependencyGlob('%s_psf_results*.fits' % sensor_id,
                                        jobname='fe55_analysis')[0]
 plots.fe55_dists(fe55_file=fe55_file)
-try:
-    pylab.savefig('%s_fe55_dists.png' % sensor_id)
-except:
-    print "Unable to save plot %s_fe55_dists.png" % sensor_id
+pylab.savefig('%s_fe55_dists.png' % sensor_id)
 
 # PSF distributions from Fe55 fits
 plots.psf_dists(fe55_file=fe55_file)

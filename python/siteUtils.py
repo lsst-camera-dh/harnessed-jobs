@@ -174,6 +174,11 @@ def packageVersions():
                                 hostname=socket.getfqdn())
     return result
 
+def jobInfo():
+    result = lcatr.schema.valid(lcatr.schema.get('job_info'),
+                                job_id=os.environ['LCATR_JOB_ID'])
+    return result
+
 class Parfile(dict):
     def __init__(self, infile, section):
         super(Parfile, self).__init__()

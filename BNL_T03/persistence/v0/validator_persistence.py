@@ -39,7 +39,7 @@ for amp in imutils.allAmps:
                                       deferred_charge_median=median_flux,
                                       deferred_charge_stdev=stdev))
 
-results.append(siteUtils.packageVersions())
+results.extend([siteUtils.packageVersions(), siteUtils.jobInfo()])
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

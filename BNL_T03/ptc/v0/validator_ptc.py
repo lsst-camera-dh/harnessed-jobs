@@ -10,7 +10,8 @@ eotestUtils.addHeaderData(ptc_results, LSST_NUM=sensor_id, TESTTYPE='FLAT',
                           CCD_MANU=siteUtils.getCcdVendor().upper())
 
 results = [lcatr.schema.fileref.make(ptc_results),
-           siteUtils.packageVersions()]
+           siteUtils.packageVersions(),
+           siteUtils.jobInfo()]
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
