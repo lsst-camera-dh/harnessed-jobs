@@ -27,7 +27,7 @@ for amp, npix, ncol in zip(amps, npixels, ncolumns):
                                       bright_pixels=npix,
                                       bright_columns=ncol))
 
-results.extend([siteUtils.packageVersions(), siteUtils.jobInfo()])
+results.extend(siteUtils.jobInfo())
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

@@ -19,7 +19,7 @@ results.extend([lcatr.schema.fileref.make(item) for item in png_files])
 test_report = '%s_eotest_report.pdf' % sensor_id
 results.append(lcatr.schema.fileref.make(test_report))
 
-results.extend([siteUtils.packageVersions(), siteUtils.jobInfo()])
+results.extend(siteUtils.jobInfo())
 
 #
 # CCS configuration files

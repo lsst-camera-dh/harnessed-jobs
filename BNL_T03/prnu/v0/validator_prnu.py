@@ -17,7 +17,7 @@ for wl, stdev, mean in zip(prnu_results['WAVELENGTH'],
                                       wavelength=int(np.round(wl)), 
                                       pixel_stdev=stdev, pixel_mean=mean))
 results.append(siteUtils.packageVersions())
-results.extend([siteUtils.packageVersions(), siteUtils.jobInfo()])
+results.extend(siteUtils.jobInfo())
 results.append(eotestUtils.eotestCalibrations())
 results.extend(eotestUtils.eotestCalibsPersist('illumination_non_uniformity_file'))
 

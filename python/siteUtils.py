@@ -175,9 +175,11 @@ def packageVersions():
     return result
 
 def jobInfo():
-    result = lcatr.schema.valid(lcatr.schema.get('job_info'),
-                                job_id=os.environ['LCATR_JOB_ID'])
-    return result
+    results = [packageVersions(), 
+               lcatr.schema.valid(lcatr.schema.get('job_info'),
+                                  job_name=os.environ['LCATR_JOB'],
+                                  job_id=os.environ['LCATR_JOB_ID'])]
+    return results
 
 class Parfile(dict):
     def __init__(self, infile, section):

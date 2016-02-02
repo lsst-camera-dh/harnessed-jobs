@@ -23,7 +23,8 @@ for amp, read_noise, system_noise, total_noise in zip(amps, read_noise_data,
                                       system_noise=system_noise,
                                       total_noise=total_noise))
 
-results.extend([siteUtils.packageVersions(), siteUtils.jobInfo()])
+results.extend(siteUtils.jobInfo())
+
 results.append(eotestUtils.eotestCalibrations())
 results.extend(eotestUtils.eotestCalibsPersist('system_noise_file'))
 
