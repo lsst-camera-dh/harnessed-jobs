@@ -59,6 +59,7 @@ try:
     rply = result.getResult();
 
 # turn off the turbo pump
+    starttim = time.time()
     while True:
         print "checking if the temperature is high enough to turn off turbo pump";
         result = cryosub.synchCommand(20,"getTemp","B");
