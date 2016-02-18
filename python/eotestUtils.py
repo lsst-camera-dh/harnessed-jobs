@@ -116,7 +116,7 @@ def eotestCalibrations():
     result = lcatr.schema.valid(lcatr.schema.get('eotest_calibrations'), **kwds)
     return result
 
-def eotestCalibsPersist(*keys):
+def eotestCalibsPersist(*keys, **kwds):
     """
     Loop through specified list of keys in eotest calibration config
     file and persist as lcatr.schema.filerefs.  Return the list of
@@ -130,7 +130,14 @@ def eotestCalibsPersist(*keys):
             if not os.path.isfile(filename):
                 raise RuntimeError("eotest calibration parameter %s = %s is not a valid file" % (key, filename))
             shutil.copy(filename, '.')
-            results.append(lcatr.schema.fileref.make(os.path.basename(filename)))
+            try:
+                md = kwds['metadata'][key]
+            except KeyError:
+                # Either KeyError signifies that there is no metadata
+                # associated with this calibration file.
+                md = None
+            results.append(lcatr.schema.fileref.make(os.path.basename(filename),
+                                                     metadata=md))
     return results
 
 def addHeaderData(fitsfile, **kwds):
