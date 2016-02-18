@@ -27,7 +27,7 @@ print "Please setup the OGP MeasureMind application to store results in respecti
 
 # leave a link to the location where the files should go
 print "Making links to the data directories in %s" % os.getcwd()
-os.system("ln -s %s flatlink" % flatdatedir);
+os.system("ln -s %s abshghtlink" % flatdatedir);
 os.system("ls -lrt")
 
 #top = Tkinter.Tk()
