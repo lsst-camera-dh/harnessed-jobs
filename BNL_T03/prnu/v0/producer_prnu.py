@@ -12,7 +12,7 @@ mask_files = eotestUtils.glob_mask_files()
 gains = eotestUtils.getSensorGains()
 correction_image = eotestUtils.getIlluminationNonUniformityImage()
 if correction_image is None:
-    print 
+    print
     print "WARNING: The correction image file is not given in"
     print "config/%s/eotest_calibrations.cfg." % siteUtils.getSiteName()
     print "No correction for non-uniform illumination will be applied."

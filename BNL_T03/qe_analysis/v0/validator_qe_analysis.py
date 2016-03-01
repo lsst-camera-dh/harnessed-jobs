@@ -24,8 +24,10 @@ for band in QE:
 
 qe_acq_job_id = siteUtils.get_prerequisite_job_id('*_lambda_flat_*.fits',
                                                   jobname=siteUtils.getProcessName('qe_acq'))
-md = dict(photodiode_ratio_file=dict(JOB_ID=qe_acq_job_id))
+md = dict(photodiode_ratio_file=dict(JOB_ID=qe_acq_job_id),
+          illumination_non_uniformity_file=dict(JOB_ID=qe_acq_job_id))
 results.extend(eotestUtils.eotestCalibsPersist('photodiode_ratio_file',
+                                               'illumination_non_uniformity_file',
                                                metadata=md))
 qe_files = glob.glob('*QE*.*')
 for item in qe_files:

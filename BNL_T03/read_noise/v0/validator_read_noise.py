@@ -26,7 +26,12 @@ for amp, read_noise, system_noise, total_noise in zip(amps, read_noise_data,
 results.extend(siteUtils.jobInfo())
 
 results.append(eotestUtils.eotestCalibrations())
-results.extend(eotestUtils.eotestCalibsPersist('system_noise_file'))
+
+fe55_acq_job_id = siteUtils.get_prerequisite_job_id('*_fe55_fe55_*.fits',
+                                                    jobname=siteUtils.getProcessName('fe55_acq'))
+md = dict(system_noise_file=dict(JOB_ID=fe55_acq_job_id))
+results.extend(eotestUtils.eotestCalibsPersist('system_noise_file',
+                                               metadata=md))
 
 files = glob.glob('*read_noise?*.fits')
 for fitsfile in files:
