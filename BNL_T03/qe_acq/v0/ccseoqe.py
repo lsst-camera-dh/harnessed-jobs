@@ -75,6 +75,29 @@ try:
         rply = result.getResult();
 
 
+# take bias images
+
+    print "setting location of bias fits directory"
+    arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+
+    result = arcsub.synchCommand(10,"setCCDnum",ccd)
+
+    result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
+    result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+
+    for i in range(bcount):
+        timestamp = time.time()
+        fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
+        arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
+
+        print "Ready to take bias image. time = %f" % time.time()
+        result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+        fitsfilename = result.getResult();
+        result = arcsub.synchCommand(500,"waitForExpoEnd");
+        rply = result.getResult();
+        print "after click click at %f" % time.time()
+        time.sleep(1.0)
+
 # go through config file looking for 'qe' instructions
     print "Scanning config file for LAMBDA specifications";
     fp = open(acqcfgfile,"r");
@@ -105,18 +128,6 @@ try:
             print "The wl retrieved from the monochromator is rwl = %f" % rwl
             result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
-# take bias images
-
-            arcsub.synchCommand(10,"setParameter","ExpTime","0"); 
-            arcsub.synchCommand(10,"setParameter","Light","0");
-
-            print "setting location of bias fits directory"
-            arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
-
-            result = arcsub.synchCommand(10,"setCCDnum",ccd)
-
-            result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
-            result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
 
             for i in range(2):
                 timestamp = time.time()
@@ -127,20 +138,6 @@ try:
                 result = arcsub.synchCommand(500,"waitForExpoEnd");
                 rply = result.getResult();
                 print "after click click at %f" % time.time()
-
-            for i in range(bcount):
-                timestamp = time.time()
-                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (ccd,seq)
-                arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
-
-                print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                result = arcsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
-                print "after click click at %f" % time.time()
-                time.sleep(1.0)
-
 
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
