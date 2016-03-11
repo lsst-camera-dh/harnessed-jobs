@@ -188,3 +188,52 @@ class Parfile(dict):
         parser.read(infile)
         for key, value in parser.items(section):
             self[key] = cast(value)
+
+class DataCatalogMetadata(dict):
+    """
+    Class to handle metadata passed to the eTraveler for registering
+    files with metadata in the Data Catalog.
+    """
+    def __init__(self, **kwds):
+        super(DataCatalogMetadata, self).__init__(**kwds)
+    def __call__(self, **kwds):
+        my_dict = dict()
+        my_dict.update(self)
+        my_dict.update(kwds)
+        return my_dict
+
+def get_prerequisite_job_id(pattern, jobname=None, paths=None,
+                            sort=False):
+    """
+    Extract the job id of the prerequisite harnesssed job from the
+    associated data files (using the dependency_glob pattern),
+    assuming that it is included in the folder name.  The Job Harness
+    and eTraveler tools do not have a way of providing this
+    information, even though the eTraveler db tables do contain it, so
+    we are forced to use this ad hoc method.
+    """
+    files = dependency_glob(pattern, jobname=jobname, paths=paths, sort=sort)
+    #
+    # The job id is supposed to be the name of the lowest-level folder
+    # containing the requested files.
+    #
+    job_id = os.path.split(os.path.split(files[0])[0])[1]
+    return job_id
+
+def get_datacatalog_glob_job_id(pattern, testtype=None, imgtype=None,
+                                sort=False):
+    """
+    Extract the job id of the harnessed job that produced the
+    requested data files assuming that it is included in the folder
+    name.  Ideally, this information would be in the metadata for
+    these files, but it is not so we are forced to use this ad hoc
+    method.
+    """
+    files = datacatalog_glob(pattern, testtype=testtype, imgtype=imgtype,
+                             sort=sort)
+    #
+    # The job id is supposed to be the name of the lowest-level folder
+    # containing the requested files.
+    #
+    job_id = os.path.split(os.path.split(files[0])[0])[1]
+    return job_id
