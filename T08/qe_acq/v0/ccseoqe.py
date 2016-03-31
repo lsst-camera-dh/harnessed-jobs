@@ -12,7 +12,7 @@ import eolib
 
 CCS.setThrowExceptions(True);
 
-try:
+if (True):
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
     tssub  = CCS.attachSubsystem("%s" % ts);
@@ -24,24 +24,25 @@ try:
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "attaching PDU subsystem"
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
-    print "Attaching raft subsystem"
-    raftsub  = CCS.attachSubsystem("%s" % raft);
+    print "Attaching ts8 subsystem"
+
+    ts8sub  = CCS.attachSubsystem("ts8");
 
     time.sleep(3.)
 
     cdir = tsCWD
 
     ts_version = ""
-    raft_version = ""
+    ts8_version = ""
     ts_revision = ""
-    raft_revision = ""
+    ts8_revision = ""
 
 
 # get the software versions to include in the data products to be persisted in the DB
-    ts_version,raft_version,ts_revision,raft_revision = eolib.EOgetCCSVersions(tssub,cdir)
+#    ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
 # prepare TS8: make sure temperature and vacuum are OK and load the sequencer
-    eolib.EOSetup(tssub,RAFTID,CCSRAFTTYPE,cdir,sequence_file,vac_outlet,raftsub)
+#    eolib.EOSetup(tssub,RAFTID,CCSRAFTTYPE,cdir,sequence_file,vac_outlet,ts8sub)
 
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
@@ -54,25 +55,34 @@ try:
 #number of PLCs between readings
     nplc = 1.0
 
-    raft = RAFTID
+#    raft = RAFTID
+    raft = CCDID
     print "Working on RAFT %s" % raft
 
+# options:exposure_time, open_shutter, actuate_xed, file_pattern
 # make sure the XED is deactivated
-    raftsub.synchCommand(10,"setParameter","Fe55","0");
+#    ts8sub.synchCommand(10,"setExposureParameter","Fe55","0");
+#    ts8sub.synchCommand(30,"setExposureParameter","actuate_xed","False");
+#Traceback (most recent call last):  File "<script>", line 65, in <module>org.lsst.ccs.command.Co#mmandInvocationException: Error: Can't invoke command     at org.lsst.ccs.command.CommandSetBuil#der$CommandSetImplementation.invoke(CommandSetBuilder.java:63)      at org.lsst.ccs.command.Comm#andSetBuilder$CommandSetImplementation.invoke(CommandSetBuilder.java:54)      at org.lsst.ccs.co#mmand.CompositeCommandSet.invoke(CompositeCommandSet.java:92)   at org.lsst.ccs.Agent$RunningCom#mand.lambda$new$7(Agent.java:875) at org.lsst.ccs.Agent$RunningCommand$$Lambda$41/25424946.call(#Unknown Source)     at java.util.concurrent.FutureTask.run(FutureTask.java:266)     at java.util#.concurrent.Executors$RunnableAdapter.call(Executors.java:511)        at java.util.concurrent.Fu#tureTask.run(FutureTask.java:266)       at java.util.concurrent.ThreadPoolExecutor.runWorker(Thr#eadPoolExecutor.java:1142)        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPo#olExecutor.java:617)at java.lang.Thread.run(Thread.java:745)Caused by: java.lang.IllegalArgum
 
 # clear the REB buffers
     print "doing some unrecorded bias acquisitions to clear the buffers"
     print "set controller for bias exposure"
-    raftsub.synchCommand(10,"setParameter","Light","0");
-    raftsub.synchCommand(10,"setParameter","ExpTime","0");
+# Note: Same problem as above
+#    ts8sub.synchCommand(10,"setExposureParameter","open_shutter","true");
+#    ts8sub.synchCommand(10,"setExposureParameter","exposure_time",0);
     for i in range(5):
         timestamp = time.time()
-        result = raftsub.synchCommand(10,"setFitsFilename","");
+# Note: commented out because it seemed to be causing a hang after
+#     Generating image image 12308x12032 took 2 seconds.
+#    File "<script>", line 317, in <module> (ACTION and CONFIGURATION commands are only accepted in READY stateorg.lsst.ccs.messaging.CommandRejectedException: ACTION and CONFIGURATION commands are only accepted in READY state 
+        result = ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
         print "Ready to take clearing bias image. time = %f" % time.time()
-        result = raftsub.synchCommand(500,"exposeAcquireAndSave");
-        rply = result.getResult()
-        result = raftsub.synchCommand(500,"waitForExpoEnd");
-        rply = result.getResult();
+#        result = ts8sub.synchCommand(500,"exposeAcquireAndSave");
+#        rply = result.getResult()
+# Note: I had already commented out the following
+#        result = ts8sub.synchCommand(500,"waitForExpoEnd");
+#        rply = result.getResult();
 
 
 # go through config file looking for 'qe' instructions
@@ -87,7 +97,27 @@ try:
             target = float(tokens[2])
             print "wl = %f" % wl;
 
-            result = raftsub.synchCommand(10,"setHeader","SequenceNumber",seq)
+#            result = ts8sub.synchCommand(10,"setHeader","SequenceNumber",str(seq),False)
+# Note:
+#ts8 ccs>setHeader test ExpTime 1.0
+#*** Failed to invoke main method in class org.lsst.ccs.subsystem.shell.ConsoleCommandShell
+#*** Reason:  Error finding command setHeader with 3 arguments: 2 matches found in MethodBasedCommandDictionary
+#org.lsst.ccs.command.AmbiguousCommandException: Error finding command setHeader with 3 arguments: 2 matches found in MethodBasedCommandDictionary
+#        at org.lsst.ccs.command.MethodBasedCommandDictionary.findCommand(MethodBasedCommandDictionary.java:44)
+#        at org.lsst.ccs.command.MethodBasedCommandDictionary.containsCommand(MethodBasedCommandDictionary.java:18)
+#        at org.lsst.ccs.command.CompositeCommandDictionary.containsCommand(CompositeCommandDictionary.java:53)
+#        at org.lsst.ccs.command.CompositeCommandDictionary.containsCommand(CompositeCommandDictionary.java:53)
+#        at org.lsst.ccs.command.CompositeCommandDictionary.containsCommand(CompositeCommandDictionary.java:53)
+#        at org.lsst.ccs.command.CompositeCommandSet.invoke(CompositeCommandSet.java:91)
+#        at org.lsst.ccs.shell.JLineShell.run(JLineShell.java:133)
+#        at org.lsst.ccs.subsystem.shell.ConsoleCommandShell.main(ConsoleCommandShell.java:237)
+#        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+#        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+#        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+#        at java.lang.reflect.Method.invoke(Method.java:483)
+#        at org.lsst.ccs.bootstrap.Bootstrap.launchCCSApplication(Bootstrap.java:627)
+#        at org.lsst.ccs.bootstrap.Bootstrap.main(Bootstrap.java:708)
+#[jh-test ts8prod@ts8-raft1 workdir]$ 
 
             print "setting the monochromator wavelength to %f" % wl
 #            if (exptime > lo_lim):
@@ -103,72 +133,76 @@ try:
             print "publishing state"
             result = tssub.synchCommand(60,"publishState");
             print "The wl retrieved from the monochromator is rwl = %f" % rwl
-            result = raftsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
+#            result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
 #
 # take bias images
 # 
 
-            raftsub.synchCommand(10,"setParameter","ExpTime","0"); 
-            raftsub.synchCommand(10,"setParameter","Light","0");
+#            ts8sub.synchCommand(10,"setExposureParameter","exposure_time",0); 
+#            ts8sub.synchCommand(10,"setExposureParameter","open_shutter","false");
 
             print "setting location of bias fits directory"
-            raftsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+            ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
 
-            result = raftsub.synchCommand(10,"setRAFTnum",raft)
+#            result = ts8sub.synchCommand(10,"setRaftName",raft)
+# Note: throws a nont implemented exception
 
-            result = raftsub.synchCommand(10,"setHeader","TestType","LAMBDA")
-            result = raftsub.synchCommand(10,"setHeader","ImageType","BIAS")
+#            result = ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA")
+#            result = ts8sub.synchCommand(10,"setHeader","ImageType","BIAS")
 
             for i in range(2):
                 timestamp = time.time()
-                raftsub.synchCommand(10,"setFitsFilename","");
+                ts8sub.synchCommand(10,"setFitsFilesNamePattern","clear.fits");
                 print "Ready to take clearing bias image. time = %f" % time.time()
-                result = raftsub.synchCommand(500,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                result = raftsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
+                ts8sub.synchCommand(15,"exposeAcquireAndSave");
+#                Note: How to wait for a response
+#                fitsfilename = result.getResult();
+#                result = ts8sub.synchCommand(500,"waitForExpoEnd");
+#                rply = result.getResult();
                 print "after click click at %f" % time.time()
 
             for i in range(bcount):
                 timestamp = time.time()
                 fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (raft,seq)
-                raftsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                ts8sub.synchCommand(10,"setFitsFilesNamePattern",fitsfilename);
 
                 print "Ready to take bias image. time = %f" % time.time()
-                result = raftsub.synchCommand(500,"exposeAcquireAndSave");
+                result = ts8sub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
-                result = raftsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
+#                result = ts8sub.synchCommand(500,"waitForExpoEnd");
+#                rply = result.getResult();
                 print "after click click at %f" % time.time()
                 time.sleep(1.0)
 
 
 # take light exposures
-            raftsub.synchCommand(10,"setParameter","Light","1");
+#            ts8sub.synchCommand(10,"setExposureParameter","Light","1");
             print "setting location of fits exposure directory"
-            raftsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
-            raftsub.synchCommand(10,"setFitsFilename","");
-            raftsub.synchCommand(10,"setParameter","ExpTime","2000"); 
+            ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
+            ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
+#            ts8sub.synchCommand(10,"setExposureParameter","ExpTime","2000"); 
 
-            result = raftsub.synchCommand(500,"exposeAcquireAndSave");
+            result = ts8sub.synchCommand(500,"exposeAcquireAndSave");
             fitsfilename = result.getResult();
-            result = raftsub.synchCommand(500,"waitForExpoEnd");
-            rply = result.getResult();
+#            result = ts8sub.synchCommand(500,"waitForExpoEnd");
+#            rply = result.getResult();
             print "after click click at %f" % time.time()
             time.sleep(2.0)
 
 # do in-job flux calibration
 # QUESTION: how do we want this to choose a value for a set of sensors?
 
-            result  = raftsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
-            result = raftsub.synchCommand(200,"exposeAcquireAndSave");
+            result  = ts8sub.synchCommand(10,"setFitsFilesNamePattern","fluxcalimage-${TIMESTAMP}");
+            result = ts8sub.synchCommand(200,"exposeAcquireAndSave");
             flncal = result.getResult();
-            result = raftsub.synchCommand(500,"waitForExpoEnd");
-            rply = result.getResult();
+#            result = ts8sub.synchCommand(500,"waitForExpoEnd");
+#            rply = result.getResult();
  
-            result = raftsub.synchCommand(10,"getFluxStats",flncal);
-            flux = float(result.getResult());
+#            result = ts8sub.synchCommand(10,"getFluxStats",flncal);
+#            flux = float(result.getResult());
+# force it to a fixed value for now 
+            flux = 300.0
 
             time.sleep(2.0)
 
@@ -198,8 +232,8 @@ try:
                 nplc = (exptime+2.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = raftsub.synchCommand(10,"setHeader","TestType","LAMBDA")
-            result = raftsub.synchCommand(10,"setHeader","ImageType","FLAT")
+            result = ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA")
+            result = ts8sub.synchCommand(10,"setHeader","ImageType","FLAT")
 
 
 # adjust timeout because we will be waiting for the data to become ready
@@ -207,14 +241,14 @@ try:
             print "Setting timeout to %f s" % mywait
             pdsub.synchCommand(1000,"setTimeout",mywait);
 
-            raftsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            ts8sub.synchCommand(10,"setExposureParameter","ExpTime",str(int(exptime*1000)));
 
-            result = raftsub.synchCommand(10,"setFitsFilename","");
+            result = ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
             print "Ready to take clearing bias image. time = %f" % time.time()
-            result = raftsub.synchCommand(20,"exposeAcquireAndSave");
+            result = ts8sub.synchCommand(20,"exposeAcquireAndSave");
             rply = result.getResult()
-            result = raftsub.synchCommand(500,"waitForExpoEnd");
-            rply = result.getResult();
+#            result = ts8sub.synchCommand(500,"waitForExpoEnd");
+#            rply = result.getResult();
 
             time.sleep(4.0)
 
@@ -237,18 +271,18 @@ try:
 
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_lambda_flat_%4.4d_%3.3d_${TIMESTAMP}.fits" % (raft,int(wl),seq)
-                raftsub.synchCommand(10,"setFitsFilename",fitsfilename);
+                fitsfilename = "%s_lambda_flat_%4.4d_%3.3d_${TIMESTAMP}.fits" % (ts8,int(wl),seq)
+                ts8sub.synchCommand(10,"setFitsFilesNamePattern",fitsfilename);
                 print "fitsfilename = %s" % fitsfilename
 
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(1.0);
 
                 print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
-                result = raftsub.synchCommand(500,"exposeAcquireAndSave");
+                result = ts8sub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
-                result = raftsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
+#                result = ts8sub.synchCommand(500,"waitForExpoEnd");
+#                rply = result.getResult();
                 print "after click click at %f" % time.time()
 
                 print "done with exposure # %d" % i
@@ -269,7 +303,7 @@ try:
 
 
 
-                result = raftsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+                result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 # ------------------- end of imcount loop --------------------------------
 # reset timeout to something reasonable for a regular command
@@ -287,26 +321,27 @@ try:
     fp.write(`istate`+"\n");
     fp.write("%s\n" % ts_version);
     fp.write("%s\n" % ts_revision);
-    fp.write("%s\n" % raft_version);
-    fp.write("%s\n" % raft_revision);
+    fp.write("%s\n" % ts8_version);
+    fp.write("%s\n" % ts8_revision);
     fp.close();
 
 # move TS to idle state
                     
-    result = tssub.synchCommand(200,"setTSReady");
-    rply = result.getResult();
+#    result = tssub.synchCommand(200,"setTSReady");
+#    rply = result.getResult();
 
 # get the glowing vacuum gauge back on
-    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
-    rply = result.getResult();
-
-    result = raftsub.synchCommand(10,"setHeader","TestType","LAMBDA-END")
+#    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+#    rply = result.getResult();
+try:
+#    result = ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA-END")
+    print "something"
 
 except Exception, ex:
 
 # get the glowing vacuum gauge back on
-    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
-    rply = result.getResult();
+#    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+#    rply = result.getResult();
 
     result = pdsub.synchCommand(10,"softReset");
     buff = result.getResult()
@@ -318,8 +353,8 @@ except ScriptingTimeoutException, exx:
     print "ScriptingTimeoutException at %f " % time.time()
 
 # get the glowing vacuum gauge back on
-    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
-    rply = result.getResult();
+#    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
+#    rply = result.getResult();
 
     result = pdsub.synchCommand(10,"softReset");
     buff = result.getResult()

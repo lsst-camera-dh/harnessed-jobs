@@ -65,8 +65,8 @@ try:
         rply = result.getResult();
 
 # move TS to ready state
-    result = tssub.synchCommand(10000,"setTSReady");
-    reply = result.getResult();
+    rdyresult = tssub.asynchCommand("setTSReady");
+# let it run in the background
 
 #check state of ts devices
     print "wait for ts state to become ready";
@@ -76,13 +76,17 @@ try:
 
     while True:
         print "checking for test stand to be ready for acq";
-        result = tssub.synchCommand(10,"isTestStandReady");
-        tsstate = result.getResult();
-        result = cryosub.synchCommand(20,"getTemp","B");
-        ctemp = result.getResult();
-        tstat = "time = %f , T = %f\n" % (time.time(),ctemp)
-        print tstat
-        fpfiles.write(tstat)
+        try:
+            result = tssub.synchCommand(10,"isTestStandReady");
+            tsstate = result.getResult();
+            result = cryosub.synchCommand(20,"getTemp","B");
+            ctemp = result.getResult();
+            tstat = "time = %f , T = %f\n" % (time.time(),ctemp)
+            print tstat
+            fpfiles.write(tstat)
+        except:
+            print "likely an attempt to query when an action was in progress"
+            print "It is OK ... we caught it."
 # the following line is just for test situations so that there would be no waiting
 #        tsstate=1;
         if ((time.time()-starttim)>18000):
@@ -93,6 +97,10 @@ try:
         time.sleep(5.)
 
     fpfiles.close()
+
+# safety check that it really is done
+    reply = rdyresult.get();
+
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
 
