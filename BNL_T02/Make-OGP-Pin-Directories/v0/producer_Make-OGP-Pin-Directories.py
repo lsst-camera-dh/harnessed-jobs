@@ -11,19 +11,34 @@ ogpscriptname = "Lateral_pos_metrology.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
-topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
-print "Creating the top level directory for the CCD at %s" % topccddir
+topccddir = "/dev/null"
+pindir = "/dev/null"
+pindatedir = "/dev/null"
 
-pindir = "%s/LateralPosition/" % topccddir
-print "Creating directory for lateral pin results. Location is %s" % pindir
+omt = os.getenv("OGP_MANUAL_TIME")
+if ("None" in omt) :
+    tm = time.strftime("%Y%m%d-%HH%MM")
+    topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
+    print "Creating the top level directory for the CCD at %s" % topccddir
 
-tm = time.strftime("%Y%m%d-%HH%MM")
+    pindir = "%s/LateralPosition/" % topccddir
+    print "Creating directory for lateral pin results. Location is %s" % pindir
+    pindatedir = "%s%s" % (pindir,tm)
+    print "Creating dated lateral pin directory for the CCD at %s" % pindatedir
+    os.makedirs(pindatedir)
+    print "Please setup the OGP MeasureMind application to store results in respective lateral pin directory indicated above"
 
-pindatedir = "%s%s" % (pindir,tm)
-print "Creating dated lateral pin directory for the CCD at %s" % pindatedir
-os.makedirs(pindatedir)
+else :
+    print "!!! AN OGP MANUAL TIME HAS BEEN SPECIFIED !!!"
+    tm = omt
+    topccddir = "/cygdrive/c/Production_DATA_manual/%s" % ccd
+    pindir = "%s/LateralPosition/" % topccddir
+    pindatedir = "%s%s" % (pindir,tm)
+    print "The name for the top level directory will be %s" % topccddir
+    print "Will assume data already in lateral pin directory indicated above"
+    os.unsetenv("OGP_MANUAL_TIME")
+
 os.system("chmod 777 %s" %  pindatedir)
-print "Please setup the OGP MeasureMind application to store results in respective lateral pin directory indicated above"
 
 # leave a link to the location where the files should go
 print "Making links to the data directories in %s" % os.getcwd()
