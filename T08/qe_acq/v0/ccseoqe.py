@@ -43,12 +43,16 @@ if (True):
 
 # prepare TS8: make sure temperature and vacuum are OK and load the sequencer
 #    eolib.EOSetup(tssub,RAFTID,CCSRAFTTYPE,cdir,sequence_file,vac_outlet,ts8sub)
+  
+    result = ts8sub.synchCommand(20,"loadSequencer",acffile);
 
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_HILIM', default='120.0'))
     bcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_BCOUNT', default='1'))
     imcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_IMCOUNT', default='1'))
+
+    bcount = 3
 
     seq = 0
 
@@ -69,16 +73,16 @@ if (True):
     print "doing some unrecorded bias acquisitions to clear the buffers"
     print "set controller for bias exposure"
 # Note: Same problem as above
-#    ts8sub.synchCommand(10,"setExposureParameter","open_shutter","true");
-#    ts8sub.synchCommand(10,"setExposureParameter","exposure_time",0);
+    ts8sub.synchCommand(10,"setExposureParameter open_shutter true");
+    ts8sub.synchCommand(10,"setExposureParameter exposure_time 0");
     for i in range(5):
         timestamp = time.time()
 # Note: commented out because it seemed to be causing a hang after
-#     Generating image image 12308x12032 took 2 seconds.
+#     Generating Image image 12308x12032 took 2 seconds.
 #    File "<script>", line 317, in <module> (ACTION and CONFIGURATION commands are only accepted in READY stateorg.lsst.ccs.messaging.CommandRejectedException: ACTION and CONFIGURATION commands are only accepted in READY state 
         result = ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
         print "Ready to take clearing bias image. time = %f" % time.time()
-#        result = ts8sub.synchCommand(500,"exposeAcquireAndSave");
+        ts8sub.synchCommand(50,"exposeAcquireAndSave");
 #        rply = result.getResult()
 # Note: I had already commented out the following
 #        result = ts8sub.synchCommand(500,"waitForExpoEnd");
@@ -139,14 +143,14 @@ if (True):
 # take bias images
 # 
 
-#            ts8sub.synchCommand(10,"setExposureParameter","exposure_time",0); 
-#            ts8sub.synchCommand(10,"setExposureParameter","open_shutter","false");
+            ts8sub.synchCommand(10,"setExposureParameter exposure_time 0"); 
+            ts8sub.synchCommand(10,"setExposureParameter open_shutter false");
 
             print "setting location of bias fits directory"
             ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
 
 #            result = ts8sub.synchCommand(10,"setRaftName",raft)
-# Note: throws a nont implemented exception
+# Note: throws a not implemented exception
 
 #            result = ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA")
 #            result = ts8sub.synchCommand(10,"setHeader","ImageType","BIAS")
@@ -155,7 +159,7 @@ if (True):
                 timestamp = time.time()
                 ts8sub.synchCommand(10,"setFitsFilesNamePattern","clear.fits");
                 print "Ready to take clearing bias image. time = %f" % time.time()
-                ts8sub.synchCommand(15,"exposeAcquireAndSave");
+                ts8sub.synchCommand(50,"exposeAcquireAndSave");
 #                Note: How to wait for a response
 #                fitsfilename = result.getResult();
 #                result = ts8sub.synchCommand(500,"waitForExpoEnd");
@@ -164,7 +168,8 @@ if (True):
 
             for i in range(bcount):
                 timestamp = time.time()
-                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (raft,seq)
+#                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (raft,seq)
+                fitsfilename = "%s_lambda_bias_%3.3d_%s.fits" % (raft,seq,time.time())
                 ts8sub.synchCommand(10,"setFitsFilesNamePattern",fitsfilename);
 
                 print "Ready to take bias image. time = %f" % time.time()
@@ -173,7 +178,7 @@ if (True):
 #                result = ts8sub.synchCommand(500,"waitForExpoEnd");
 #                rply = result.getResult();
                 print "after click click at %f" % time.time()
-                time.sleep(1.0)
+                time.sleep(3.0)
 
 
 # take light exposures
@@ -181,10 +186,10 @@ if (True):
             print "setting location of fits exposure directory"
             ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
             ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
-#            ts8sub.synchCommand(10,"setExposureParameter","ExpTime","2000"); 
+            ts8sub.synchCommand(10,"setExposureParameter exposure_time 2000"); 
 
-            result = ts8sub.synchCommand(500,"exposeAcquireAndSave");
-            fitsfilename = result.getResult();
+            ts8sub.synchCommand(50,"exposeAcquireAndSave");
+#            fitsfilename = result.getResult();
 #            result = ts8sub.synchCommand(500,"waitForExpoEnd");
 #            rply = result.getResult();
             print "after click click at %f" % time.time()
@@ -193,9 +198,12 @@ if (True):
 # do in-job flux calibration
 # QUESTION: how do we want this to choose a value for a set of sensors?
 
-            result  = ts8sub.synchCommand(10,"setFitsFilesNamePattern","fluxcalimage-${TIMESTAMP}");
-            result = ts8sub.synchCommand(200,"exposeAcquireAndSave");
-            flncal = result.getResult();
+#            result  = ts8sub.synchCommand(10,"setFitsFilesNamePattern","fluxcalimage-${TIMESTAMP}");
+            result  = ts8sub.synchCommand(10,"setFitsFilesNamePattern","fluxcalimage-%s" % time.time());
+            ts8sub.synchCommand(200,"exposeAcquireAndSave");
+# Note: since I don't know how to wait
+            time.sleep(2.0)
+#            flncal = result.getResult();
 #            result = ts8sub.synchCommand(500,"waitForExpoEnd");
 #            rply = result.getResult();
  
@@ -241,12 +249,14 @@ if (True):
             print "Setting timeout to %f s" % mywait
             pdsub.synchCommand(1000,"setTimeout",mywait);
 
-#            ts8sub.synchCommand(10,"setExposureParameter","ExpTime",str(int(exptime*1000)));
+            ts8sub.synchCommand(10,"setExposureParameter exposure_time str(int(exptime*1000)));
+# Note: since I don't know hot to wait
+            time.sleep(exptime)
 
-            result = ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
+            ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
             print "Ready to take clearing bias image. time = %f" % time.time()
-            result = ts8sub.synchCommand(20,"exposeAcquireAndSave");
-            rply = result.getResult()
+            ts8sub.synchCommand(20,"exposeAcquireAndSave");
+#            rply = result.getResult()
 #            result = ts8sub.synchCommand(500,"waitForExpoEnd");
 #            rply = result.getResult();
 
@@ -271,7 +281,8 @@ if (True):
 
 # start acquisition
                 timestamp = time.time()
-                fitsfilename = "%s_lambda_flat_%4.4d_%3.3d_${TIMESTAMP}.fits" % (ts8,int(wl),seq)
+#                fitsfilename = "%s_lambda_flat_%4.4d_%3.3d_${TIMESTAMP}.fits" % (ts8,int(wl),seq)
+                fitsfilename = "%s_lambda_flat_%4.4d_%3.3d_%s.fits" % (ts8,int(wl),seq,time.time())
                 ts8sub.synchCommand(10,"setFitsFilesNamePattern",fitsfilename);
                 print "fitsfilename = %s" % fitsfilename
 
