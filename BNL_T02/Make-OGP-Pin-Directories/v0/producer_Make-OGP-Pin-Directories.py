@@ -34,7 +34,7 @@ else :
     topccddir = "/cygdrive/c/Production_DATA_manual/%s" % ccd
     pindir = "%s/LateralPosition/" % topccddir
     pindatedir = "%s%s" % (pindir,tm)
-    print "The name for the top level directory will be %s" % topccddir
+    print "The name for lateral pin directory will be %s" % pindatedir
     print "Will assume data already in lateral pin directory indicated above"
     os.unsetenv("OGP_MANUAL_TIME")
 

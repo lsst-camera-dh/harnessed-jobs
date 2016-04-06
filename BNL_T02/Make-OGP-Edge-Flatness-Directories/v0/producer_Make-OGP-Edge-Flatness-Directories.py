@@ -13,24 +13,43 @@ ogpscriptname2 = "ITL\_EdgeScan.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
-topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
-print "Creating the top level directory for the CCD at %s" % topccddir
+topccddir = "/dev/null"
+edgedir = "/dev/null"
+edgedatedir = "/dev/null"
+flatdir = "/dev/null"
+flatdatedir = "/dev/null"
 
-edgedir = "%s/EdgeScan/" % topccddir
-print "Creating directory for edge scan results. Location is %s" % edgedir
+omt = os.getenv("OGP_MANUAL_TIME")
+if ("None" in omt) :
+    tm = time.strftime("%Y%m%d-%HH%MM")
+    topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
+    print "Creating the top level directory for the CCD at %s" % topccddir
 
-flatdir = "%s/Flatness/" % topccddir
-print "Creating directory for flatness results. Location is %s" % flatdir
+    edgedir = "%s/EdgeScan/" % topccddir
+    print "Creating directory for edge scan results. Location is %s" % edgedir
 
-tm = time.strftime("%Y%m%d-%HH%MM")
+    flatdir = "%s/Flatness/" % topccddir
+    print "Creating directory for flatness results. Location is %s" % flatdir
 
-edgedatedir = "%s%s" % (edgedir,tm)
-print "Creating dated edge directory for the CCD at %s" % edgedatedir
-os.makedirs(edgedatedir)
+    edgedatedir = "%s%s" % (edgedir,tm)
+    print "Creating dated edge directory for the CCD at %s" % edgedatedir
+    os.makedirs(edgedatedir)
+    flatdatedir = "%s%s" % (flatdir,tm)
+    print "Creating dated edge directory for the CCD at %s" % flatdatedir
+    os.makedirs(flatdatedir)
+else :
+    print "!!! AN OGP MANUAL TIME HAS BEEN SPECIFIED !!!"
+    tm = omt
+    topccddir = "/cygdrive/c/Production_DATA_manual/%s" % ccd
+    edgedir = "%s/EdgeScan/" % topccddir
+    flatdir = "%s/Flatness/" % topccddir
+    edgedatedir = "%s%s" % (edgedir,tm)
+    flatdatedir = "%s%s" % (flatdir,tm)
+    print "The names for the directories are :\n%s\n%s" % (edgedatedir,flatdatedir)
+    print "Will assume data already in edge and flatness directories indicated above"
+    os.unsetenv("OGP_MANUAL_TIME")
+
 os.system("chmod 777 %s" %  edgedatedir)
-flatdatedir = "%s%s" % (flatdir,tm)
-print "Creating dated edge directory for the CCD at %s" % flatdatedir
-os.makedirs(flatdatedir)
 os.system("chmod 777 %s" %  flatdatedir)
 print "Please setup the OGP MeasureMind application to store results in respective edge scan and flatness directories indicated above"
 

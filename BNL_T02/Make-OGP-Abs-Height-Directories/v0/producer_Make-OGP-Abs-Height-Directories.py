@@ -11,19 +11,34 @@ ogpscriptname = "CCDb_Abs_Hgt_robust.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
-topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
-print "Creating the top level directory for the CCD at %s" % topccddir
 
-flatdir = "%s/AbsoluteHeight/" % topccddir
-print "Creating directory for flatness results. Location is %s" % flatdir
+topccddir = "/dev/null"
+flatdir = "/dev/null"
+flatdatedir = "/dev/null"
 
-tm = time.strftime("%Y%m%d-%HH%MM")
+omt = os.getenv("OGP_MANUAL_TIME")
+if ("None" in omt) :
+    tm = time.strftime("%Y%m%d-%HH%MM")
+    topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
+    print "Creating the top level directory for the CCD at %s" % topccddir
+    flatdir = "%s/AbsoluteHeight/" % topccddir
+    print "Creating directory for flatness results. Location is %s" % flatdir
+    flatdatedir = "%s%s" % (flatdir,tm)
+    print "Creating dated flatness directory for the CCD at %s" % flatdatedir
+    os.makedirs(flatdatedir)
+    print "Please setup the OGP MeasureMind application to store results in respective flatness directory indicated above"
+else :
+    print "!!! AN OGP MANUAL TIME HAS BEEN SPECIFIED !!!"
+    tm = omt
+    topccddir = "/cygdrive/c/Production_DATA_manual/%s" % ccd
+    flatdir = "%s/Flatness/" % topccddir
+    flatdatedir = "%s%s" % (flatdir,tm)
+    print "The name for the flatness directory will be %s" % flatdatedir
+    print "Will assume data already in the flatness directory indicated above"
+    os.unsetenv("OGP_MANUAL_TIME")
 
-flatdatedir = "%s%s" % (flatdir,tm)
-print "Creating dated flatness directory for the CCD at %s" % flatdatedir
-os.makedirs(flatdatedir)
 os.system("chmod 777 %s" %  flatdatedir)
-print "Please setup the OGP MeasureMind application to store results in respective flatness directory indicated above"
+
 
 # leave a link to the location where the files should go
 print "Making links to the data directories in %s" % os.getcwd()
