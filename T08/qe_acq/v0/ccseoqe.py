@@ -44,7 +44,7 @@ if (True):
 # prepare TS8: make sure temperature and vacuum are OK and load the sequencer
 #    eolib.EOSetup(tssub,RAFTID,CCSRAFTTYPE,cdir,sequence_file,vac_outlet,ts8sub)
   
-    result = ts8sub.synchCommand(20,"loadSequencer",acffile);
+    result = ts8sub.synchCommand(90,"loadSequencer",acffile);
 
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'LAMBDA_LOLIM', default='1.0'))
@@ -67,26 +67,10 @@ if (True):
 # make sure the XED is deactivated
 #    ts8sub.synchCommand(10,"setExposureParameter","Fe55","0");
 #    ts8sub.synchCommand(30,"setExposureParameter","actuate_xed","False");
-#Traceback (most recent call last):  File "<script>", line 65, in <module>org.lsst.ccs.command.Co#mmandInvocationException: Error: Can't invoke command     at org.lsst.ccs.command.CommandSetBuil#der$CommandSetImplementation.invoke(CommandSetBuilder.java:63)      at org.lsst.ccs.command.Comm#andSetBuilder$CommandSetImplementation.invoke(CommandSetBuilder.java:54)      at org.lsst.ccs.co#mmand.CompositeCommandSet.invoke(CompositeCommandSet.java:92)   at org.lsst.ccs.Agent$RunningCom#mand.lambda$new$7(Agent.java:875) at org.lsst.ccs.Agent$RunningCommand$$Lambda$41/25424946.call(#Unknown Source)     at java.util.concurrent.FutureTask.run(FutureTask.java:266)     at java.util#.concurrent.Executors$RunnableAdapter.call(Executors.java:511)        at java.util.concurrent.Fu#tureTask.run(FutureTask.java:266)       at java.util.concurrent.ThreadPoolExecutor.runWorker(Thr#eadPoolExecutor.java:1142)        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPo#olExecutor.java:617)at java.lang.Thread.run(Thread.java:745)Caused by: java.lang.IllegalArgum
+
 
 # clear the REB buffers
-    print "doing some unrecorded bias acquisitions to clear the buffers"
-    print "set controller for bias exposure"
-# Note: Same problem as above
-    ts8sub.synchCommand(10,"setExposureParameter open_shutter true");
-    ts8sub.synchCommand(10,"setExposureParameter exposure_time 0");
-    for i in range(5):
-        timestamp = time.time()
-# Note: commented out because it seemed to be causing a hang after
-#     Generating Image image 12308x12032 took 2 seconds.
-#    File "<script>", line 317, in <module> (ACTION and CONFIGURATION commands are only accepted in READY stateorg.lsst.ccs.messaging.CommandRejectedException: ACTION and CONFIGURATION commands are only accepted in READY state 
-        result = ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
-        print "Ready to take clearing bias image. time = %f" % time.time()
-        ts8sub.synchCommand(50,"exposeAcquireAndSave");
-#        rply = result.getResult()
-# Note: I had already commented out the following
-#        result = ts8sub.synchCommand(500,"waitForExpoEnd");
-#        rply = result.getResult();
+#    ,,, is this still needed?
 
 
 # go through config file looking for 'qe' instructions
@@ -98,6 +82,11 @@ if (True):
         tokens = str.split(line)
         if ((len(tokens) > 0) and (tokens[0] == 'lambda')):
             wl = int(tokens[1])
+
+# Note: stop it at 500 ... this is just for demonstration purposes for now
+            if (wl > 350.) :
+                break
+
             target = float(tokens[2])
             print "wl = %f" % wl;
 
@@ -106,25 +95,10 @@ if (True):
 #ts8 ccs>setHeader test ExpTime 1.0
 #*** Failed to invoke main method in class org.lsst.ccs.subsystem.shell.ConsoleCommandShell
 #*** Reason:  Error finding command setHeader with 3 arguments: 2 matches found in MethodBasedCommandDictionary
-#org.lsst.ccs.command.AmbiguousCommandException: Error finding command setHeader with 3 arguments: 2 matches found in MethodBasedCommandDictionary
-#        at org.lsst.ccs.command.MethodBasedCommandDictionary.findCommand(MethodBasedCommandDictionary.java:44)
-#        at org.lsst.ccs.command.MethodBasedCommandDictionary.containsCommand(MethodBasedCommandDictionary.java:18)
-#        at org.lsst.ccs.command.CompositeCommandDictionary.containsCommand(CompositeCommandDictionary.java:53)
-#        at org.lsst.ccs.command.CompositeCommandDictionary.containsCommand(CompositeCommandDictionary.java:53)
-#        at org.lsst.ccs.command.CompositeCommandDictionary.containsCommand(CompositeCommandDictionary.java:53)
-#        at org.lsst.ccs.command.CompositeCommandSet.invoke(CompositeCommandSet.java:91)
-#        at org.lsst.ccs.shell.JLineShell.run(JLineShell.java:133)
-#        at org.lsst.ccs.subsystem.shell.ConsoleCommandShell.main(ConsoleCommandShell.java:237)
-#        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-#        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-#        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-#        at java.lang.reflect.Method.invoke(Method.java:483)
-#        at org.lsst.ccs.bootstrap.Bootstrap.launchCCSApplication(Bootstrap.java:627)
-#        at org.lsst.ccs.bootstrap.Bootstrap.main(Bootstrap.java:708)
 #[jh-test ts8prod@ts8-raft1 workdir]$ 
 
             print "setting the monochromator wavelength to %f" % wl
-#            if (exptime > lo_lim):
+
             result = monosub.synchCommand(1000,"setWaveAndFilter",wl);
             rwl = result.getResult()
             time.sleep(10.)
@@ -143,7 +117,6 @@ if (True):
 # take bias images
 # 
 
-            ts8sub.synchCommand(10,"setExposureParameter exposure_time 0"); 
             ts8sub.synchCommand(10,"setExposureParameter open_shutter false");
 
             print "setting location of bias fits directory"
@@ -152,11 +125,14 @@ if (True):
 #            result = ts8sub.synchCommand(10,"setRaftName",raft)
 # Note: throws a not implemented exception
 
-#            result = ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA")
-#            result = ts8sub.synchCommand(10,"setHeader","ImageType","BIAS")
+            ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA",False)
+            ts8sub.synchCommand(10,"setHeader","ImageType","BIAS",False)
+            result = ts8sub.synchCommand(90,"loadSequencer",acffile);
 
-            for i in range(2):
+# probably not needed any more ... reduce count to 1
+            for i in range(1):
                 timestamp = time.time()
+                ts8sub.synchCommand(10,"setExposureParameter exposure_time 0"); 
                 ts8sub.synchCommand(10,"setFitsFilesNamePattern","clear.fits");
                 print "Ready to take clearing bias image. time = %f" % time.time()
                 ts8sub.synchCommand(50,"exposeAcquireAndSave");
@@ -166,8 +142,11 @@ if (True):
 #                rply = result.getResult();
                 print "after click click at %f" % time.time()
 
+            time.sleep(3.0)
+
             for i in range(bcount):
                 timestamp = time.time()
+                ts8sub.synchCommand(10,"setExposureParameter exposure_time 0"); 
 #                fitsfilename = "%s_lambda_bias_%3.3d_${TIMESTAMP}.fits" % (raft,seq)
                 fitsfilename = "%s_lambda_bias_%3.3d_%s.fits" % (raft,seq,time.time())
                 ts8sub.synchCommand(10,"setFitsFilesNamePattern",fitsfilename);
@@ -185,7 +164,7 @@ if (True):
 #            ts8sub.synchCommand(10,"setExposureParameter","Light","1");
             print "setting location of fits exposure directory"
             ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
-            ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
+            ts8sub.synchCommand(10,"setFitsFilesNamePattern","clear.fits");
             ts8sub.synchCommand(10,"setExposureParameter exposure_time 2000"); 
 
             ts8sub.synchCommand(50,"exposeAcquireAndSave");
@@ -199,7 +178,9 @@ if (True):
 # QUESTION: how do we want this to choose a value for a set of sensors?
 
 #            result  = ts8sub.synchCommand(10,"setFitsFilesNamePattern","fluxcalimage-${TIMESTAMP}");
-            result  = ts8sub.synchCommand(10,"setFitsFilesNamePattern","fluxcalimage-%s" % time.time());
+            ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
+            ts8sub.synchCommand(10,"setExposureParameter exposure_time 2000"); 
+            ts8sub.synchCommand(10,"setFitsFilesNamePattern","fluxcalimage-%s" % time.time());
             ts8sub.synchCommand(200,"exposeAcquireAndSave");
 # Note: since I don't know how to wait
             time.sleep(2.0)
@@ -210,7 +191,7 @@ if (True):
 #            result = ts8sub.synchCommand(10,"getFluxStats",flncal);
 #            flux = float(result.getResult());
 # force it to a fixed value for now 
-            flux = 300.0
+            flux = 2000.0
 
             time.sleep(2.0)
 
@@ -218,6 +199,7 @@ if (True):
 #            flux = flux * 0.50
 
             exptime = target/flux
+#            exptime = 10000
             print "needed exposure time = %f" % exptime
             if (exptime > hi_lim) :
                 exptime = hi_lim
@@ -233,6 +215,8 @@ if (True):
             else :
                 nplc = 0.25
 
+# Note: for testing, make these recordings as quick as possible by reducing the number of samples:
+#            nplc = nplc * 10
 
             nreads = (exptime+2.0)*60/nplc
             if (nreads > 3000):
@@ -240,8 +224,8 @@ if (True):
                 nplc = (exptime+2.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
-            result = ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA")
-            result = ts8sub.synchCommand(10,"setHeader","ImageType","FLAT")
+            ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA",False)
+            ts8sub.synchCommand(10,"setHeader","ImageType","FLAT",False)
 
 
 # adjust timeout because we will be waiting for the data to become ready
@@ -249,20 +233,30 @@ if (True):
             print "Setting timeout to %f s" % mywait
             pdsub.synchCommand(1000,"setTimeout",mywait);
 
-            ts8sub.synchCommand(10,"setExposureParameter exposure_time str(int(exptime*1000)));
-# Note: since I don't know hot to wait
+#            ts8sub.synchCommand(10,"setExposureParameter exposure_time %s" % str(int(exptime*1000)));
+            print "setExposureParameter exposure_time %s" % str(int(exptime*1000))
+            ts8sub.synchCommand(10,"setExposureParameter exposure_time 10000");
+
+            print "Ready to take clearing bias image. time = %f" % time.time()
+            ts8sub.synchCommand(10,"setExposureParameter open_shutter false");
+            print "setting location of bias fits directory"
+            ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
+            ts8sub.synchCommand(10,"setFitsFilesNamePattern","clear.fits");
+
+            ts8sub.synchCommand(300,"exposeAcquireAndSave");
+# Note: since I don't know how to wait
             time.sleep(exptime)
 
-            ts8sub.synchCommand(10,"setFitsFilesNamePattern","");
-            print "Ready to take clearing bias image. time = %f" % time.time()
-            ts8sub.synchCommand(20,"exposeAcquireAndSave");
 #            rply = result.getResult()
 #            result = ts8sub.synchCommand(500,"waitForExpoEnd");
 #            rply = result.getResult();
 
-            time.sleep(4.0)
+#            time.sleep(4.0)
+
+            result = ts8sub.synchCommand(90,"loadSequencer",acffile);
 
             for i in range(imcount):
+                print "image number = %d" % i
                 print "starting acquisition step for lambda = %8.2f" % wl
 
                 print "call accumBuffer to start PD recording at %f" % time.time()
@@ -281,8 +275,14 @@ if (True):
 
 # start acquisition
                 timestamp = time.time()
+
+                print "setExposureParameter exposure_time %s" % str(int(exptime*1000))
+                ts8sub.synchCommand(10,"setExposureParameter exposure_time 10000");
+                ts8sub.synchCommand(10,"setExposureParameter open_shutter true");
+                ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
+
 #                fitsfilename = "%s_lambda_flat_%4.4d_%3.3d_${TIMESTAMP}.fits" % (ts8,int(wl),seq)
-                fitsfilename = "%s_lambda_flat_%4.4d_%3.3d_%s.fits" % (ts8,int(wl),seq,time.time())
+                fitsfilename = "%s_lambda_flat_%4.4d_%3.3d_%s.fits" % (raft,int(wl),seq,time.time())
                 ts8sub.synchCommand(10,"setFitsFilesNamePattern",fitsfilename);
                 print "fitsfilename = %s" % fitsfilename
 
@@ -290,8 +290,11 @@ if (True):
                 time.sleep(1.0);
 
                 print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
-                result = ts8sub.synchCommand(500,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
+                ts8sub.synchCommand(500,"exposeAcquireAndSave");
+# Note: since I don't know how else to wait
+                time.sleep(exptime)
+
+#                fitsfilename = result.getResult();
 #                result = ts8sub.synchCommand(500,"waitForExpoEnd");
 #                rply = result.getResult();
                 print "after click click at %f" % time.time()
@@ -308,13 +311,15 @@ if (True):
                 time.sleep(2.)
 
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-                result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
+# Note: otherwise it will try to write to a directory that doesn't exist on the other machine
+#                result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
+                result = pdsub.synchCommand(1000,"readBuffer","/tmp/%s" % pdfilename);
                 buff = result.getResult()
                 print "Finished getting readings at %f" % time.time()
 
 
-
-                result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+# Note: note implemented yet
+#                result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 # ------------------- end of imcount loop --------------------------------
 # reset timeout to something reasonable for a regular command
@@ -345,7 +350,7 @@ if (True):
 #    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
 #    rply = result.getResult();
 try:
-#    result = ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA-END")
+    result = ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA-END",False)
     print "something"
 
 except Exception, ex:
