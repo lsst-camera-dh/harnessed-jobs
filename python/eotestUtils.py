@@ -154,6 +154,7 @@ def addHeaderData(fitsfile, **kwds):
         clobber = kwds['clobber']
     except KeyError:
         clobber = True
-    # Preserve bitpix for all image extensions since astropy.io.fits 
-    # always chage
     fits_obj.writeto(fitsfile, clobber=clobber)
+
+def png_data_product(pngfile, sensor_id):
+    return pngfile[len(sensor_id)+1:-len('.png')]
