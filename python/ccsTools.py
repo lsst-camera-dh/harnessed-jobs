@@ -59,13 +59,20 @@ class CcsSetup(OrderedDict):
         self._read(os.path.join(siteUtils.getJobDir(), configFile))
         CCDTYPE = _quote(siteUtils.getUnitType())
         print "CCDTYPE = %s" % CCDTYPE
-        if ("ITL" in CCDTYPE) :
-            print "setting CCSCCDTYPE"
-            self['CCSCCDTYPE'] = _quote("ITL")
-            self['acffile'] = self['itl_acffile']
-        if ("e2v" in CCDTYPE) :
-            self['CCSCCDTYPE'] = _quote("E2V")
-            self['acffile'] = self['e2v_acffile']
+        if ("RTM" in CCDTYPE) :
+            if ("e2v" in CCDTYPE) :
+                self['CCSCCDTYPE'] = _quote("E2V")
+                self['acffile'] = self['e2v_acffile']
+            else :
+                self['CCSCCDTYPE'] = _quote("ITL")
+                self['acffile'] = self['itl_acffile']
+        else :
+            if ("ITL" in CCDTYPE) :
+                self['CCSCCDTYPE'] = _quote("ITL")
+                self['acffile'] = self['itl_acffile']
+            if ("e2v" in CCDTYPE) :
+                self['CCSCCDTYPE'] = _quote("E2V")
+                self['acffile'] = self['e2v_acffile']
         print "The acffile to be used is %s" % self['acffile']
 
     def _read(self, configFile):

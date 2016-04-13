@@ -52,7 +52,7 @@ if (True):
     bcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_BCOUNT', default='1'))
     imcount = int(eolib.getCfgVal(acqcfgfile, 'LAMBDA_IMCOUNT', default='1'))
 
-    bcount = 3
+    bcount = 1
 
     seq = 0
 
@@ -101,7 +101,7 @@ if (True):
 
             result = monosub.synchCommand(1000,"setWaveAndFilter",wl);
             rwl = result.getResult()
-            time.sleep(10.)
+#            time.sleep(10.)
             if (abs(wl-rwl)>1.0) :
                 print "ALERT ALERT ALERT MONOCHROMATOR APPEARS NOT TO HAVE REACHED THE DESIRED WAVELENGTH"
                 print "request wl = %f" % wl
@@ -109,7 +109,7 @@ if (True):
                 print "SKIPPING THIS WAVELENGTH!"
                 continue
             print "publishing state"
-            result = tssub.synchCommand(60,"publishState");
+#            result = tssub.synchCommand(60,"publishState");
             print "The wl retrieved from the monochromator is rwl = %f" % rwl
 #            result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
@@ -127,7 +127,7 @@ if (True):
 
             ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA",False)
             ts8sub.synchCommand(10,"setHeader","ImageType","BIAS",False)
-            result = ts8sub.synchCommand(90,"loadSequencer",acffile);
+#            result = ts8sub.synchCommand(90,"loadSequencer",acffile);
 
 # probably not needed any more ... reduce count to 1
             for i in range(1):
@@ -157,22 +157,23 @@ if (True):
 #                result = ts8sub.synchCommand(500,"waitForExpoEnd");
 #                rply = result.getResult();
                 print "after click click at %f" % time.time()
-                time.sleep(3.0)
+#                time.sleep(3.0)
 
 
 # take light exposures
 #            ts8sub.synchCommand(10,"setExposureParameter","Light","1");
-            print "setting location of fits exposure directory"
-            ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
-            ts8sub.synchCommand(10,"setFitsFilesNamePattern","clear.fits");
-            ts8sub.synchCommand(10,"setExposureParameter exposure_time 2000"); 
+            ts8sub.synchCommand(10,"setExposureParameter open_shutter true");
+#            print "setting location of fits exposure directory"
+#            ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
+#            ts8sub.synchCommand(10,"setFitsFilesNamePattern","clear.fits");
+#            ts8sub.synchCommand(10,"setExposureParameter exposure_time 2000"); 
 
-            ts8sub.synchCommand(50,"exposeAcquireAndSave");
+#            ts8sub.synchCommand(50,"exposeAcquireAndSave");
 #            fitsfilename = result.getResult();
 #            result = ts8sub.synchCommand(500,"waitForExpoEnd");
 #            rply = result.getResult();
-            print "after click click at %f" % time.time()
-            time.sleep(2.0)
+#            print "after click click at %f" % time.time()
+#            time.sleep(2.0)
 
 # do in-job flux calibration
 # QUESTION: how do we want this to choose a value for a set of sensors?
