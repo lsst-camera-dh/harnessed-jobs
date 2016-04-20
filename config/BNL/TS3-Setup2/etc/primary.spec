@@ -32,7 +32,7 @@ DETSIZE     String  ${DETSIZE}                  NOAO MOSAIC keywords
 BINX        Integer 1                           [pixels] binning along X axis 
 BINY        Integer 1                           [pixels] binning along Y axis 
 HEADVER     Integer 1                           Version number of header
-CCDGAIN     Float   4.40                        Rough guess at overall system gain (e-/DNB)
+CCDGAIN     Float   4.50                        Rough guess at overall system gain (e-/DNB)
 CCDNOISE    Float   1.0                         Rough guess at system noise (e- rms)
 CFGFILE     String  ${ConfigFile}               Configuration file name
 CTLRID      String  ${BackPlaneID}              Controller back plane ID
