@@ -1,6 +1,6 @@
 ###############################################################################
 # flat
-# Acquire flat image pairs for linearity and gain measurement.
+# Acquire flat image pairs for linearity measurement.
 # For each 'flat' command a pair of flat field images are acquired
 #
 # In the configuration file the format for a flat command is
@@ -49,7 +49,6 @@ try:
     eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub)
 
     print "Setting the current ranges on the Bias and PD devices"
-#    biassub.synchCommand(10,"setCurrentRange",0.0002)
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
     print "Now collect some parameters from the config file"
@@ -64,19 +63,13 @@ try:
 
     seq = 0  # image pair number in sequence
 
-#    monosub.synchCommand(120,"setFilter",3);
-
-
     ccd = CCDID
     print "Working on CCD %s" % ccd
 
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
-    result = monosub.synchCommand(30,"setSlitSize",1,222);
-    result = monosub.synchCommand(30,"setSlitSize",2,222);
-# removing for test with no SW change
-#    result = monosub.synchCommand(30,"setSlitSize",1,48);
-#    result = monosub.synchCommand(30,"setSlitSize",2,48);
+    result = monosub.synchCommand(30,"setSlitSize",1,270);
+    result = monosub.synchCommand(30,"setSlitSize",2,270);
 
 # clear the buffers                                                                                          
     print "doing some unrecorded bias acquisitions to clear the buffers"
@@ -112,13 +105,6 @@ try:
 
             print "target exposure = %d" % (target);
 
-# removing for test with no SW change
-#            if (target > 13000) :
-#                result = monosub.synchCommand(30,"setSlitSize",1,112);
-#                result = monosub.synchCommand(30,"setSlitSize",2,112);
-#                owl = 0.
-
-
             result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
 
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='FLAT', use_nd=False)
@@ -131,7 +117,6 @@ try:
             print "setting location of bias fits directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
- 
             print "start bias exposure loop"
 
             result = arcsub.synchCommand(10,"setCCDnum",ccd)
@@ -170,7 +155,6 @@ try:
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
 
-#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
@@ -184,12 +168,11 @@ try:
                 result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
 # do in-job flux calibration
-
+# #####################################################################################3
 # dispose of first image
                 arcsub.synchCommand(10,"setParameter","Light","1");
                 arcsub.synchCommand(10,"setParameter","ExpTime","2000");
                 
-#                arcsub.synchCommand(10,"setFitsFilename","chk1.fits");
                 arcsub.synchCommand(10,"setFitsFilename","");
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
@@ -209,13 +192,10 @@ try:
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
                 flux = float(result.getResult());
 
-# scale 
-#                flux = flux * 0.50
-
                 print "The flux is determined to be %f" % flux
 
                 owl = wl
-
+# ####################################################################################3
             exptime = target/flux
             print "needed exposure time = %f" % exptime
             if (exptime > hi_lim) :
@@ -345,8 +325,8 @@ try:
     result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
     rply = result.getResult();
 
-    result = monosub.synchCommand(30,"setSlitSize",1,210);
-    result = monosub.synchCommand(30,"setSlitSize",2,210);
+    result = monosub.synchCommand(30,"setSlitSize",1,270);
+    result = monosub.synchCommand(30,"setSlitSize",2,270);
 
     result = arcsub.synchCommand(10,"setHeader","TestType","FLAT-DONE")
 
