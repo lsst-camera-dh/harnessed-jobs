@@ -97,7 +97,7 @@ try:
 
 
 #            exptime = eolib.expCheck(calfile, labname, target, wl, hi_lim, lo_lim, test='LAMBDA', use_nd=False)
-            exptime = 1.0
+            exptime = 3.0
 
             if (doarch) :
 
