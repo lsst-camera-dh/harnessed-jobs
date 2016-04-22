@@ -20,4 +20,7 @@ for item in coolfiles :
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
 
+# see if the status file is there thus indicating successful completion of the ccs script
+fp = open("status.out","r");
+
 #ccsValidator('ts3_cool_down_acq')

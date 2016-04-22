@@ -104,15 +104,7 @@ try:
     result = tssub.synchCommand(120,"goTestStand");
     rply = result.getResult();
 
-
-except Exception, ex:
-
-    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
-
-except ScriptingTimeoutException, ex:
-
-    raise Exception("There was an ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
-
+    fp = open("%s/status.out" % (cdir),"w");
     istate=0;
     result = tssub.synchCommandLine(10,"getstate");
     istate=result.getResult();
@@ -122,5 +114,13 @@ except ScriptingTimeoutException, ex:
     fp.write("%s\n" % archon_version);
     fp.write("%s\n" % archon_revision);
     fp.close();
+
+except Exception, ex:
+
+    raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
+
+except ScriptingTimeoutException, ex:
+
+    raise Exception("There was an ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 print "ts3_cool_down: COMPLETED"
