@@ -129,6 +129,8 @@ try:
             result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
 
 
+            arcsub.synchCommand(10,"setParameter","Light","0");
+            arcsub.synchCommand(10,"setParameter","ExpTime","0");
             for i in range(2):
                 timestamp = time.time()
                 arcsub.synchCommand(10,"setFitsFilename","");
@@ -188,10 +190,10 @@ try:
 
 
             nreads = (exptime+2.0)*60/nplc
-            if (nreads > 3000):
-                nreads = 3000
+            if (nreads > 2048):
+                nreads = 2048
                 nplc = (exptime+2.0)*60/nreads
-                print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
+                print "Nreads limited to 2048. nplc set to %f to cover full exposure period " % nplc
 
             result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
             result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")

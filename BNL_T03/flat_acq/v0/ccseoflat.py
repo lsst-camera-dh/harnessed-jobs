@@ -203,7 +203,7 @@ try:
             if (exptime < lo_lim) :
                 exptime = lo_lim
             print "adjusted exposure time = %f" % exptime
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes
             if (exptime>0.5) :
@@ -229,13 +229,17 @@ try:
             print "starting acquisition step for lambda = %8.2f with exptime %8.2f s" % (wl, exptime)
 
             print "throw away first image"
+# wait an amount of time equivalent to the last flux image taken
+#            time.sleep(2.0)
+            arcsub.synchCommand(10,"setParameter","ExpTime","0");
             result = arcsub.synchCommand(10,"setFitsFilename","");
             print "Ready to take disposable image. time = %f" % time.time()
             result = arcsub.synchCommand(500,"exposeAcquireAndSave");
             fitsfilename = result.getResult();
             result = arcsub.synchCommand(500,"waitForExpoEnd");
             rply = result.getResult();
-            print "done waiting for for throw away image to be acquired %f" % time.time()
+            print "done waiting for throw away image to be acquired %f" % time.time()
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
             for i in range(imcount):
                 print "starting image setup and PD reading accumulation at %f" % time.time()
