@@ -287,7 +287,9 @@ try:
 #                time.sleep(1.)
 
                 try:
-                    print "executing readBuffer"
+                    print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
+                    pdsub.synchCommand(20,"setTimeout",120.);
+
                     result = pdsub.synchCommand(500,"readBuffer","%s/%s" % (cdir,pdfilename));
                     buff = result.getResult()
                 except:

@@ -127,10 +127,11 @@ try:
             result = tssub.synchCommand(60,"publishState");
 
 # prepare to readout diodes
-            nreads = exptime*60/nplc + 200
+# the number of readings on the end is greatly reduced because it is all supposed to be dark afterall
+            nreads = exptime*60/nplc + 20
             if (nreads > 1000):
                 nreads = 1000
-                nplc = exptime*60/(nreads-200)
+                nplc = exptime*60/(nreads-20)
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
 
@@ -145,6 +146,9 @@ try:
 
             for i in range(imcount):
 
+                pdsub.synchCommand(20,"reset");
+                print "Setting the current ranges on the Bias and PD devices"
+                pdsub.synchCommand(20,"setCurrentRange",0.000002)
 
 # adjust timeout because we will be waiting for the data to become ready both
 # at the accumbuffer stage and the readbuffer stage
@@ -185,7 +189,13 @@ try:
                 time.sleep(5.)
     
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-                result = pdsub.synchCommand(1800,"readBuffer","%s/%s" % (cdir,pdfilename));
+                pdsub.synchCommand(20,"setTimeout",60.);
+                try:
+                    result = pdsub.synchCommand(200,"readBuffer","%s/%s" % (cdir,pdfilename));
+                except: # try one more time
+                    print "readBuffer failed once ... try one more time"
+                    result = pdsub.synchCommand(200,"readBuffer","%s/%s" % (cdir,pdfilename));
+
                 buff = result.getResult()
                 print "Finished getting readings at %f" % time.time()
 

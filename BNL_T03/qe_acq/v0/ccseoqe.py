@@ -260,9 +260,18 @@ try:
 # make sure the sample of the photo diode is complete
                 time.sleep(2.)
 
-                print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-                result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
-                buff = result.getResult()
+                try:
+                    print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
+                    pdsub.synchCommand(20,"setTimeout",120.);
+
+                    result = pdsub.synchCommand(500,"readBuffer","%s/%s" % (cdir,pdfilename));
+                    buff = result.getResult()
+                except:
+# give it one more try
+                    print "problem occurred on first readBuffer attempt ... trying once more!"
+                    result = pdsub.synchCommand(500,"readBuffer","%s/%s" % (cdir,pdfilename));
+                    buff = result.getResult()
+
                 print "Finished getting readings at %f" % time.time()
 
 

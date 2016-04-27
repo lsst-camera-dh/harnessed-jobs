@@ -26,6 +26,9 @@ try:
     monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
     print "attaching PDU subsystem"
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
+    print "attaching Lamp subsystem"
+    lampsub = CCS.attachSubsystem("%s/Lamp" % ts );
+
     print "Attaching archon subsystem"
     arcsub  = CCS.attachSubsystem("%s" % archon);
     
@@ -239,6 +242,10 @@ try:
     
     fp.close();
     
+# turn off the lamp
+    print "TURNING OFF THE LAMP"
+    result = lampsub.synchCommand(100000,"setLampPowerEnable",False);
+
 # move TS to ready state
     result = tssub.synchCommand(60,"setTSReady");
     reply = result.getResult();
