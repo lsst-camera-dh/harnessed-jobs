@@ -1,0 +1,11 @@
+# -*- python -*-
+{
+    'schema_name' : 'rebalive_functionality',
+    'schema_version' : 0,
+    'stat' : int,
+    'teststand_version' : str,
+    'teststand_revision' : str,
+    'archon_version' : str,
+    'archon_revision' : str
+}
+
