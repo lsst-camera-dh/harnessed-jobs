@@ -33,8 +33,8 @@ try:
     cdir = tsCWD
 
 # set the scan range here:
-    wlbegin = 970.
-    wlend   = 990.
+    wlbegin = 300.
+    wlend   = 1100.
 
     wlstep = 10.
 
