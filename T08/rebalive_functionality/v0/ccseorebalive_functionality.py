@@ -14,6 +14,7 @@ CCS.setThrowExceptions(True);
 if (True):
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("ts8");
+    pwrsub  = CCS.attachSubsystem("ccs-rebps");
 
     time.sleep(3.)
 
@@ -24,6 +25,151 @@ if (True):
     ts_revision = ""
     ts8_revision = ""
 
+    fp = open("%s/rebalive_report.results" % (cdir),"w");
+
+# attempt to power apply the REB power
+    test_name = "apply_power"
+    try:
+        result = pwrsub.synchCommand(10,"togglePower");
+        status_value = "success";
+    except:
+        status_value = "failed"
+    fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
+
+#  Verify data link integrity.
+    test_name = "link_integrity"
+    try:
+        result = ts8sub.synchCommand(10,"getREBDevices");
+        status_value = result.getResult();
+    except:
+        status_value = "failed"
+    fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
+
+# Read 1-wire ID chip and record the value.
+    test_name = "link_integrity"
+    try:
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vi");
+        fitsfilename = result.getResult();
+        status_value = "success"
+    except:
+        status_value = "failed"
+    fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
+
+# Read and record the REB firmware version.
+# see: https://confluence.slac.stanford.edu/display/LSSTCAM/REB+Register+Sets
+    test_name = "REB_firmware_version"
+    try:
+        result = ts8sub.synchCommand(10,"readRegister 0");
+        fitsfilename = result.getResult();
+        status_value = "success"
+    except:
+        status_value = "failed"
+    fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
+
+
+# Read the voltage and current consumption measured by the VP5 LTC2945 current monitor on the REB, record the value and compare to the current measured at the P/S.
+    try:
+        test_name = "VP5_LTC2945_6V_I"
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vv");
+        rebv =  = result.getResult();
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vi");
+        rebi  = result.getResult();
+        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
+
+        test_name = "VP5_LTC2945_9V_I"
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.9Vv");
+        rebv =  = result.getResult();
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.9Vi");
+        rebi  = result.getResult();
+        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
+
+        test_name = "VP5_LTC2945_24V_I"
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.24Vv");
+        rebv =  = result.getResult();
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.24Vi");
+        rebi  = result.getResult();
+        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
+
+        test_name = "VP5_LTC2945_40V_I"
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.40Vv");
+        rebv =  = result.getResult();
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.40Vi");
+        rebi  = result.getResult();
+        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
+
+    except:
+        test_name = "VP5_LTC2945"
+        status_value = "failed"
+
+
+# Apply the analog power supply voltages (VP15_UNREG, VN15_UNREG, VP7_UNREG, VP40_UNREG) to the REB in the correct sequence (check with Rick for sequence and voltage values). Abort the test if any supply hits it overcurrent limit. Readback voltages and current consumption at the P/S and at the REB LTC2945 sensors.
+
+    try:
+        test_name = "VP5_LTC2945_6V_I"
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vv");
+        rebv =  = result.getResult();
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vi");
+        rebi  = result.getResult();
+        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
+
+        test_name = "VP5_LTC2945_9V_I"
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.9Vv");
+        rebv =  = result.getResult();
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.9Vi");
+        rebi  = result.getResult();
+        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
+
+        test_name = "VP5_LTC2945_24V_I"
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.24Vv");
+        rebv =  = result.getResult();
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.24Vi");
+        rebi  = result.getResult();
+        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
+
+        test_name = "VP5_LTC2945_40V_I"
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.40Vv");
+        rebv =  = result.getResult();
+        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.40Vi");
+        rebi  = result.getResult();
+        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
+
+    except:
+        test_name = "VP5_LTC2945"
+        status_value = "failed"
+
+
+
+#ccs-rebps/sequencePower  ? ?  Ideally yes, but currently ccs-rebps togglePower
+#ccs-rebps/MainPS getCurrent    ccs-rebps readChannelValue
+
+# Verify that all currents are within the expected range 
+
+
+# Record the value of the currents on each supply, both at the P/S and by the REB.
+
+
+# Readback the temperatures measured by each of the ADT7420 sensors on the REB.
+
+
+# Apply the CCD bias voltages and set the CCD clock rails (to E2V levels).
+
+ccs-rebps/setBiasDac ?  ccs-rafts loadNamedConfig, ccs-rafts loadDacs, ccs-rafts loadBiasDacs
+
+12. Re-check supply currents and verify they do not exceed expected values.
+13. Configure the ASPICs to standard gain and RC time constant, and leave the inputs in
+clamped state.
+
+ccs-rebps/sequencePower  ? ?  ccs-rafts loadAspics
+
+14. Execute a zero-second exposure and readout sequence. Start a timer when the \u201cclose
+shutter\u201d command executes.
+loadSequencer ...
+
+setExposureParameter open_shutter false
+setExposureParameter exposure_time 0
+exposeAcquireAndSave
+
+(I am purposely skipping the directory and filename settings)
 
   
     result = ts8sub.synchCommand(90,"loadSequencer",acffile);
