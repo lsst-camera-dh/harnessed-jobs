@@ -189,8 +189,6 @@ if (True):
              ts8asp%i.synchCommand(10,"change clamp 1");
 
 
-#ccs-rebps/sequencePower  ? ?  ccs-rafts loadAspics
-
 #14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.
  
          ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA",False)
