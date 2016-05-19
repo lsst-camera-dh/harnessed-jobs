@@ -15,6 +15,7 @@ if (True):
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("ts8");
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
+    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainPS");
 
     time.sleep(3.)
 
@@ -37,115 +38,113 @@ if (True):
     fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
 
 #  Verify data link integrity.
+    rebs = ""
     test_name = "link_integrity"
     try:
         result = ts8sub.synchCommand(10,"getREBDevices");
-        status_value = result.getResult();
+        rebs = result.getResult();
+        status_values = rebs
     except:
         status_value = "failed"
     fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
 
+    for rebid in rebs :
+        print "REB ID = %s" % rebid
+        print "=============================="
 # Read 1-wire ID chip and record the value.
-    test_name = "link_integrity"
-    try:
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vi");
-        fitsfilename = result.getResult();
-        status_value = "success"
-    except:
-        status_value = "failed"
-    fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
+        test_name = "link_integrity"
+        try:
+# SCI's own address
+            result = ts8sub.synchCommand(10,"readRegister "+rebid+" 2");
+            fitsfilename = result.getResult();
+            status_value = "success"
+        except:
+            status_value = "failed"
+        fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
 
 # Read and record the REB firmware version.
 # see: https://confluence.slac.stanford.edu/display/LSSTCAM/REB+Register+Sets
-    test_name = "REB_firmware_version"
-    try:
-        result = ts8sub.synchCommand(10,"readRegister 0");
-        fitsfilename = result.getResult();
-        status_value = "success"
-    except:
-        status_value = "failed"
-    fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
+        test_name = "REB_firmware_version"
+        try:
+            result = ts8sub.synchCommand(10,"readRegister "+rebid+" 0");
+            fitsfilename = result.getResult();
+            status_value = "success"
+        except:
+            status_value = "failed"
+        fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
 
 
 # Read the voltage and current consumption measured by the VP5 LTC2945 current monitor on the REB, record the value and compare to the current measured at the P/S.
-    try:
-        test_name = "VP5_LTC2945_6V_I"
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vv");
-        rebv =  = result.getResult();
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vi");
-        rebi  = result.getResult();
-        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
-
-        test_name = "VP5_LTC2945_9V_I"
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.9Vv");
-        rebv =  = result.getResult();
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.9Vi");
-        rebi  = result.getResult();
-        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
-
-        test_name = "VP5_LTC2945_24V_I"
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.24Vv");
-        rebv =  = result.getResult();
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.24Vi");
-        rebi  = result.getResult();
-        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
-
-        test_name = "VP5_LTC2945_40V_I"
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.40Vv");
-        rebv =  = result.getResult();
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.40Vi");
-        rebi  = result.getResult();
-        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
-
-    except:
-        test_name = "VP5_LTC2945"
-        status_value = "failed"
+        chans = [6V 9V 24V 40V]
+        for chn in chans :
+            try:
+                test_name = "VP5_LTC2945_%s_I" % chn
+                result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
+                rebv =  = result.getResult();
+                result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
+                rebi  = result.getResult();
+                fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
+            except:
+                test_name = "VP5_LTC2945"
+                status_value = "failed"
 
 
 # Apply the analog power supply voltages (VP15_UNREG, VN15_UNREG, VP7_UNREG, VP40_UNREG) to the REB in the correct sequence (check with Rick for sequence and voltage values). Abort the test if any supply hits it overcurrent limit. Readback voltages and current consumption at the P/S and at the REB LTC2945 sensors.
-
-    try:
-        test_name = "VP5_LTC2945_6V_I"
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vv");
-        rebv =  = result.getResult();
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.6Vi");
-        rebi  = result.getResult();
-        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
-
-        test_name = "VP5_LTC2945_9V_I"
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.9Vv");
-        rebv =  = result.getResult();
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.9Vi");
-        rebi  = result.getResult();
-        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
-
-        test_name = "VP5_LTC2945_24V_I"
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.24Vv");
-        rebv =  = result.getResult();
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.24Vi");
-        rebi  = result.getResult();
-        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
-
-        test_name = "VP5_LTC2945_40V_I"
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.40Vv");
-        rebv =  = result.getResult();
-        result = ts8sub.synchCommand(10,"getChannelValue DR00.Reb0.40Vi");
-        rebi  = result.getResult();
-        fp.write("%-20s\t | \t %f \t %f\n" % (test_name,rebv, rebi);
-
-    except:
-        test_name = "VP5_LTC2945"
-        status_value = "failed"
-
-
-
-#ccs-rebps/sequencePower  ? ?  Ideally yes, but currently ccs-rebps togglePower
-#ccs-rebps/MainPS getCurrent    ccs-rebps readChannelValue
+# ccs-rafts loadNamedConfig, ccs-rafts loadDacs, ccs-rafts loadBiasDacs
+        test_name = "apply analog power"
+        try:
+            result = pwrsub.synchCommand(10,"loadDacs",true);
+            status_value = "success";
+        except:
+            status_value = "failed"
+        fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
+        test_name = "apply analog power"
+        try:
+            result = pwrsub.synchCommand(10,"loadBiasDacs",true);
+            status_value = "success";
+        except:
+            status_value = "failed"
+        fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
+#
+# 
+#
 
 # Verify that all currents are within the expected range 
 
-
 # Record the value of the currents on each supply, both at the P/S and by the REB.
+
+# REB4 Supply current expected ranges (voltage, current min, current max) [mA]
+#+5V	500	750
+#+7V	400	600
+#+15V	100	300
+#+40V	60	120
+# Note: -15V monitor is not operational on REB4.
+        curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60}) 
+        curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120}) 
+
+        for chn in chans :
+            try:
+                test_name = "VP5_LTC2945_%s_I" % chn
+                result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
+                rebv =  = result.getResult();
+                result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
+                rebi  = result.getResult();
+                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn],curmax[chn]);
+            except:
+                test_name = "VP5_LTC2945"
+                status_value = "failed"
+
+
+
+        test_name = "main PS current"
+        try:
+            result = pwrmainsub.synchCommand(10,"getCurrent",true);
+            status_value = "success";
+        except:
+            status_value = "failed"
+        fp.write("%-20s\t | \t %s\n" % (test_name,status_value);
+
+
 
 
 # Readback the temperatures measured by each of the ADT7420 sensors on the REB.
