@@ -38,14 +38,18 @@ if (True):
 
     fp = open("%s/rebalive_results.txt" % (cdir),"w");
 
-# attempt to power apply the REB power
-    test_name = "apply_power"
-    try:
-        result = pwrsub.synchCommand(10,"togglePower");
-        status_value = "success";
-    except:
-        status_value = "failed"
-    fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
+    status_value = None
+
+    for i in range(3) :
+# attempt to apply the REB power
+        test_name = "power to line %d" % i
+        try:
+# OWEN: How does one see the current state of the line?
+            result = pwrsub.synchCommand(10,"togglePower",i,-1);
+            status_value = "success";
+        except:
+            status_value = "failed"
+            fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
 
 #  Verify data link integrity.
     rebs = ""
@@ -95,7 +99,7 @@ if (True):
                 rebv = result.getResult();
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
                 rebi  = result.getResult();
-                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn],curmax[chn]));
+                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
             except:
                 fp.write("%-20s\t | failed | failed \n" % (test_name));
 
@@ -143,7 +147,7 @@ if (True):
                 rebv = result.getResult();
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
                 rebi  = result.getResult();
-                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn],curmax[chn]));
+                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
             except:
                 fp.write("%-20s\t | failed | failed \n" % (test_name));
 
@@ -152,8 +156,8 @@ if (True):
 
         test_name = "main PS current"
         try:
-            result = pwrmainsub.synchCommand(10,"getCurrent",true);
-            status_value = "success";
+            result = pwrmainsub.synchCommand(10,"getCurrent");
+            status_value = result.getResult();
         except:
             status_value = "failed"
         fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
@@ -170,18 +174,18 @@ if (True):
                 print "temperature read command=%s" % cmnd
                 result = ts8sub.synchCommand(10,cmnd);
                 rebt = result.getResult();
-                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebt));
+                fp.write("%-20s\t | \t %f \n" % (test_name,rebt));
             except:
-                fp.write("%-20s\t | failed | failed \n" % (test_name));
+                fp.write("%-20s\t | failed \n" % (test_name));
 
         for itemp in range(1,3) :
             test_name = "DREB Temp_%s" % itemp
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.Temp%d" % (rebid,itemp));
                 rebt = result.getResult();
-                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebt));
+                fp.write("%-20s\t | \t %f \n" % (test_name,rebt));
             except:
-                fp.write("%-20s\t | failed | failed \n" % (test_name));
+                fp.write("%-20s\t | failed \n" % (test_name));
 
 # Apply the CCD bias voltages and set the CCD clock rails (to E2V levels).
         result = ts8sub.synchCommand(90,"loadSequencer","seq_1M.xml");
@@ -197,7 +201,7 @@ if (True):
                 rebv = result.getResult();
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
                 rebi  = result.getResult();
-                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn],curmax[chn]));
+                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
             except:
                 fp.write("%-20s\t | failed | failed \n" % (test_name_));
 
@@ -245,3 +249,42 @@ if (True):
 
 
 print "rebalive_functionalty test END"
+
+
+###############################################################################               
+# EOgetCCSVersions: getCCSVersions                                                            
+def TS8getCCSVersions(ts8sub,cdir):
+    result = ts8sub.synchCommand(10,"getCCSVersions");
+    ccsversions = result.getResult()
+    ccsvfiles = open("%s/ccsversion" % cdir,"w");
+    ccsvfiles.write("%s" % ccsversions)
+    ccsvfiles.close()
+
+    ssys = ""
+
+    ts8_version = ""
+    ccsrebps_version = ""
+    ts8_revision = ""
+    ccsrebps_revision = ""
+    for line in str(ccsversions).split("\t"):
+        tokens = line.split()
+        if (len(tokens)>2) :
+            if ("ts8" in tokens[2]) :
+                ssys = "ts8"
+            if ("ccs-rebps" in tokens[2]) :
+                ssys = "ccs-rebps"
+            if (tokens[1] == "Version:") :
+                print "%s - version = %s" % (ssys,tokens[2])
+                if (ssys == "ts8") :
+                    ts8_version = tokens[2]
+                if (ssys == "ccs-rebps") :
+                    ccsrebps_version = tokens[2]
+            if (len(tokens)>3) :
+                if (tokens[2] == "Rev:") :
+                    print "%s - revision = %s" % (ssys,tokens[3])
+                    if (ssys == "ts8") :
+                        ts8_revision = tokens[3]
+                    if (ssys == "ccs-rebps") :
+                        ccsrebps_revision = tokens[3]
+
+    return(ts8_version,ccsrebps_version,ts8_revision,ccsrebps_revision)
