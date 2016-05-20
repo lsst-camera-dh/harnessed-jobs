@@ -23,9 +23,6 @@ if (True):
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
     pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainPS");
 
-    ts8asp = [0,0,0,0,0,0,0,0]
-    for i in range(5) :
-        ts8asp[i] = CCS.attachSubsystem("ts8/R00.Reb2.ASPIC%d" % i)
 
     time.sleep(3.)
 
@@ -87,6 +84,40 @@ if (True):
             status_value = "failed"
         fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
 
+
+# record all DAC parameters
+        test_name = "DAC parameters"
+        ts8dac = CCS.attachSubsystem("ts8/%s.DAC" % (rebid))
+        try:
+            cmnd = "printConfigurableParameters"
+            result = ts8dac.synchCommand(10,cmnd);
+            rdac = result.getResult();
+            print "DAC parameters\n%s" % rdac
+            rdacstr = "%s" % rdac
+            for line in rdacstr.strip("{|}").split(",") :
+                print "test_name = %s" % test_name
+                print "line = %s" % line
+                fp.write("%-20s\t | \t %s \n" % (test_name,line));
+        except:
+            fp.write("%-20s\t | failed \n" % (test_name));
+
+        ts8asp = [0,0,0,0,0,0,0,0]
+        for i in range(6) :
+            ts8asp[i] = CCS.attachSubsystem("ts8/%s.ASPIC%d" % (rebid,i))
+
+        for iasp in range(6) :
+            test_name = "DAC parms ASPIC%d" % iasp
+            try:
+                cmnd = "printConfigurableParameters"
+                result = ts8asp[iasp].synchCommand(10,cmnd);
+                rasp = "%s" % result.getResult();
+                print "DAC parms ASPIC%d \n %s" % (iasp,rasp)
+                for line in rasp.strip("{|}").split(",") :
+                    print "test_name = %s" % test_name
+                    print "line = %s" % line
+                    fp.write("%-20s\t | \t %s \n" % (test_name,line));
+            except:
+                fp.write("%-20s\t | failed \n" % (test_name));
 
 # Read the voltage and current consumption measured by the VP5 LTC2945 current monitor on the REB, record the value and compare to the current measured at the P/S.
 
@@ -164,7 +195,6 @@ if (True):
 
 
 
-
 # Readback the temperatures measured by each of the ADT7420 sensors on the REB.
 
         for itemp in range(1,9) :
@@ -208,7 +238,7 @@ if (True):
 
 #13. Configure the ASPICs to standard gain and RC time constant, and leave the inputs in clamped state.
 
-        for i in range(5) :
+        for i in range(6) :
             ts8asp[i].synchCommand(10,"change clamp 1");
 
 
@@ -232,7 +262,7 @@ if (True):
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
         
-        fp.write("bias image\t | %s | %s \n" % (tm_start, tm_end));
+        fp.write("%-20s\t| %s | %s \n" % ("bias exp start/stop",tm_start, tm_end));
 
 
     fp.close();
