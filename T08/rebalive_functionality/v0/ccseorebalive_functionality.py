@@ -97,7 +97,8 @@ if (True):
             for line in rdacstr.strip("{|}").split(",") :
                 print "test_name = %s" % test_name
                 print "line = %s" % line
-                fp.write("%-20s\t | \t %s \n" % (test_name,line));
+                vals = line.split("=")
+                fp.write("%-20s\t | \t %s \t | %s \n" % (test_name,vals[0],vals[1]));
         except:
             fp.write("%-20s\t | failed \n" % (test_name));
 
@@ -115,7 +116,8 @@ if (True):
                 for line in rasp.strip("{|}").split(",") :
                     print "test_name = %s" % test_name
                     print "line = %s" % line
-                    fp.write("%-20s\t | \t %s \n" % (test_name,line));
+                    vals = line.split("=")
+                    fp.write("%-20s\t | \t %s \t | %s \n" % (test_name,vals[0],vals[1]));
             except:
                 fp.write("%-20s\t | failed \n" % (test_name));
 
@@ -130,7 +132,7 @@ if (True):
                 rebv = result.getResult();
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
                 rebi  = result.getResult();
-                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
+                fp.write("%-20s\t | \t %f |\t %f  | \t %f |\t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
             except:
                 fp.write("%-20s\t | failed | failed \n" % (test_name));
 
@@ -178,7 +180,7 @@ if (True):
                 rebv = result.getResult();
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
                 rebi  = result.getResult();
-                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
+                fp.write("%-20s\t | \t %f |\t %f  | \t %f |\t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
             except:
                 fp.write("%-20s\t | failed | failed \n" % (test_name));
 
@@ -231,7 +233,7 @@ if (True):
                 rebv = result.getResult();
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
                 rebi  = result.getResult();
-                fp.write("%-20s\t | \t %f \t %f  | \t %f \t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
+                fp.write("%-20s\t | \t %f |\t %f  | \t %f |\t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
             except:
                 fp.write("%-20s\t | failed | failed \n" % (test_name_));
 
@@ -262,7 +264,7 @@ if (True):
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
         
-        fp.write("%-20s\t| %s | %s \n" % ("bias exp start/stop",tm_start, tm_end));
+        fp.write("%-20s\t | %s | %s \n" % ("bias exp start/stop",tm_start, tm_end));
 
 
     fp.close();
