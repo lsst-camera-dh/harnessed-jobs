@@ -24,8 +24,6 @@ if (True):
     pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainPS");
 
 
-    time.sleep(3.)
-
     cdir = tsCWD
 
     ts_version = "NA"
@@ -42,7 +40,7 @@ if (True):
         test_name = "power to line %d" % i
         try:
 # OWEN: How does one see the current state of the line?
-            result = pwrsub.synchCommand(10,"togglePower",i,-1);
+            result = pwrsub.synchCommand(10,"setPowerOn",i,-1,True);
             status_value = "success";
         except:
             status_value = "failed"
@@ -63,12 +61,12 @@ if (True):
         fp.write("\n\nREB ID = %s\n" % rebid)
         fp.write("==============================\n")
 # Read 1-wire ID chip and record the value.
-        test_name = "link_integrity"
+        test_name = "1-wire ID"
         try:
 # SCI's own address
             result = ts8sub.synchCommand(10,"readRegister "+rebid+" 2");
-            fitsfilename = result.getResult();
-            status_value = "success"
+            sci_id = result.getResult();
+            status_value = sci_id
         except:
             status_value = "failed"
         fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
@@ -78,8 +76,8 @@ if (True):
         test_name = "REB_firmware_version"
         try:
             result = ts8sub.synchCommand(10,"readRegister "+rebid+" 0");
-            fitsfilename = result.getResult();
-            status_value = "success"
+            firmver = result.getResult();
+            status_value = firmver
         except:
             status_value = "failed"
         fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
@@ -248,18 +246,16 @@ if (True):
  
         ts8sub.synchCommand(10,"setHeader","TestType","LAMBDA",False)
         ts8sub.synchCommand(10,"setHeader","ImageType","BIAS",False)
-        ts8sub.synchCommand(10,"setExposureParameter exposure_time 0");
-        ts8sub.synchCommand(10,"setExposureParameter open_shutter false");
         ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
-        
+
+# <LSST CCD SN>_<test type>_<image type>_<seq. info>_<time stamp>.fits        
         fitsfilename = "%s_lambda_bias_%4.4d_%3.3d_%s.fits" % (rebid,0,0,time.time())
-        ts8sub.synchCommand(10,"setFitsFilesNamePattern",fitsfilename);
         print "fitsfilename = %s" % fitsfilename
         
         tm_start = time.time()
         print "Ready to take image with exptime = %f at time = %f" % (0,tm_start)
         
-        result = ts8sub.synchCommand(500,"exposeAcquireAndSave");
+        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",0,False,False,fitsfilename);
         something = result.getResult();
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
