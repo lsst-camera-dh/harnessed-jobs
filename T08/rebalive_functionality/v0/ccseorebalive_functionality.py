@@ -21,7 +21,7 @@ if (True):
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("ts8");
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
-    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainPS");
+    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
 
 
     cdir = tsCWD
@@ -37,31 +37,31 @@ if (True):
 
     for i in range(3) :
 # attempt to apply the REB power
-        test_name = "power to line %d" % i
+        test_name = "power_to_line %d" % i
         try:
 # OWEN: How does one see the current state of the line?
             result = pwrsub.synchCommand(10,"setPowerOn",i,-1,True);
             status_value = "success";
         except:
             status_value = "failed"
-            fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
+            fp.write("%s|%s\n" % (test_name,status_value));
 
 #  Verify data link integrity.
     rebs = ""
-    test_name = "link_integrity"
+    test_name = "%s_link_integrity" % i
     try:
         result = ts8sub.synchCommand(10,"getREBDevices");
         rebs = result.getResult();
         status_value = rebs
     except:
         status_value = "failed"
-    fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
+    fp.write("%s| %s\n" % (test_name,status_value));
 
     for rebid in rebs :
-        fp.write("\n\nREB ID = %s\n" % rebid)
-        fp.write("==============================\n")
+#        fp.write("\n\nREB ID = %s\n" % rebid)
+#        fp.write("==============================\n")
 # Read 1-wire ID chip and record the value.
-        test_name = "1-wire ID"
+        test_name = "%s_1-wire_ID" % rebid
         try:
 # SCI's own address
             result = ts8sub.synchCommand(10,"readRegister "+rebid+" 2");
@@ -69,22 +69,22 @@ if (True):
             status_value = sci_id
         except:
             status_value = "failed"
-        fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
+        fp.write("%s|%s\n" % (test_name,status_value));
 
 # Read and record the REB firmware version.
 # see: https://confluence.slac.stanford.edu/display/LSSTCAM/REB+Register+Sets
-        test_name = "REB_firmware_version"
+        test_name = "%s_REB_firmware_version" % rebid
         try:
             result = ts8sub.synchCommand(10,"readRegister "+rebid+" 0");
             firmver = result.getResult();
             status_value = firmver
         except:
             status_value = "failed"
-        fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
+        fp.write("%s|%s\n" % (test_name,status_value));
 
 
 # record all DAC parameters
-        test_name = "DAC parameters"
+        test_name = "%s_DAC_parameters" % rebid
         ts8dac = CCS.attachSubsystem("ts8/%s.DAC" % (rebid))
         try:
             cmnd = "printConfigurableParameters"
@@ -95,17 +95,17 @@ if (True):
             for line in rdacstr.strip("{|}").split(",") :
                 print "test_name = %s" % test_name
                 print "line = %s" % line
-                vals = line.split("=")
-                fp.write("%-20s\t | \t %s \t | %s \n" % (test_name,vals[0],vals[1]));
+                vals = line.strip("[|]").split("=")
+                fp.write("%s_%s| %s \n" % (test_name,vals[0],vals[1].strip("[|]")));
         except:
-            fp.write("%-20s\t | failed \n" % (test_name));
+            fp.write("%s| failed \n" % (test_name));
 
         ts8asp = [0,0,0,0,0,0,0,0]
         for i in range(6) :
             ts8asp[i] = CCS.attachSubsystem("ts8/%s.ASPIC%d" % (rebid,i))
 
         for iasp in range(6) :
-            test_name = "DAC parms ASPIC%d" % iasp
+            test_name = "%s_DAC_parms_ASPIC%d" % (rebid,iasp)
             try:
                 cmnd = "printConfigurableParameters"
                 result = ts8asp[iasp].synchCommand(10,cmnd);
@@ -115,45 +115,50 @@ if (True):
                     print "test_name = %s" % test_name
                     print "line = %s" % line
                     vals = line.split("=")
-                    fp.write("%-20s\t | \t %s \t | %s \n" % (test_name,vals[0],vals[1]));
+                    fp.write("%s_%s| %s \n" % (test_name,vals[0].strip(" "),vals[1]));
             except:
-                fp.write("%-20s\t | failed \n" % (test_name));
+                fp.write("%s| failed \n" % (test_name));
 
 # Read the voltage and current consumption measured by the VP5 LTC2945 current monitor on the REB, record the value and compare to the current measured at the P/S.
 
         chans = ["6V","9V","24V","40V"]
+        curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60}) 
+        curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120}) 
 
         for chn in chans :
-            test_name = "VP5_LTC2945_%s" % chn
+            test_name = "%s_check0_VP5_LTC2945_%s" % (rebid,chn)
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
                 rebv = result.getResult();
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
                 rebi  = result.getResult();
-                fp.write("%-20s\t | \t %f |\t %f  | \t %f |\t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
+                fp.write("%s_rebv|%f \n" % (test_name,rebv));
+                fp.write("%s_rebi|%f \n" % (test_name,rebi));
+                fp.write("%s_rebi_min|%f \n" % (test_name,curmin[chn]/1.e6));
+                fp.write("%s_rebi_max|%f \n" % (test_name,curmax[chn]/1.e6));
             except:
-                fp.write("%-20s\t | failed | failed \n" % (test_name));
+                fp.write("%s| failed \n" % (test_name));
 
 
 # Apply the analog power supply voltages (VP15_UNREG, VN15_UNREG, VP7_UNREG, VP40_UNREG) to the REB in the correct sequence (check with Rick for sequence and voltage values). Abort the test if any supply hits it overcurrent limit. Readback voltages and current consumption at the P/S and at the REB LTC2945 sensors.
 # ccs-rafts loadNamedConfig, ccs-rafts loadDacs, ccs-rafts loadBiasDacs
-        test_name = "apply analog power"
+        test_name = "%s_load_Dacs_power" % rebid
         try:
             result = pwrsub.synchCommand(10,"loadDacs",true);
             status_value = "success";
         except:
             status_value = "failed"
-        fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
+        fp.write("%s|%s\n" % (test_name,status_value));
 
 
 
-        test_name = "apply analog power"
+        test_name = "%s_load_BiasDacs_power" % rebid
         try:
             result = pwrsub.synchCommand(10,"loadBiasDacs",true);
             status_value = "success";
         except:
             status_value = "failed"
-        fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
+        fp.write("%s|%s\n" % (test_name,status_value));
 #
 # 
 #
@@ -168,54 +173,55 @@ if (True):
 #+15V	100	300
 #+40V	60	120
 # Note: -15V monitor is not operational on REB4.
-        curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60}) 
-        curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120}) 
 
         for chn in chans :
-            test_name = "VP5_LTC2945_%s" % chn
+            test_name = "%s_check1_VP5_LTC2945_%s" % (rebid,chn)
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
                 rebv = result.getResult();
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
                 rebi  = result.getResult();
-                fp.write("%-20s\t | \t %f |\t %f  | \t %f |\t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
+                fp.write("%s_rebv|%f \n" % (test_name,rebv));
+                fp.write("%s_rebi|%f \n" % (test_name,rebi));
+                fp.write("%s_rebi_min|%f \n" % (test_name,curmin[chn]/1.e6));
+                fp.write("%s_rebi_max|%f \n" % (test_name,curmax[chn]/1.e6));
             except:
-                fp.write("%-20s\t | failed | failed \n" % (test_name));
+                fp.write("%s| failed \n" % (test_name));
 
 
 
 
-        test_name = "main PS current"
+        test_name = "%s_main_PS_current" % rebid
         try:
             result = pwrmainsub.synchCommand(10,"getCurrent");
             status_value = result.getResult();
         except:
             status_value = "failed"
-        fp.write("%-20s\t | \t %s\n" % (test_name,status_value));
+        fp.write("%s|%s\n" % (test_name,status_value));
 
 
 
 # Readback the temperatures measured by each of the ADT7420 sensors on the REB.
 
         for itemp in range(1,9) :
-            test_name = "REB Temp_%s" % itemp
+            test_name = "%s_REB_Temp_%s" % (rebid,itemp)
             try:
                 cmnd = "getChannelValue %s.Temp%d" % (rebid,itemp)
                 print "temperature read command=%s" % cmnd
                 result = ts8sub.synchCommand(10,cmnd);
                 rebt = result.getResult();
-                fp.write("%-20s\t | \t %f \n" % (test_name,rebt));
+                fp.write("%s|%f \n" % (test_name,rebt));
             except:
-                fp.write("%-20s\t | failed \n" % (test_name));
+                fp.write("%s| failed \n" % (test_name));
 
         for itemp in range(1,3) :
-            test_name = "DREB Temp_%s" % itemp
+            test_name = "%s_DREB_Temp_%s" % (rebid,itemp)
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.Temp%d" % (rebid,itemp));
                 rebt = result.getResult();
-                fp.write("%-20s\t | \t %f \n" % (test_name,rebt));
+                fp.write("%s|%f \n" % (test_name,rebt));
             except:
-                fp.write("%-20s\t | failed \n" % (test_name));
+                fp.write("%s| failed \n" % (test_name));
 
 # Apply the CCD bias voltages and set the CCD clock rails (to E2V levels).
         result = ts8sub.synchCommand(90,"loadSequencer","seq_1M.xml");
@@ -225,15 +231,18 @@ if (True):
 #12. Re-check supply currents and verify they do not exceed expected values.
 
         for chn in chans :
-            test_name = "VP5_LTC2945_%s" % chn
+            test_name = "%s_check2_VP5_LTC2945_%s" % (rebid,chn)
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
                 rebv = result.getResult();
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
                 rebi  = result.getResult();
-                fp.write("%-20s\t | \t %f |\t %f  | \t %f |\t %f \n" % (test_name,rebv, rebi, curmin[chn]/1.e6,curmax[chn]/1.e6));
+                fp.write("%s_rebv|%f \n" % (test_name,rebv));
+                fp.write("%s_rebi|%f \n" % (test_name,rebi));
+                fp.write("%s_rebi_min|%f \n" % (test_name,curmin[chn]/1.e6));
+                fp.write("%s_rebi_max|%f \n" % (test_name,curmax[chn]/1.e6));
             except:
-                fp.write("%-20s\t | failed | failed \n" % (test_name_));
+                fp.write("%s| failed \n" % (test_name));
 
 
 #13. Configure the ASPICs to standard gain and RC time constant, and leave the inputs in clamped state.
@@ -260,7 +269,8 @@ if (True):
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
         
-        fp.write("%-20s\t | %s | %s \n" % ("bias exp start/stop",tm_start, tm_end));
+        fp.write("%s| %s \n" % ("%s_bias_exposure_t_start" % rebid,tm_start));
+        fp.write("%s| %s \n" % ("%s_bias_exposure_t_end" % rebid,tm_end));
 
 
     fp.close();
