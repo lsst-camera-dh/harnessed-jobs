@@ -4,14 +4,25 @@ import os
 import siteUtils
 import shutil
 import lcatr.schema
+import glob
 
 jobDir = siteUtils.getJobDir()
 
 shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 
-#os.system("./rebalive_plots.sh")
+os.system("./rebalive_plots.sh")
 
+results = []
+
+alivefiles = glob.glob("*.dat")
+alivefiles = alivefiles + glob.glob("*summary*")
+alivefiles = alivefiles + glob.glob("*png")
+alivefiles = alivefiles + glob.glob("*log*")
+alivefiles = alivefiles + glob.glob("*txt")
+
+data_products = [lcatr.schema.fileref.make(item) for item in alivefiles]
+results.extend(data_products)
 
 statusAssignments = {}
 
@@ -27,8 +38,6 @@ jobName = "rebalive_functionality"
 
 print "jobName = %s" % jobName
 print "schema = %s" % str(lcatr.schema.get(jobName))
-
-results = []
 
 results.append(lcatr.schema.valid(lcatr.schema.get(jobName),
                                       **statusAssignments))
