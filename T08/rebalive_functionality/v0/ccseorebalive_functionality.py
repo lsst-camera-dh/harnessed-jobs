@@ -37,9 +37,9 @@ if (True):
 
     for i in range(3) :
 # attempt to apply the REB power
-        test_name = "power_to_line %d" % i
+        pstep = 1
+        test_name = "Step%d_power_to_line %d" % (pstep,i)
         try:
-# OWEN: How does one see the current state of the line?
             result = pwrsub.synchCommand(10,"setPowerOn",i,-1,True);
             status_value = "success";
         except:
@@ -48,7 +48,8 @@ if (True):
 
 #  Verify data link integrity.
     rebs = ""
-    test_name = "%s_link_integrity" % i
+    pstep = pstep + 1
+    test_name = "Step%d_%s_REB_devices" % (pstep,i)
     try:
         result = ts8sub.synchCommand(10,"getREBDevices");
         rebs = result.getResult();
@@ -61,10 +62,11 @@ if (True):
 #        fp.write("\n\nREB ID = %s\n" % rebid)
 #        fp.write("==============================\n")
 # Read 1-wire ID chip and record the value.
-        test_name = "%s_1-wire_ID" % rebid
+        istep = pstep + 1
+        test_name = "Step%d_%s_1-wire_ID" % (istep,rebid)
         try:
 # SCI's own address
-            result = ts8sub.synchCommand(10,"readRegister "+rebid+" 2");
+            result = ts8sub.synchCommand(10,"readRegister "+rebid+" 1");
             sci_id = result.getResult();
             status_value = sci_id
         except:
@@ -73,7 +75,8 @@ if (True):
 
 # Read and record the REB firmware version.
 # see: https://confluence.slac.stanford.edu/display/LSSTCAM/REB+Register+Sets
-        test_name = "%s_REB_firmware_version" % rebid
+        istep = istep + 1
+        test_name = "Step%d_%s_REB_firmware_version" % (istep,rebid)
         try:
             result = ts8sub.synchCommand(10,"readRegister "+rebid+" 0");
             firmver = result.getResult();
@@ -84,7 +87,8 @@ if (True):
 
 
 # record all DAC parameters
-        test_name = "%s_DAC_parameters" % rebid
+        istep = istep + 1
+        test_name = "Step%d_%s_DAC_parameters" % (istep,rebid)
         ts8dac = CCS.attachSubsystem("ts8/%s.DAC" % (rebid))
         try:
             cmnd = "printConfigurableParameters"
@@ -105,7 +109,7 @@ if (True):
             ts8asp[i] = CCS.attachSubsystem("ts8/%s.ASPIC%d" % (rebid,i))
 
         for iasp in range(6) :
-            test_name = "%s_DAC_parms_ASPIC%d" % (rebid,iasp)
+            test_name = "Step%d_%s_DAC_parms_ASPIC%d" % (istep,rebid,iasp)
             try:
                 cmnd = "printConfigurableParameters"
                 result = ts8asp[iasp].synchCommand(10,cmnd);
@@ -125,8 +129,9 @@ if (True):
         curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60}) 
         curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120}) 
 
+        istep = istep + 1
         for chn in chans :
-            test_name = "%s_check0_VP5_LTC2945_%s" % (rebid,chn)
+            test_name = "Step%d_%s_check0_VP5_LTC2945_%s" % (istep,rebid,chn)
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
                 rebv = result.getResult();
@@ -142,7 +147,8 @@ if (True):
 
 # Apply the analog power supply voltages (VP15_UNREG, VN15_UNREG, VP7_UNREG, VP40_UNREG) to the REB in the correct sequence (check with Rick for sequence and voltage values). Abort the test if any supply hits it overcurrent limit. Readback voltages and current consumption at the P/S and at the REB LTC2945 sensors.
 # ccs-rafts loadNamedConfig, ccs-rafts loadDacs, ccs-rafts loadBiasDacs
-        test_name = "%s_load_Dacs_power" % rebid
+        istep = istep + 1
+        test_name = "Step%d_%s_load_Dacs_power" % (istep,rebid)
         try:
             result = pwrsub.synchCommand(10,"loadDacs",true);
             status_value = "success";
@@ -151,8 +157,8 @@ if (True):
         fp.write("%s|%s\n" % (test_name,status_value));
 
 
-
-        test_name = "%s_load_BiasDacs_power" % rebid
+        istep = istep + 1
+        test_name = "Step%d_%s_load_BiasDacs_power" % (istep,rebid)
         try:
             result = pwrsub.synchCommand(10,"loadBiasDacs",true);
             status_value = "success";
@@ -174,8 +180,9 @@ if (True):
 #+40V	60	120
 # Note: -15V monitor is not operational on REB4.
 
+        istep = istep + 1
         for chn in chans :
-            test_name = "%s_check1_VP5_LTC2945_%s" % (rebid,chn)
+            test_name = "Step%d_%s_check1_VP5_LTC2945_%s" % (istep,rebid,chn)
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
                 rebv = result.getResult();
@@ -191,7 +198,7 @@ if (True):
 
 
 
-        test_name = "%s_main_PS_current" % rebid
+        test_name = "Step%d_%s_main_PS_current" % (istep,rebid)
         try:
             result = pwrmainsub.synchCommand(10,"getCurrent");
             status_value = result.getResult();
@@ -203,8 +210,9 @@ if (True):
 
 # Readback the temperatures measured by each of the ADT7420 sensors on the REB.
 
+        istep = istep + 1
         for itemp in range(1,9) :
-            test_name = "%s_REB_Temp_%s" % (rebid,itemp)
+            test_name = "Step%d_%s_REB_Temp_%s" % (istep,rebid,itemp)
             try:
                 cmnd = "getChannelValue %s.Temp%d" % (rebid,itemp)
                 print "temperature read command=%s" % cmnd
@@ -215,7 +223,7 @@ if (True):
                 fp.write("%s| failed \n" % (test_name));
 
         for itemp in range(1,3) :
-            test_name = "%s_DREB_Temp_%s" % (rebid,itemp)
+            test_name = "Step%d_%s_DREB_Temp_%s" % (istep,rebid,itemp)
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.Temp%d" % (rebid,itemp));
                 rebt = result.getResult();
@@ -230,8 +238,9 @@ if (True):
 
 #12. Re-check supply currents and verify they do not exceed expected values.
 
+        istep = istep + 1
         for chn in chans :
-            test_name = "%s_check2_VP5_LTC2945_%s" % (rebid,chn)
+            test_name = "Step%d_%s_check2_VP5_LTC2945_%s" % (istep,rebid,chn)
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
                 rebv = result.getResult();
@@ -257,7 +266,7 @@ if (True):
         ts8sub.synchCommand(10,"setHeader","ImageType","BIAS",False)
         ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
 
-# <LSST CCD SN>_<test type>_<image type>_<seq. info>_<time stamp>.fits        
+# <LSST CCD SN>_<test type>_<image type>_<seq. info>_<time stamp>.fits
         fitsfilename = "%s_lambda_bias_%4.4d_%3.3d_%s.fits" % (rebid,0,0,time.time())
         print "fitsfilename = %s" % fitsfilename
         
@@ -269,8 +278,9 @@ if (True):
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
         
-        fp.write("%s| %s \n" % ("%s_bias_exposure_t_start" % rebid,tm_start));
-        fp.write("%s| %s \n" % ("%s_bias_exposure_t_end" % rebid,tm_end));
+        istep = istep + 1
+        fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_start" % (istep,rebid),tm_start));
+        fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_end" % (istep,rebid),tm_end));
 
 
     fp.close();
