@@ -8,14 +8,20 @@ set outfl = `echo $i | awk -F '/' '{print $2}'`
 echo "title time "$i >! $outfl.dat
 eval mysql CCSTrending4 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst --execute=\'$selection\'  >> $outfl.dat
 end
-foreach i (`ls -1 *.dat | awk -F "." '{print $1"."$2"."substr($3,1,4) }'`)
+
+foreach i (`ls -1 *.dat | awk -F "." '{print $1"."$2"."substr($3,1,4) }' | sort -u`)
+
 echo "joining files of prefix $i"
+
 rm data.dat
 touch data.dat
+
 foreach j (`ls -1 $i*.dat`)
-join -a 2 data.dat $j > data2.dat
+echo "joining file $j"
+join -a 2 data.dat $j | sed 's/ time / /' > data2.dat
 mv data2.dat data.dat
 end
+
 eval gnuplot rebalive_plots.gp
 mv data.dat $i-joined.dat
 eval mv plot.png $i.png

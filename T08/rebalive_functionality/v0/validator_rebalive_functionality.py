@@ -15,11 +15,10 @@ os.system("./rebalive_plots.sh")
 
 results = []
 
-alivefiles = glob.glob("*.dat")
+alivefiles = glob.glob("*.txt")
 alivefiles = alivefiles + glob.glob("*summary*")
 alivefiles = alivefiles + glob.glob("*png")
 alivefiles = alivefiles + glob.glob("*log*")
-alivefiles = alivefiles + glob.glob("*txt")
 
 data_products = [lcatr.schema.fileref.make(item) for item in alivefiles]
 results.extend(data_products)
