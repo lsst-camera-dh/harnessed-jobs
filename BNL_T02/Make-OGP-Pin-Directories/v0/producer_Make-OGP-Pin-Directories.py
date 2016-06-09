@@ -7,7 +7,7 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "Lateral_pos_metrology.RTN"
+ogpscriptname = "ITL_LatPos.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
@@ -16,7 +16,7 @@ pindir = "/dev/null"
 pindatedir = "/dev/null"
 
 omt = os.getenv("OGP_MANUAL_TIME")
-if ("None" in omt) :
+if omt is None :
     tm = time.strftime("%Y%m%d-%HH%MM")
     topccddir = "/cygdrive/c/Production_DATA/%s" % ccd
     print "Creating the top level directory for the CCD at %s" % topccddir
