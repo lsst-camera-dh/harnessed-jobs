@@ -13,7 +13,7 @@ shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 
 #os.system("./rebalive_plots.sh")
 
-jobName = "rebalive_current_precheck"
+jobName = "rebalive_current_dacsloaded"
 
 results = []
 
@@ -59,4 +59,4 @@ lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
 
 
-#ccsValidator('rebalive_current_precheck')
+#ccsValidator('rebalive_current_dacsloaded')

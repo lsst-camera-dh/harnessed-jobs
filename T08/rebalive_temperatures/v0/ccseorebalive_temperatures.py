@@ -1,9 +1,9 @@
 ###############################################################################
-# REB aliveness current_temperatures test
+# REB aliveness temperatures test
 #
 # Ex:
 # source ts8setup-test
-# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_current_temperatures --version v0
+# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_temperatures --version v0
 #
 # author: homer    5/2016
 #
@@ -35,10 +35,11 @@ if (True):
 
     status_value = None
 
+    pstep = 0
 #  Verify data link integrity.
     rebs = ""
     pstep = pstep + 1
-    test_name = "Step%d_%s_REB_devices" % (pstep,i)
+    test_name = "Step%d_REB_devices" % (pstep)
     try:
         result = ts8sub.synchCommand(10,"getREBDevices");
         rebs = result.getResult();

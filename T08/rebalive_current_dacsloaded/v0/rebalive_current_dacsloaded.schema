@@ -1,7 +1,7 @@
 # -*- python -*-
-# grep "|" /home/ts8prod/jobHarness/jh_stage/RTM/alive-test-1/rebalive_exposure/v0/214/rebalive_results.txt | awk -F '|' '{print "    \047"$1"\047 : str,"}'
+# grep "|" /home/ts8prod/jobHarness/jh_stage/RTM/alive-test-1/rebalive_current_dacsloaded/v0/214/rebalive_results.txt | awk -F '|' '{print "    \047"$1"\047 : str,"}'
 {
-    'schema_name' : 'rebalive_exposure',
+    'schema_name' : 'rebalive_current_dacsloaded',
     'schema_version' : 0,
     'Step2_2_REB_devices' : str,
     'Step3_R00.Reb2_1-wire_ID' : str,

@@ -39,7 +39,7 @@ if (True):
 
     rebs = ""
     pstep = 1
-    test_name = "Step%d_%s_REB_devices" % (pstep,i)
+    test_name = "Step%d_REB_devices" % (pstep)
     try:
         result = ts8sub.synchCommand(10,"getREBDevices");
         rebs = result.getResult();

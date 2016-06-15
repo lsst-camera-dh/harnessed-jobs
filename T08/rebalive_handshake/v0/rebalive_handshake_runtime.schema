@@ -1,0 +1,12 @@
+# -*- python -*-
+{
+    'schema_name' : 'rebalive_handshake_runtime',
+    'schema_version' : 0,
+    'Step2_REB_devices' : str,
+    'Step3_R00.Reb2_1-wire_ID' : str,
+    'Step4_R00.Reb2_REB_firmware_version' : str,
+    'Step3_R00.Reb1_1-wire_ID' : str,
+    'Step4_R00.Reb1_REB_firmware_version' : str,
+    'Step3_R00.Reb0_1-wire_ID' : str,
+    'Step4_R00.Reb0_REB_firmware_version' : str,
+}

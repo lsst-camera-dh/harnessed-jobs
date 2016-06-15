@@ -1,9 +1,9 @@
 ###############################################################################
-# REB aliveness power test
+# REB aliveness current_dacsloaded test
 #
 # Ex:
 # source ts8setup-test
-# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_power_to_line --version v0
+# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_current_dacsloaded --version v0
 #
 # author: homer    5/2016
 #
@@ -35,9 +35,20 @@ if (True):
 
     status_value = None
 
+    for i in range(3) :
+# attempt to apply the REB power
+        pstep = 1
+        test_name = "Step%d_power_to_line %d" % (pstep,i)
+        try:
+            result = pwrsub.synchCommand(10,"setPowerOn",i,-1,True);
+            status_value = "success";
+        except:
+            status_value = "failed"
+            fp.write("%s|%s\n" % (test_name,status_value));
+
+#  Verify data link integrity.
     rebs = ""
-    pstep = 1
-    istep = 1
+    pstep = pstep + 1
     test_name = "Step%d_REB_devices" % (pstep)
     try:
         result = ts8sub.synchCommand(10,"getREBDevices");
@@ -50,6 +61,9 @@ if (True):
     for rebid in rebs :
 #        fp.write("\n\nREB ID = %s\n" % rebid)
 #        fp.write("==============================\n")
+        istep = pstep + 1
+
+
 # record all DAC parameters
         istep = istep + 1
         test_name = "Step%d_%s_DAC_parameters" % (istep,rebid)
@@ -72,30 +86,46 @@ if (True):
         for i in range(6) :
             ts8asp[i] = CCS.attachSubsystem("ts8/%s.ASPIC%d" % (rebid,i))
 
-        for iasp in range(6) :
-            test_name = "Step%d_%s_DAC_parms_ASPIC%d" % (istep,rebid,iasp)
-            try:
-                cmnd = "printConfigurableParameters"
-                result = ts8asp[iasp].synchCommand(10,cmnd);
-                rasp = "%s" % result.getResult();
-                print "DAC parms ASPIC%d \n %s" % (iasp,rasp)
-                for line in rasp.strip("{|}").split(",") :
-                    print "test_name = %s" % test_name
-                    print "line = %s" % line
-                    vals = line.split("=")
-                    fp.write("%s_%s| %s \n" % (test_name,vals[0].strip(" "),vals[1]));
-            except:
-                fp.write("%s| failed \n" % (test_name));
 
-# Read the voltage and current consumption measured by the VP5 LTC2945 current monitor on the REB, record the value and compare to the current measured at the P/S.
 
-        chans = ["6V","9V","24V","40V"]
-        curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60}) 
-        curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120}) 
+# Apply the analog power supply voltages (VP15_UNREG, VN15_UNREG, VP7_UNREG, VP40_UNREG) to the REB in the correct sequence (check with Rick for sequence and voltage values). Abort the test if any supply hits it overcurrent limit. Readback voltages and current consumption at the P/S and at the REB LTC2945 sensors.
+# ccs-rafts loadNamedConfig, ccs-rafts loadDacs, ccs-rafts loadBiasDacs
+        istep = istep + 1
+        test_name = "Step%d_%s_load_Dacs_power" % (istep,rebid)
+        try:
+            result = pwrsub.synchCommand(10,"loadDacs",true);
+            status_value = "success";
+        except:
+            status_value = "failed"
+        fp.write("%s|%s\n" % (test_name,status_value));
+
+
+        istep = istep + 1
+        test_name = "Step%d_%s_load_BiasDacs_power" % (istep,rebid)
+        try:
+            result = pwrsub.synchCommand(10,"loadBiasDacs",true);
+            status_value = "success";
+        except:
+            status_value = "failed"
+        fp.write("%s|%s\n" % (test_name,status_value));
+#
+# 
+#
+
+# Verify that all currents are within the expected range 
+
+# Record the value of the currents on each supply, both at the P/S and by the REB.
+
+# REB4 Supply current expected ranges (voltage, current min, current max) [mA]
+#+5V	500	750
+#+7V	400	600
+#+15V	100	300
+#+40V	60	120
+# Note: -15V monitor is not operational on REB4.
 
         istep = istep + 1
         for chn in chans :
-            test_name = "Step%d_%s_check0_VP5_LTC2945_%s" % (istep,rebid,chn)
+            test_name = "Step%d_%s_check1_VP5_LTC2945_%s" % (istep,rebid,chn)
             try:
                 result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
                 rebv = result.getResult();
@@ -107,6 +137,20 @@ if (True):
                 fp.write("%s_rebi_max|%f \n" % (test_name,curmax[chn]/1.e6));
             except:
                 fp.write("%s| failed \n" % (test_name));
+
+
+
+
+        test_name = "Step%d_%s_main_PS_current" % (istep,rebid)
+        try:
+            result = pwrmainsub.synchCommand(10,"getCurrent");
+            status_value = result.getResult();
+        except:
+            status_value = "failed"
+        fp.write("%s|%s\n" % (test_name,status_value));
+
+
+
 
 
     fp.close();

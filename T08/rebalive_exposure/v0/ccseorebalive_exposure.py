@@ -1,9 +1,9 @@
 ###############################################################################
-# REB aliveness functionality test
+# REB aliveness exposure test
 #
 # Ex:
 # source ts8setup-test
-# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_functionality --version v0
+# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_exposure --version v0
 #
 # author: homer    5/2016
 #
@@ -39,7 +39,8 @@ if (True):
 #  Verify data link integrity.
     rebs = ""
     pstep = 1
-    test_name = "Step%d_%s_REB_devices" % (pstep,i)
+    istep = 1
+    test_name = "Step%d_REB_devices" % (pstep)
     try:
         result = ts8sub.synchCommand(10,"getREBDevices");
         rebs = result.getResult();
@@ -54,8 +55,8 @@ if (True):
 
 #13. Configure the ASPICs to standard gain and RC time constant, and leave the inputs in clamped state.
 
-        for i in range(6) :
-            ts8asp[i].synchCommand(10,"change clamp 1");
+#        for i in range(6) :
+#            ts8asp[i].synchCommand(10,"change clamp 1");
 
 
 #14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.

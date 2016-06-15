@@ -1,0 +1,10 @@
+# -*- python -*-
+{
+    'schema_name' : 'rebalive_current_dacsloaded_runtime',
+    'schema_version' : 0,
+    'Step2_REB_devices' : str,
+    'Step4_R00.Reb2_DAC_parameters_csGate' : str,
+    'Step4_R00.Reb2_DAC_parameters' : str,
+    'Step5_R00.Reb2_load_Dacs_power' : str,
+    'Step6_R00.Reb2_load_BiasDacs_power' : str,
+}
