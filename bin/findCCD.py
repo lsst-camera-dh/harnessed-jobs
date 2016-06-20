@@ -15,7 +15,7 @@ parser.add_argument('-F','--FType', default='',help="File type (default=%(defaul
 parser.add_argument('-q','--qType', default='',help="query type - report or blank (default all) ")
 
 ## Limit dataCatalog search to specified parts of the catalog
-parser.add_argument('-m','--mirrorName',default='BNL-test',help="mirror name to search, i.e. in dataCat /LSST/mirror/<mirrorName> (default=%(default)s)")
+parser.add_argument('-m','--mirrorName',default='BNL-prod',help="mirror name to search, i.e. in dataCat /LSST/mirror/<mirrorName> (default=%(default)s)")
 parser.add_argument('-X','--XtraOpts',default='',help="any extra 'datacat find' options (default=%(default)s)")
 
 ## Output
@@ -52,6 +52,7 @@ if (args.mirrorName == 'BNL-prod' or args.mirrorName == 'BNL-test'):
         else:
                 use_latest_activity = False
 elif (args.mirrorName == 'vendorCopy-prod' or args.mirrorName == 'vendorCopy-test'):
+	query = "TESTTYPE IS NOT NULL"
         folder = folder + 'mirror/' + sourceMap[args.mirrorName] + args.CCDType + '-CCD/' + sensorID
         if args.TestName != '':
                 folder += '/' + args.TestName + '/v0/'
@@ -69,12 +70,18 @@ elif (args.mirrorName == 'SAWG-BNL'):
         
 
 print folder
-        
-query = args.XtraOpts
+
+if args.XtraOpts != '':
+	if query == '':
+		query = args.XtraOpts
+	else:
+		query += "&&" + args.XtraOpts
 
 site = args.site
 
 datacatalog = DataCatalog(folder=folder, experiment='LSST', site=site, use_newest_subfolder=use_latest_activity)
+
+#datasets = datacatalog.find_datasets(query,datacat_search_patterns="dark")
 
 datasets = datacatalog.find_datasets(query)
 print "%i datasets found\n" % len(datasets)
