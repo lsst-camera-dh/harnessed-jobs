@@ -76,7 +76,7 @@ syscmnd("cd %s ; tar -vzxf %s.tar.gz" % (ogpscriptshome,tag))
 print "making a link to it"
 syscmnd("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
 
-versionsFile = open("%s/OGP-scripts/Production\ routines/RTN_versions.txt" % ogpscriptshome )
+versionsFile = open("%s/OGP-scripts/Production routines/RTN_versions.txt" % ogpscriptshome )
 for line in versionsFile:
 #    print "line = %s" % line
     values = line.split("|")
