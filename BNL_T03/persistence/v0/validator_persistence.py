@@ -2,7 +2,6 @@
 import glob
 import pyfits
 import numpy as np
-import lsst.eotest.image_utils as imutils
 import lsst.eotest.sensor as sensorTest
 import lcatr.schema
 import siteUtils
@@ -32,7 +31,8 @@ index = np.where(times == min(post_flat_times))[0][0]
 
 # Loop over amplifiers and record the deferred charge (median pixel
 # value and stdev) in the first post-flat dark frame.
-for amp in imutils.allAmps:
+gains = eotestUtils.getSensorGains()
+for amp in gains:
     median_flux = persistence[1].data.field('MEDIAN%02i' % amp)[index]
     stdev = persistence[1].data.field('STDEV%02i' % amp)[index]
     results.append(lcatr.schema.valid(lcatr.schema.get('persistence'), amp=amp,
