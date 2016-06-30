@@ -35,16 +35,8 @@ if (True):
 
     status_value = None
 
-    for i in range(3) :
-# attempt to apply the REB power
-        pstep = 1
-        test_name = "Step%d_power_to_line %d" % (pstep,i)
-        try:
-            result = pwrsub.synchCommand(10,"setPowerOn",i,-1,True);
-            status_value = "success";
-        except:
-            status_value = "failed"
-            fp.write("%s|%s\n" % (test_name,status_value));
+
+    pstep = 0
 
 #  Verify data link integrity.
     rebs = ""

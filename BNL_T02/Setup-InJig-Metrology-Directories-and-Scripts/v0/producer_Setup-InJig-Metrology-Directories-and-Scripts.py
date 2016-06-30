@@ -14,8 +14,22 @@ def makedirs(idir) :
 
 
 #ogpscriptname = "CCDa_Edge_scan_Abs_hgt_Flatness_robust.RTN"
-ogpscriptname1 = "e2V\_Flat_AbsHgt.RTN"
-ogpscriptname2 = "e2V\_EdgeScan.RTN"
+#ogpscriptname1 = "e2V\_Flat_AbsHgt.RTN"
+#ogpscriptname2 = "e2V\_EdgeScan.RTN"
+ogpscriptname1 = ""
+ogpscriptname2 = ""
+
+versionsFile = open("RTN_versions.txt")
+for line in versionsFile:
+#    print "line = %s" % line
+    values = line.split("|")
+    if "e2V_Flat_AbsHgt" in values[0] :
+        ogpscriptname1 = values[0]
+        print "For Absolute Height, using - %s" % line
+    if "e2V_EdgeScan" in values[0] :
+        ogpscriptname2 = values[0]
+        print "For Edge Scan, using       - %s" % line
+
 
 ccd = os.environ["LCATR_UNIT_ID"]
 

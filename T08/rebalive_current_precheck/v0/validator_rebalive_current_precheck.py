@@ -10,8 +10,8 @@ jobDir = siteUtils.getJobDir()
 
 shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
+shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
-#os.system("./rebalive_plots.sh")
 
 jobName = "rebalive_current_precheck"
 
@@ -58,5 +58,6 @@ results.append(siteUtils.packageVersions())
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
 
+#os.system("./rebalive_plots.sh")
 
 #ccsValidator('rebalive_current_precheck')

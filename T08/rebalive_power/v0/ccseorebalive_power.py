@@ -3,7 +3,7 @@
 #
 # Ex:
 # source ts8setup-test
-# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_power_to_line --version v0
+# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_power --version v0
 #
 # author: homer    5/2016
 #
@@ -35,78 +35,34 @@ if (True):
 
     status_value = None
 
-    rebs = ""
-    pstep = 1
-    istep = 1
-    test_name = "Step%d_REB_devices" % (pstep)
-    try:
-        result = ts8sub.synchCommand(10,"getREBDevices");
-        rebs = result.getResult();
-        status_value = rebs
-    except:
-        status_value = "failed"
-    fp.write("%s| %s\n" % (test_name,status_value));
-
-    for rebid in rebs :
-#        fp.write("\n\nREB ID = %s\n" % rebid)
-#        fp.write("==============================\n")
-# record all DAC parameters
-        istep = istep + 1
-        test_name = "Step%d_%s_DAC_parameters" % (istep,rebid)
-        ts8dac = CCS.attachSubsystem("ts8/%s.DAC" % (rebid))
+    for i in range(3) :
+# attempt to apply the REB power
+        pstep = 1
+        test_name = "Step%d_power_to_line %d" % (pstep,i)
         try:
-            cmnd = "printConfigurableParameters"
-            result = ts8dac.synchCommand(10,cmnd);
-            rdac = result.getResult();
-            print "DAC parameters\n%s" % rdac
-            rdacstr = "%s" % rdac
-            for line in rdacstr.strip("{|}").split(",") :
-                print "test_name = %s" % test_name
-                print "line = %s" % line
-                vals = line.strip("[|]").split("=")
-                fp.write("%s_%s| %s \n" % (test_name,vals[0],vals[1].strip("[|]")));
+            result = pwrsub.synchCommand(10,"setPowerOn",i,-1,True);
+            status_value = "success";
         except:
-            fp.write("%s| failed \n" % (test_name));
+            status_value = "failed"
+            fp.write("%s|%s\n" % (test_name,status_value));
 
-        ts8asp = [0,0,0,0,0,0,0,0]
-        for i in range(6) :
-            ts8asp[i] = CCS.attachSubsystem("ts8/%s.ASPIC%d" % (rebid,i))
+        pstep = pstep + 1
+        test_name = "Step%d_digi_pwr_to_line digital power %d" % (pstep,i)
+        try:
+            result = pwrsub.synchCommand(10,"toggleNamedPower %d digital"%i);
+            status_value = "success";
+        except:
+            status_value = "failed"
+        fp.write("%s|%s\n" % (test_name,status_value));
 
-        for iasp in range(6) :
-            test_name = "Step%d_%s_DAC_parms_ASPIC%d" % (istep,rebid,iasp)
-            try:
-                cmnd = "printConfigurableParameters"
-                result = ts8asp[iasp].synchCommand(10,cmnd);
-                rasp = "%s" % result.getResult();
-                print "DAC parms ASPIC%d \n %s" % (iasp,rasp)
-                for line in rasp.strip("{|}").split(",") :
-                    print "test_name = %s" % test_name
-                    print "line = %s" % line
-                    vals = line.split("=")
-                    fp.write("%s_%s| %s \n" % (test_name,vals[0].strip(" "),vals[1]));
-            except:
-                fp.write("%s| failed \n" % (test_name));
+        test_name = "Step%d_digi_pwr_to_line analog power %d" % (pstep,i)
+        try:
+            result = pwrsub.synchCommand(10,"toggleNamedPower %d analog"%i);
+            status_value = "success";
+        except:
+            status_value = "failed"
+        fp.write("%s|%s\n" % (test_name,status_value));
 
-# Read the voltage and current consumption measured by the VP5 LTC2945 current monitor on the REB, record the value and compare to the current measured at the P/S.
-
-        chans = ["6V","9V","24V","40V"]
-        curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60}) 
-        curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120}) 
-
-        istep = istep + 1
-        for chn in chans :
-            test_name = "Step%d_%s_check0_VP5_LTC2945_%s" % (istep,rebid,chn)
-            try:
-                result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
-                rebv = result.getResult();
-                result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
-                rebi  = result.getResult();
-                fp.write("%s_rebv|%f \n" % (test_name,rebv));
-                fp.write("%s_rebi|%f \n" % (test_name,rebi));
-                fp.write("%s_rebi_min|%f \n" % (test_name,curmin[chn]/1.e6));
-                fp.write("%s_rebi_max|%f \n" % (test_name,curmax[chn]/1.e6));
-            except:
-                fp.write("%s| failed \n" % (test_name));
 
 
     fp.close();

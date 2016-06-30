@@ -21,6 +21,7 @@ alivefiles = glob.glob("*.txt")
 alivefiles = alivefiles + glob.glob("*summary*")
 alivefiles = alivefiles + glob.glob("*png")
 alivefiles = alivefiles + glob.glob("*log*")
+alivefiles = alivefiles + glob.glob("*fits")
 
 data_products = [lcatr.schema.fileref.make(item) for item in alivefiles]
 results.extend(data_products)
@@ -57,6 +58,11 @@ results.append(siteUtils.packageVersions())
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
+
+fitsfiles = glob.glob("*fits")
+
+for fl in fitsfiles:
+    os.system("screen -d -m ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s &" % fl)
 
 
 #ccsValidator('rebalive_exposure')

@@ -37,14 +37,21 @@ if (True):
 
     for i in range(3) :
 # attempt to apply the REB power
-        pstep = 1
-        test_name = "Step%d_power_to_line %d" % (pstep,i)
-        try:
-            result = pwrsub.synchCommand(10,"setPowerOn",i,-1,True);
-            status_value = "success";
-        except:
-            status_value = "failed"
-            fp.write("%s|%s\n" % (test_name,status_value));
+        pstep = 0
+#ccs-rebps ccs>toggleNamedPower REB0 
+#master     digital    analog     od         clockhi    clocklo    heater     dphi       hvbias     
+#Error (type st for stacktrace): Error dispatching command: Error: Can't convert string 'REB0' to class int
+#ccs-rebps ccs>toggleNamedPower 0 digital
+#ccs-rebps ccs>toggleNamedPower 0 analog
+
+#        pstep = pstep + 1
+#        test_name = "Step%d_apply_analog_power_to_line %d" % (pstep,i)
+#        try:
+#            result = pwrsub.synchCommand(10,"toggleNamedPower %d analog"%i);
+#            status_value = "success";
+#        except:
+#            status_value = "failed"
+#        fp.write("%s|%s\n" % (test_name,status_value));
 
 #  Verify data link integrity.
     rebs = ""
@@ -63,6 +70,10 @@ if (True):
 #        fp.write("==============================\n")
         istep = pstep + 1
 
+
+
+        curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60})
+        curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120})
 
 # record all DAC parameters
         istep = istep + 1
@@ -90,22 +101,42 @@ if (True):
 
 # Apply the analog power supply voltages (VP15_UNREG, VN15_UNREG, VP7_UNREG, VP40_UNREG) to the REB in the correct sequence (check with Rick for sequence and voltage values). Abort the test if any supply hits it overcurrent limit. Readback voltages and current consumption at the P/S and at the REB LTC2945 sensors.
 # ccs-rafts loadNamedConfig, ccs-rafts loadDacs, ccs-rafts loadBiasDacs
+
+
         istep = istep + 1
-        test_name = "Step%d_%s_load_Dacs_power" % (istep,rebid)
+        print "doing loadDacs"
+        test_name = "Step%d_%s_load_DACS" % (istep,rebid)
+        print "test_name = %s" % test_name
+
         try:
-            result = pwrsub.synchCommand(10,"loadDacs",true);
-            status_value = "success";
+            print "sending loadDacs command"
+            result = ts8sub.synchCommand(10,"loadDacs true");
+            status_value = result.getResult();
         except:
+            print "command failure!"
             status_value = "failed"
         fp.write("%s|%s\n" % (test_name,status_value));
 
 
         istep = istep + 1
-        test_name = "Step%d_%s_load_BiasDacs_power" % (istep,rebid)
+        print "doing loadBiasDacs"
+        test_name = "Step%d_%s_load_BiasDacs" % (istep,rebid)
         try:
-            result = pwrsub.synchCommand(10,"loadBiasDacs",true);
-            status_value = "success";
+            result = ts8sub.synchCommand(10,"loadBiasDacs true");
+            status_value = result.getResult();
         except:
+            print "command failure!"
+            status_value = "failed"
+        fp.write("%s|%s\n" % (test_name,status_value));
+
+        istep = istep + 1
+        print "doing loadAspics"
+        test_name = "Step%d_%s_load_Aspics" % (istep,rebid)
+        try:
+            result = ts8sub.synchCommand(10,"loadAspics true");
+            status_value = result.getResult();
+        except:
+            print "command failure!"
             status_value = "failed"
         fp.write("%s|%s\n" % (test_name,status_value));
 #
@@ -123,20 +154,25 @@ if (True):
 #+40V	60	120
 # Note: -15V monitor is not operational on REB4.
 
+#R00.Reb2.DigV, R00.Reb2.DigI, R00.Reb2.AnaV, R00.Reb2.ClkV, R00.Reb2.ClkI, R00.Reb2.ODV, R00.Reb2.ODI, R00.Reb2.OD0V, R00.Reb2.OG0V, R00.Reb2.RD0V, R00.Reb2.GD0V, R00.Reb2.OD1V, R00.Reb2.OG1V, R00.Reb2.RD1V, R00.Reb2.GD1V, R00.Reb2.OD2V, R00.Reb2.OG2V, R00.Reb2.RD2V, R00.Reb2.GD2V, R00.Reb2.Ref05V, R00.Reb2.Ref15V, R00.Reb2.Ref25V, R00.Reb2.Ref125V,
+
+
+        result = ts8sub.synchCommand(10,"getChannelNames");
+        chans = result.getResult();
+
         istep = istep + 1
         for chn in chans :
-            test_name = "Step%d_%s_check1_VP5_LTC2945_%s" % (istep,rebid,chn)
-            try:
-                result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
-                rebv = result.getResult();
-                result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
-                rebi  = result.getResult();
-                fp.write("%s_rebv|%f \n" % (test_name,rebv));
-                fp.write("%s_rebi|%f \n" % (test_name,rebi));
-                fp.write("%s_rebi_min|%f \n" % (test_name,curmin[chn]/1.e6));
-                fp.write("%s_rebi_max|%f \n" % (test_name,curmax[chn]/1.e6));
-            except:
-                fp.write("%s| failed \n" % (test_name));
+            if rebid in chn and ("V" in chn or "I" in chn) :
+                print "chn = (%s)" % chn
+                test_name = "Step%d_%s_check1_VP5_LTC2945_%s" % (istep,rebid,chn)
+                try:
+                    result = ts8sub.synchCommand(10,"getChannelValue %s" % (chn));
+                    rebval = result.getResult();
+
+                    fp.write("%s|%f \n" % (test_name,rebval));
+
+                except:
+                    fp.write("%s| failed \n" % (test_name));
 
 
 
@@ -149,6 +185,30 @@ if (True):
             status_value = "failed"
         fp.write("%s|%s\n" % (test_name,status_value));
 
+
+    print "getting REB PS values"
+    result = pwrsub.synchCommand(10,"getChannelNames");
+    chans = result.getResult();
+
+    print "chans = "
+    print chans
+
+    istep = istep + 1
+    for ireb in range(3) :
+        for chn in chans :
+            print "chn = %s" % chn
+            prebid = "REB%d" % ireb
+            if prebid in chn and (".V" in chn or ".I" in chn) :
+                print "chn = (%s)" % chn
+                test_name = "Step%d_%s_check0_REB_PS_%s" % (istep,rebid,chn)
+                try:
+                    result = pwrsub.synchCommand(10,"getChannelValue %s" % (chn));
+                    rebval = result.getResult();
+
+                    fp.write("%s|%f \n" % (test_name,rebval));
+
+                except:
+                    fp.write("%s| failed \n" % (test_name));
 
 
 

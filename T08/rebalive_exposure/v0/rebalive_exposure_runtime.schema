@@ -5,8 +5,4 @@
     'Step1_REB_devices' : str,
     'Step2_R00.Reb2_bias_exposure_t_start' : str,
     'Step2_R00.Reb2_bias_exposure_t_end' : str,
-    'Step3_R00.Reb1_bias_exposure_t_start' : str,
-    'Step3_R00.Reb1_bias_exposure_t_end' : str,
-    'Step4_R00.Reb0_bias_exposure_t_start' : str,
-    'Step4_R00.Reb0_bias_exposure_t_end' : str,
 }

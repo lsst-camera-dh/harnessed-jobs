@@ -66,24 +66,52 @@ if (True):
 
 # Read the voltage and current consumption measured by the VP5 LTC2945 current monitor on the REB, record the value and compare to the current measured at the P/S.
 
+#R00.Reb2.DigV, R00.Reb2.DigI, R00.Reb2.AnaV, R00.Reb2.ClkV, R00.Reb2.ClkI, R00.Reb2.ODV, R00.Reb2.ODI, R00.Reb2.OD0V, R00.Reb2.OG0V, R00.Reb2.RD0V, R00.Reb2.GD0V, R00.Reb2.OD1V, R00.Reb2.OG1V, R00.Reb2.RD1V, R00.Reb2.GD1V, R00.Reb2.OD2V, R00.Reb2.OG2V, R00.Reb2.RD2V, R00.Reb2.GD2V, R00.Reb2.Ref05V, R00.Reb2.Ref15V, R00.Reb2.Ref25V, R00.Reb2.Ref125V,
+
         chans = ["6V","9V","24V","40V"]
         curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60}) 
         curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120}) 
 
+        result = ts8sub.synchCommand(10,"getChannelNames");
+        chans = result.getResult();
+
         istep = istep + 1
         for chn in chans :
-            test_name = "Step%d_%s_check0_VP5_LTC2945_%s" % (istep,rebid,chn)
-            try:
-                result = ts8sub.synchCommand(10,"getChannelValue D%s.%sv" % (rebid,chn));
-                rebv = result.getResult();
-                result = ts8sub.synchCommand(10,"getChannelValue D%s.%si" % (rebid,chn));
-                rebi  = result.getResult();
-                fp.write("%s_rebv|%f \n" % (test_name,rebv));
-                fp.write("%s_rebi|%f \n" % (test_name,rebi));
-                fp.write("%s_rebi_min|%f \n" % (test_name,curmin[chn]/1.e6));
-                fp.write("%s_rebi_max|%f \n" % (test_name,curmax[chn]/1.e6));
-            except:
-                fp.write("%s| failed \n" % (test_name));
+            if rebid in chn and ("V" in chn or "I" in chn) :
+                print "chn = (%s)" % chn
+                test_name = "Step%d_%s_check0_VP5_LTC2945_%s" % (istep,rebid,chn)
+                try:
+                    result = ts8sub.synchCommand(10,"getChannelValue %s" % (chn));
+                    rebval = result.getResult();
+
+                    fp.write("%s|%f \n" % (test_name,rebval));
+
+                except:
+                    fp.write("%s| failed \n" % (test_name));
+
+    print "getting REB PS values"
+    result = pwrsub.synchCommand(10,"getChannelNames");
+    chans = result.getResult();
+
+    print "chans = "
+    print chans
+
+    istep = istep + 1
+    for ireb in range(3) :
+        for chn in chans :
+            print "chn = %s" % chn
+            prebid = "REB%d" % ireb
+            if prebid in chn and (".V" in chn or ".I" in chn) :
+                print "chn = (%s)" % chn
+                test_name = "Step%d_%s_check0_REB_PS_%s" % (istep,rebid,chn)
+                try:
+                    result = pwrsub.synchCommand(10,"getChannelValue %s" % (chn));
+                    rebval = result.getResult();
+
+                    fp.write("%s|%f \n" % (test_name,rebval));
+
+                except:
+                    fp.write("%s| failed \n" % (test_name));
 
 
     fp.close();
