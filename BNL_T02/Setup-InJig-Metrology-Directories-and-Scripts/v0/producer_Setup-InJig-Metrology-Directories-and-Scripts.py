@@ -19,17 +19,6 @@ def makedirs(idir) :
 ogpscriptname1 = ""
 ogpscriptname2 = ""
 
-versionsFile = open("RTN_versions.txt")
-for line in versionsFile:
-#    print "line = %s" % line
-    values = line.split("|")
-    if "e2V_Flat_AbsHgt" in values[0] :
-        ogpscriptname1 = values[0]
-        print "For Absolute Height, using - %s" % line
-    if "e2V_EdgeScan" in values[0] :
-        ogpscriptname2 = values[0]
-        print "For Edge Scan, using       - %s" % line
-
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
@@ -86,6 +75,18 @@ print "untarring"
 syscmnd("cd %s ; tar -vzxf %s.tar.gz" % (ogpscriptshome,tag))
 print "making a link to it"
 syscmnd("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
+
+versionsFile = open("%s/OGP-scripts/Production\ routines/RTN_versions.txt" % ogpscriptshome )
+for line in versionsFile:
+#    print "line = %s" % line
+    values = line.split("|")
+    if "e2V_Flat_AbsHgt" in values[0] :
+        ogpscriptname1 = values[0]
+        print "For Absolute Height, using - %s" % line
+    if "e2V_EdgeScan" in values[0] :
+        ogpscriptname2 = values[0]
+        print "For Edge Scan, using       - %s" % line
+
 
 syscmnd("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname1,flatdatedir))
 syscmnd("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname2,edgedatedir))
