@@ -7,7 +7,8 @@ import tkMessageBox
 import time
 
 
-ogpscriptname = "ITL_LatPos.RTN"
+ogpscriptname1 = "ITL_LatPos.RTN"
+ogpscriptname2 = "e2V_LatPos.RTN"
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
@@ -72,7 +73,8 @@ os.system("cd %s ; tar -vzxf %s.tar.gz" % (ogpscriptshome,tag))
 print "making a link to it"
 os.system("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
 
-os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname,pindatedir))
+os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname1,pindatedir))
+os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname2,pindatedir))
 
 os.system("cd %s" % cwd)
 
