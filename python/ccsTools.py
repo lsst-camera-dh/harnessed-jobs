@@ -60,6 +60,7 @@ class CcsSetup(OrderedDict):
         CCDTYPE = _quote(siteUtils.getUnitType())
         print "CCDTYPE = %s" % CCDTYPE
         self['acffile'] = self['itl_acffile']
+        self['CCSCCDTYPE'] = _quote("ITL")
         if ("RTM" in CCDTYPE) :
             if ("e2v" in CCDTYPE) :
                 self['CCSCCDTYPE'] = _quote("E2V")
@@ -194,7 +195,7 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     files = files+glob.glob('*summary*')
     files = files+glob.glob('*.png')
     files = files+glob.glob('*.dat')
-    files = files+glob.glob('*.txt')
+
     print "The files that will be registered in lims from %s are:" % os.getcwd()
     for line in files :
         print "%s" % line
