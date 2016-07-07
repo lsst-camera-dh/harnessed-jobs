@@ -1,0 +1,6 @@
+# -*- python -*-
+{
+    'schema_name' : 'sensor_edge_scan',
+    'schema_version' : 0,
+    'grade' : str
+}
