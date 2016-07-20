@@ -17,10 +17,12 @@ jobName = "rebalive_current_precheck"
 
 results = []
 
+os.system("./rebalive_plots.sh")
+
 alivefiles = glob.glob("*.txt")
 alivefiles = alivefiles + glob.glob("*summary*")
 alivefiles = alivefiles + glob.glob("*png")
-alivefiles = alivefiles + glob.glob("*log*")
+alivefiles = alivefiles + glob.glob("*log")
 
 data_products = [lcatr.schema.fileref.make(item) for item in alivefiles]
 results.extend(data_products)
@@ -58,6 +60,5 @@ results.append(siteUtils.packageVersions())
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
 
-#os.system("./rebalive_plots.sh")
 
 #ccsValidator('rebalive_current_precheck')

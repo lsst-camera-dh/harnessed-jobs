@@ -3,14 +3,24 @@
 foreach i (`cat plotchans.list`)
 echo "generate plot data for $i"
 #set selection = 'select FROM_UNIXTIME(tstampmills/1000.),doubleData from rawdata where descr_id in (select id from datadesc where name='\"$i\"') order by -tstampmills limit 300;'
-set selection = 'select tstampmills/1000.,doubleData from rawdata where descr_id in (select id from datadesc where name='\"$i\"') order by -tstampmills limit 300;'
+set selection = 'select id from datadesc where name='\"$i\"';'
+echo "selection=("$selection")"
+
+set getid = 'mysql CCSTrending4 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst --execute='\'"$selection"\'''
+echo getid = $getid
+#eval $getid
+set id = `eval $getid | tail -1`
+echo id for $i is $id
+
+#set selection = 'select tstampmills/1000.,doubleData from rawdata where descr_id in (select id from datadesc where name='\"$i\"') order by -tstampmills limit 300;'
+set selection = 'select tstampmills/1000.,doubleData from rawdata where descr_id='$id' order by -tstampmills limit 300;'
 echo "selection=("$selection")"
 set outfl = `echo $i | awk -F '/' '{print $2}'`
 echo "title time "$i >! $outfl.dat
 eval mysql CCSTrending4 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst --execute=\'$selection\'  >> $outfl.dat
 end
 
-foreach i (`ls -1 *.dat | awk -F "." '{print $1"."$2"."substr($3,1,4) }' | sort -u`)
+foreach i (`ls -1 *.dat | awk -F "." '{print $1"."$2"."substr($3,1,1) }' | sort -u`)
 
 echo "joining files of prefix $i"
 
