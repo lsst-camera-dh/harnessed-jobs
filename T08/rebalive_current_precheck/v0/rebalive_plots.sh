@@ -20,20 +20,20 @@ echo "title time "$i >! $outfl.dat
 eval mysql CCSTrending4 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst --execute=\'$selection\'  >> $outfl.dat
 end
 
-foreach i (`ls -1 *.dat | awk -F "." '{print $1"."$2"."substr($3,1,1) }' | sort -u`)
+#foreach i (`ls -1 *.dat | awk -F "." '{print $1"."$2"."substr($3,1,1) }' | sort -u`)
 
-echo "joining files of prefix $i"
+#echo "joining files of prefix $i"
 
-rm data.dat
-touch data.dat
+#rm data.dat
+#touch data.dat
 
-foreach j (`ls -1 $i*.dat`)
-echo "joining file $j"
-join -a 2 data.dat $j | sed 's/ time / /' > data2.dat
-mv data2.dat data.dat
-end
+#foreach j (`ls -1 $i*.dat`)
+#echo "joining file $j"
+#join -a 2 data.dat $j | sed 's/ time / /' > data2.dat
+#mv data2.dat data.dat
+#end
 
 eval gnuplot rebalive_plots.gp
-mv data.dat $i-joined.dat
-eval mv plot.png $i.png
+#mv data.dat $i-joined.dat
+#eval mv plot.png $i.png
 end

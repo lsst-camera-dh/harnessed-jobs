@@ -10,8 +10,9 @@ jobDir = siteUtils.getJobDir()
 
 shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
+shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
-#os.system("./rebalive_plots.sh")
+os.system("./rebalive_plots.sh")
 
 jobName = "rebalive_current_dacsloaded"
 
@@ -20,7 +21,7 @@ results = []
 alivefiles = glob.glob("*.txt")
 alivefiles = alivefiles + glob.glob("*summary*")
 alivefiles = alivefiles + glob.glob("*png")
-alivefiles = alivefiles + glob.glob("*log*")
+alivefiles = alivefiles + glob.glob("*log")
 
 data_products = [lcatr.schema.fileref.make(item) for item in alivefiles]
 results.extend(data_products)
