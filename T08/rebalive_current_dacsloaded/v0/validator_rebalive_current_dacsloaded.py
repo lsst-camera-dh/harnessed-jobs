@@ -38,8 +38,15 @@ statusFile = open("rebalive_results.txt")
 for line in statusFile:
     print "line = %s" % line
     values = line.split("|")
-    statusAssignments[values[0]] = values[1].strip("[|]").strip(",")
-    schemaFile.write("    \'%s\' : str,\n"%values[0])
+    val = values[1].strip("[|]").strip(",")
+    aa = values[0]
+    if not "device" in aa and not "wire" in aa :
+        schemaFile.write("    \'%s\' : float,\n"%values[0])
+        if "fail" in val :
+            val = -9999999.
+    else :
+        schemaFile.write("    \'%s\' : str,\n"%values[0])
+    statusAssignments[values[0]] = val
 schemaFile.write("}\n")
 schemaFile.close()
 
