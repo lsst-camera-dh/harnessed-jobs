@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import lsst.eotest.sensor as sensorTest
+import siteUtils
+import eotestUtils
+import glob
+
+sensor_id = siteUtils.getUnitId()
+#flat_files = siteUtils.dependency_glob('*_flat*flat?_*.fits',
+#                                       jobname=siteUtils.getProcessName('flat_acq'),
+#                                       description='Flat files:')
+
+flat_files = glob.glob('/home/ts3prod/jobHarness/jh_stage/ITL-CCD/ITL-3800C-097/flat_acq/v0/3645/*_flat*flat?_*.fits')
+
+#mask_files = eotestUtils.glob_mask_files()
+mask_files = glob.glob('*_mask.fits')
+
+data = sensorTest.EOTestResults('/home/ts3prod/jobHarness/jh_stage/ITL-CCD/ITL-3800C-097/fe55_analysis/v0/3643/ITL-3800C-097_eotest_results.fits')
+amps = data['AMP']
+gains = data['GAIN']
+gains = dict([(amp, gains[amp-1]) for amp in amps])
+
+#gains = eotestUtils.getSensorGains()
+
+task = sensorTest.FlatPairTask()
+task.run(sensor_id, flat_files, mask_files, gains)
