@@ -4,6 +4,12 @@
 #
 ###############################################################################
 
+def WriteBiasVolt(fp,arcsub,valname):
+
+    result = arcsub.synchCommand(10,"getLabeled",valname);
+    vval = result.getResult();
+    fp.write("%s|%s\n" % (valname,vval));
+
 from org.lsst.ccs.scripting import *
 from java.lang import Exception
 import sys
@@ -32,6 +38,7 @@ try:
     time.sleep(3.)
 
     cdir = tsCWD
+
     
     ts_version = ""
     archon_version = ""
@@ -43,6 +50,96 @@ except:
     print "pre-setup problem!"
 
 eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub)
+
+
+if (1==1) :
+    fp = open("%s/bias-voltages.out" % (cdir),"w");
+    
+    istate=0;
+    WriteBiasVolt(fp,arcsub,"DD_V");
+    WriteBiasVolt(fp,arcsub,"A1B_V");
+    WriteBiasVolt(fp,arcsub,"A1T_V");
+    WriteBiasVolt(fp,arcsub,"A2B_V");
+    WriteBiasVolt(fp,arcsub,"A2T_V");
+    WriteBiasVolt(fp,arcsub,"A3B_V");
+    WriteBiasVolt(fp,arcsub,"A3T_V");
+    WriteBiasVolt(fp,arcsub,"BB_V");
+    WriteBiasVolt(fp,arcsub,"CLBAR_V");
+    WriteBiasVolt(fp,arcsub,"DIO1_V");
+    WriteBiasVolt(fp,arcsub,"DRV1_V");
+    WriteBiasVolt(fp,arcsub,"DRV2_V");
+    WriteBiasVolt(fp,arcsub,"DRV3_V");
+    WriteBiasVolt(fp,arcsub,"DRV4_V");
+    WriteBiasVolt(fp,arcsub,"HV1_V");
+    WriteBiasVolt(fp,arcsub,"HV2_V");
+    WriteBiasVolt(fp,arcsub,"HV3_V");
+    WriteBiasVolt(fp,arcsub,"HV4_V");
+    WriteBiasVolt(fp,arcsub,"N5VB_V");
+    WriteBiasVolt(fp,arcsub,"N5VT_V");
+    WriteBiasVolt(fp,arcsub,"N7V5A_V");
+    WriteBiasVolt(fp,arcsub,"N7V5B_V");
+    WriteBiasVolt(fp,arcsub,"OD1_V");
+    WriteBiasVolt(fp,arcsub,"OD10_V");
+    WriteBiasVolt(fp,arcsub,"OD10_B1_V");
+    WriteBiasVolt(fp,arcsub,"OD11_V");
+    WriteBiasVolt(fp,arcsub,"OD11_A2_V");
+    WriteBiasVolt(fp,arcsub,"OD12_V");
+    WriteBiasVolt(fp,arcsub,"OD12_B2_V");
+    WriteBiasVolt(fp,arcsub,"OD13_V");
+    WriteBiasVolt(fp,arcsub,"OD13_A3_V");
+    WriteBiasVolt(fp,arcsub,"OD14_V");
+    WriteBiasVolt(fp,arcsub,"OD14_B3_V");
+    WriteBiasVolt(fp,arcsub,"OD15_V");
+    WriteBiasVolt(fp,arcsub,"OD15_A4_V");
+    WriteBiasVolt(fp,arcsub,"OD16_V");
+    WriteBiasVolt(fp,arcsub,"OD16_B4_V");
+    WriteBiasVolt(fp,arcsub,"OD1_D4_V");
+    WriteBiasVolt(fp,arcsub,"OD2_V");
+    WriteBiasVolt(fp,arcsub,"OD2_C4_V");
+    WriteBiasVolt(fp,arcsub,"OD3_V");
+    WriteBiasVolt(fp,arcsub,"OD3_D3_V");
+    WriteBiasVolt(fp,arcsub,"OD4_V");
+    WriteBiasVolt(fp,arcsub,"OD4_C3_V");
+    WriteBiasVolt(fp,arcsub,"OD5_V");
+    WriteBiasVolt(fp,arcsub,"OD5_D2_V");
+    WriteBiasVolt(fp,arcsub,"OD6_V");
+    WriteBiasVolt(fp,arcsub,"OD6_C2_V");
+    WriteBiasVolt(fp,arcsub,"OD7_V");
+    WriteBiasVolt(fp,arcsub,"OD7_D1_V");
+    WriteBiasVolt(fp,arcsub,"OD8_V");
+    WriteBiasVolt(fp,arcsub,"OD8_C1_V");
+    WriteBiasVolt(fp,arcsub,"OD9_V");
+    WriteBiasVolt(fp,arcsub,"OD9_A1_V");
+    WriteBiasVolt(fp,arcsub,"ODB_V");
+    WriteBiasVolt(fp,arcsub,"ODT_V");
+    WriteBiasVolt(fp,arcsub,"OG_V");
+    WriteBiasVolt(fp,arcsub,"OTG_V");
+    WriteBiasVolt(fp,arcsub,"P1_V");
+    WriteBiasVolt(fp,arcsub,"P2_V");
+    WriteBiasVolt(fp,arcsub,"P3_V");
+    WriteBiasVolt(fp,arcsub,"P4_V");
+    WriteBiasVolt(fp,arcsub,"P5VB_V");
+    WriteBiasVolt(fp,arcsub,"P5VT_V");
+    WriteBiasVolt(fp,arcsub,"P7V5A_V");
+    WriteBiasVolt(fp,arcsub,"P7V5B_V");
+    WriteBiasVolt(fp,arcsub,"RD_V");
+    WriteBiasVolt(fp,arcsub,"RDB_V");
+    WriteBiasVolt(fp,arcsub,"RDT_V");
+    WriteBiasVolt(fp,arcsub,"RG_V");
+    WriteBiasVolt(fp,arcsub,"RGB_V");
+    WriteBiasVolt(fp,arcsub,"RGT_V");
+    WriteBiasVolt(fp,arcsub,"S1_V");
+    WriteBiasVolt(fp,arcsub,"S1B_V");
+    WriteBiasVolt(fp,arcsub,"S1T_V");
+    WriteBiasVolt(fp,arcsub,"S2_V");
+    WriteBiasVolt(fp,arcsub,"S2B_V");
+    WriteBiasVolt(fp,arcsub,"S2T_V");
+    WriteBiasVolt(fp,arcsub,"S3_V");
+    WriteBiasVolt(fp,arcsub,"S3B_V");
+    WriteBiasVolt(fp,arcsub,"S3T_V");
+    WriteBiasVolt(fp,arcsub,"SC_V");
+    WriteBiasVolt(fp,arcsub,"VBB_V");
+    fp.close();
 
 try:
 
