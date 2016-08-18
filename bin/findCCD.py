@@ -45,6 +45,8 @@ folder = '/LSST/'
 
 use_latest_activity = True
 
+query = ''
+
 if (args.mirrorName == 'BNL-prod' or args.mirrorName == 'BNL-test'):
         folder = folder + 'mirror/' + sourceMap[args.mirrorName] + args.CCDType + '-CCD/' + sensorID + '/'
         if args.TestName != '':
