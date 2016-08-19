@@ -12,7 +12,7 @@ shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
-#os.system("./rebalive_plots.sh")
+os.system("./rebalive_plots.sh")
 
 jobName = "rebalive_temperatures"
 

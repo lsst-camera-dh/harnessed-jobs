@@ -17,7 +17,7 @@ jobName = "rebalive_current_precheck"
 
 results = []
 
-#os.system("./rebalive_plots.sh")
+os.system("./rebalive_plots.sh")
 
 alivefiles = glob.glob("*.txt")
 alivefiles = alivefiles + glob.glob("*summary*")
