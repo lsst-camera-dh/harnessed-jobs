@@ -10,6 +10,12 @@ def WriteBiasVolt(fp,arcsub,valname):
     vval = result.getResult();
     fp.write("%s|%s\n" % (valname,vval));
 
+def WriteConstant(fp,arcsub,valname):
+
+    result = arcsub.synchCommand(10,"getConstant",valname);
+    vval = result.getResult();
+    fp.write("%s|%s\n" % (valname,vval));
+
 from org.lsst.ccs.scripting import *
 from java.lang import Exception
 import sys
@@ -56,6 +62,22 @@ if (1==1) :
     fp = open("%s/bias-voltages.out" % (cdir),"w");
     
     istate=0;
+    WriteConstant(fp,arcsub,"P_SLEW");
+    WriteConstant(fp,arcsub,"S_SLEW");
+    WriteConstant(fp,arcsub,"CL_LOW");
+    WriteConstant(fp,arcsub,"CL_HIGH");
+    WriteConstant(fp,arcsub,"ADCLAMP");
+    WriteConstant(fp,arcsub,"T_LOW");
+    WriteConstant(fp,arcsub,"T_HIGH");
+    WriteConstant(fp,arcsub,"RG_SLEW");
+    WriteConstant(fp,arcsub,"CL_SLEW");
+    WriteConstant(fp,arcsub,"P_LOW");
+    WriteConstant(fp,arcsub,"P_HIGH");
+    WriteConstant(fp,arcsub,"S_LOW");
+    WriteConstant(fp,arcsub,"S_HIGH");
+    WriteConstant(fp,arcsub,"RG_LOW");
+    WriteConstant(fp,arcsub,"RG_HIGH");
+
     WriteBiasVolt(fp,arcsub,"DD_V");
     WriteBiasVolt(fp,arcsub,"OD7_D1_V");
     WriteBiasVolt(fp,arcsub,"OD12_B2_V");
