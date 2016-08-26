@@ -49,7 +49,7 @@ if (True):
         status_value = "failed"
     fp.write("%s| %s\n" % (test_name,status_value));
 
-    for rebid in rebs :
+    for i in range(1) :
 #        fp.write("\n\nREB ID = %s\n" % rebid)
 #        fp.write("==============================\n")
 
@@ -60,7 +60,11 @@ if (True):
 
 
 # Apply the CCD bias voltages and set the CCD clock rails (to E2V levels).                                               
-        result = ts8sub.synchCommand(90,"loadSequencer","seq_1M.xml");
+#        result = ts8sub.synchCommand(90,"loadSequencer","seq_1M.xml");
+
+# E2V seq file from Claire
+#        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-model-geo2.seq");
+        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-modelv2.seq");
 
  
 #14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.
@@ -78,12 +82,14 @@ if (True):
         tm_start = time.time()
         print "Ready to take image with exptime = %f at time = %f" % (0,tm_start)
         
-        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",100,False,False,fitsfilename);
+#        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",100,False,False,fitsfilename);
+        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",15000,True,False,fitsfilename);
         something = result.getResult();
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
         
         istep = istep + 1
+        rebid = "raft"
         fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_start" % (istep,rebid),tm_start));
         fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_end" % (istep,rebid),tm_end));
 

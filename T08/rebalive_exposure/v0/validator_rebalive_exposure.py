@@ -61,8 +61,8 @@ lcatr.schema.validate_file()
 
 fitsfiles = glob.glob("*fits")
 
-for fl in fitsfiles:
-    os.system("screen -d -m ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s &" % fl)
+#for fl in fitsfiles:
+#    os.system("screen -d -m ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s &" % fl)
 
 
 #ccsValidator('rebalive_exposure')

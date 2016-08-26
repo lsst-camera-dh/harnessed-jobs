@@ -40,7 +40,7 @@ if (True):
         pstep = 1
         test_name = "Step%d_power_to_line %d" % (pstep,i)
         try:
-            result = pwrsub.synchCommand(10,"setPowerOn",i,-1,True);
+#            result = pwrsub.synchCommand(10,"setPowerOn",i,-1,True);
             status_value = "success";
         except:
             status_value = "failed"
@@ -49,7 +49,7 @@ if (True):
         pstep = pstep + 1
         test_name = "Step%d_digi_pwr_to_line digital power %d" % (pstep,i)
         try:
-            result = pwrsub.synchCommand(10,"toggleNamedPower %d digital"%i);
+#            result = pwrsub.synchCommand(10,"toggleNamedPower %d digital"%i);
             status_value = "success";
         except:
             status_value = "failed"
@@ -57,7 +57,7 @@ if (True):
 
         test_name = "Step%d_digi_pwr_to_line analog power %d" % (pstep,i)
         try:
-            result = pwrsub.synchCommand(10,"toggleNamedPower %d analog"%i);
+#            result = pwrsub.synchCommand(10,"toggleNamedPower %d analog"%i);
             status_value = "success";
         except:
             status_value = "failed"

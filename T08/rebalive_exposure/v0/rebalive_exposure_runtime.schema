@@ -3,6 +3,6 @@
     'schema_name' : 'rebalive_exposure_runtime',
     'schema_version' : 0,
     'Step1_REB_devices' : str,
-    'Step2_R00.Reb2_bias_exposure_t_start' : str,
-    'Step2_R00.Reb2_bias_exposure_t_end' : str,
+    'Step2_raft_bias_exposure_t_start' : str,
+    'Step2_raft_bias_exposure_t_end' : str,
 }
