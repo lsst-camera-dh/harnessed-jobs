@@ -27,8 +27,8 @@ try:
     cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
     print "attaching VacuumGauge subsystem"
     vacsub = CCS.attachSubsystem("%s/VacuumGauge" % ts );
-    print "Attaching archon subsystem"
-    arcsub  = CCS.attachSubsystem("%s" % archon);
+#    print "Attaching archon subsystem"
+#    arcsub  = CCS.attachSubsystem("%s" % archon);
 
     time.sleep(3.)
 
@@ -41,7 +41,7 @@ try:
     ts_revision = ""
     archon_revision = ""
 
-    ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
+#    ts_version,archon_version,ts_revision,archon_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
 
     starttim = time.time()
