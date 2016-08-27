@@ -22,6 +22,7 @@ set outfl = `echo $i | awk -F '/' '{print $2}'`
 echo "title time "$i >! $outfl.dat
 eval mysql CCSTrending4 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst --execute=\'"$selection"\'  >> $outfl.dat
 
-eval gnuplot rebalive_plots.gp
 
 end
+
+eval 'gnuplot < rebalive_plots.gp'
