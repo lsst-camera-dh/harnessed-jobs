@@ -15,7 +15,7 @@ CCD_SERN    String  ${CCDSerialManufacturer}    Manufacturers’ CCD Serial Numb
 LSST_NUM    String  ${LSSTCCDNum}               LSST Assigned CCD Number
 TESTTYPE    String  ${TestType}                 DARK:FLAT:OBS:PPUMP:QE:SFLAT
 IMGTYPE     String  ${ImageType}                BIAS, DARK, …
-SEQNUM      Integer ${SequenceNumber}           Sequence number extracted from the original filename
+SEQNUM      String  ${SequenceNumber}           Sequence number extracted from the original filename
 TEMP_SET    Float   ${ts/ccdtempsetpoint}       Temperature set point (deg C)
 CCDTEMP     Float   ${ts/ccdtemperature}        Measured temperature (deg C)
 CCDBSS      Float   ${ts/ccdbiasvoltage}        CCD bias voltage
