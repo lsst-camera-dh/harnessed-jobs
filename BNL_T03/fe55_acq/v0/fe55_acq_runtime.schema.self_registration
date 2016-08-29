@@ -1,6 +1,6 @@
 # -*- python -*-
 {
-    'schema_name' : 'fe55_acq',
+    'schema_name' : 'fe55_acq_runtime',
     'schema_version' : 0,
     'P_SLEW' : str,
     'S_SLEW' : str,
