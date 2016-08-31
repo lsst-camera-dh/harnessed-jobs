@@ -6,8 +6,8 @@ from DataCatalog import *
 parser = argparse.ArgumentParser(description='Find archived data in the LSST  data Catalog. These include CCD test stand and vendor data files.')
 
 ##   The following are 'convenience options' which could also be specified in the filter string
-parser.add_argument('-t','--timestamp',default=None,help="(metadata) File timestamp (default=%(default)s)")
-parser.add_argument('-s','--sensorID', default=None,help="(metadata) Sensor ID (default=%(default)s)")
+parser.add_argument('-A','--activityId',default="",help="find data by test activityId")
+parser.add_argument('-s','--sensorID', default="",help="(metadata) Sensor ID (default=%(default)s)")
 parser.add_argument('-T','--TestName', default='',help="(metadata) test type (default=%(default)s)")
 parser.add_argument('-c','--CCDType', default="ITL",help="(metadata) CCD vendor type (default=%(default)s)")
 parser.add_argument('-S','--site', default="slac.lca.archive",help="File location (default=%(default)s) ")
@@ -46,6 +46,7 @@ folder = '/LSST/'
 use_latest_activity = True
 
 query = ''
+site = args.site
 
 if (args.mirrorName == 'BNL-prod' or args.mirrorName == 'BNL-test'):
         folder = folder + 'mirror/' + sourceMap[args.mirrorName] + args.CCDType + '-CCD/' + sensorID + '/'
@@ -55,6 +56,7 @@ if (args.mirrorName == 'BNL-prod' or args.mirrorName == 'BNL-test'):
                 use_latest_activity = False
 elif (args.mirrorName == 'vendorCopy-prod' or args.mirrorName == 'vendorCopy-test'):
 	query = "TESTTYPE IS NOT NULL"
+	site = "SLAC"
         folder = folder + 'mirror/' + sourceMap[args.mirrorName] + args.CCDType + '-CCD/' + sensorID
         if args.TestName != '':
                 folder += '/' + args.TestName + '/v0/'
@@ -64,8 +66,10 @@ elif (args.mirrorName == 'vendorCopy-prod' or args.mirrorName == 'vendorCopy-tes
                 folder += '/test_report_offline/v0/'
 elif (args.mirrorName == 'vendor-prod'):
         folder = folder + sourceMap[args.mirrorName] + args.CCDType  + '/' + sensorID + '/Prod/'
+	site = "slac.lca.archive"
 elif (args.mirrorName == 'vendor-test'):
         folder = folder + sourceMap[args.mirrorName] + args.CCDType  + '/' + sensorID + '/Dev/'
+	site = "slac.lca.archive"
 elif (args.mirrorName == 'SAWG-BNL'):
         folder = folder + 'mirror/' + sourceMap[args.mirrorName] + args.CCDType  + '/' + sensorID + '/' + args.TestName
         use_latest_activity = False
@@ -79,11 +83,12 @@ if args.XtraOpts != '':
 	else:
 		query += "&&" + args.XtraOpts
 
-site = args.site
+
+if args.activityId != "":
+	query = "ActivityId==" + args.activityId
+	use_latest_activity = False
 
 datacatalog = DataCatalog(folder=folder, experiment='LSST', site=site, use_newest_subfolder=use_latest_activity)
-
-#datasets = datacatalog.find_datasets(query,datacat_search_patterns="dark")
 
 datasets = datacatalog.find_datasets(query)
 print "%i datasets found\n" % len(datasets)
