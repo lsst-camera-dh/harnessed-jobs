@@ -1,5 +1,6 @@
 import os
 import sys
+import pickle
 import subprocess
 import socket
 import fnmatch
@@ -237,3 +238,23 @@ def get_datacatalog_glob_job_id(pattern, testtype=None, imgtype=None,
     #
     job_id = os.path.split(os.path.split(files[0])[0])[1]
     return job_id
+
+def aggregate_job_ids():
+    """
+    Use lcatr.harness.helpers.dependency_jobids to collect the job ids
+    for the harnessed jobs on which the current job depends.  If
+    previous dependencies have produced pickle files containing their
+    dependency job ids, aggregate them into a common dictionary and
+    persist them in a pickle file which downstream jobs can access.
+    """
+    pickle_file = 'dependency_job_ids.pkl'
+    my_dependencies = lcatr.harness.helpers.dependency_jobids()
+    prior_job_id_files = lcatr.harness.helpers.dependency_glob(pickle_file)
+    if prior_job_id_files:
+        for item in prior_job_id_files:
+            job_ids = pickle.load(open(item, 'r'))
+            if job_ids:
+                my_dependencies.update(job_ids)
+    pickle.dump(my_dependencies, open(pickle_file, 'w'))
+    return my_dependencies
+

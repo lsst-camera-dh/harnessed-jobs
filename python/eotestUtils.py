@@ -20,7 +20,7 @@ def getSensorGains(jobname='fe55_analysis'):
         gain_file = dependency_glob('%s_eotest_results.fits' % sensor_id,
                                     jobname=processName)[0]
     except IndexError:
-        raise RuntimeError('eotestUtils.getSensorGains: %s %s' 
+        raise RuntimeError('eotestUtils.getSensorGains: %s %s'
                            % (sensor_id, processName))
     data = sensorTest.EOTestResults(gain_file)
     amps = data['AMP']
