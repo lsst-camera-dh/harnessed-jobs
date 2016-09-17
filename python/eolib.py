@@ -168,6 +168,8 @@ def EOSetup(tssub,ccdid,ccdtype,cdir,acffile,vac_outlet,arcsub,state1="setTSRead
 
     result = arcsub.synchCommand(10,"setHeader","PixelReadRate",kpixrate/1000.)
 
+#    result = arcsub.synchCommand(10,"setDefaultCCDType ITL_OVERSCAN_64")
+    result = arcsub.synchCommand(10,"setCCDOverScans",50)
 
 
 ###############################################################################
