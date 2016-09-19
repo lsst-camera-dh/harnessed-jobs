@@ -4,6 +4,7 @@ import lsst.eotest.sensor as sensorTest
 import siteUtils
 import eotestUtils
 
+siteUtils.aggregate_job_ids()
 sensor_id = siteUtils.getUnitId()
 lambda_files = siteUtils.dependency_glob('*_lambda_flat_*.fits',
                                          jobname=siteUtils.getProcessName('qe_acq'),
