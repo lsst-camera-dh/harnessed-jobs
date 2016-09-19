@@ -166,6 +166,32 @@ fe55_zoom = processName_dependencyGlob('%s_fe55_zoom.png' % sensor_id,
 print "fe55_zoom: ", fe55_zoom
 shutil.copy(fe55_zoom, '.')
 
+# Fe55 aperture flux plots.
+fe55_apflux_serial \
+    = processName_dependencyGlob('%s_fe55_apflux_serial.png' % sensor_id,
+                                 jobname='fe55_analysis')[0]
+shutil.copy(fe55_apflux_serial, '.')
+print "fe55_apflux_serial:", fe55_apflux_serial
+
+fe55_apflux_parallel \
+    = processName_dependencyGlob('%s_fe55_apflux_parallel.png' % sensor_id,
+                                 jobname='fe55_analysis')[0]
+shutil.copy(fe55_apflux_parallel, '.')
+print "fe55_apflux_parallel:", fe55_apflux_parallel
+
+# p3-p5 statistics
+fe55_p3_p5_hists \
+    = processName_dependencyGlob('%s_fe55_p3_p5_hists.png' % sensor_id,
+                                 jobname='fe55_analysis')[0]
+shutil.copy(fe55_p3_p5_hists, '.')
+print "fe55_p3_p5_hists:", fe55_p3_p5_hists
+
+fe55_p3_p5_profiles \
+    = processName_dependencyGlob('%s_fe55_p3_p5_profiles.png' % sensor_id,
+                                 jobname='fe55_analysis')[0]
+shutil.copy(fe55_p3_p5_profiles, '.')
+print "fe55_p3_p5_profiles:", fe55_p3_p5_profiles
+
 # Coadded bias frame
 bias_files = processName_dependencyGlob('%s_mean_bias_*.fits' % sensor_id,
                                         jobname='fe55_analysis')

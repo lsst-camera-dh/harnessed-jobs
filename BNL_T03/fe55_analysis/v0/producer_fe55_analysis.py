@@ -32,6 +32,22 @@ imutils.fits_mean_file(bias_files, outfile)
 sensorTest.fe55_zoom(fe55_files[0], size=250, amp=1)
 plt.savefig('%(sensor_id)s_fe55_zoom.png' % locals())
 
+#
+# Perform analysis of 9-pixel statistics for Fe55 charge clusters.
+#
+pixel_stats = sensorTest.Fe55PixelStats(fe55_files, sensor_id=sensor_id)
+pixel_stats.pixel_hists(pix0='p3', pix1='p5')
+plt.savefig('%(sensor_id)s_fe55_p3_p5_hists.png' % locals())
+
+pixel_stats.pixel_diff_profile(pixel_coord='x', pix0='p3', pix1='p5')
+plt.savefig('%(sensor_id)s_fe55_p3_p5_profiles.png' % locals())
+
+pixel_stats.apflux_profile()
+plt.savefig('%(sensor_id)s_fe55_apflux_serial.png' % locals())
+
+pixel_stats.apflux_profile(pixel_coord='y')
+plt.savefig('%(sensor_id)s_fe55_apflux_parallel.png' % locals())
+
 # Roll-off defects mask needs an input file to get the vendor
 # geometry, and will be used for all analyses.
 rolloff_mask_file = '%s_rolloff_defects_mask.fits' % sensor_id

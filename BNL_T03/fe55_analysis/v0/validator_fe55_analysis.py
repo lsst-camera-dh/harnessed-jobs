@@ -25,11 +25,24 @@ for fitsfile in output_files:
 #
 bias_mean_file = glob.glob('%(sensor_id)s_mean_bias_*.fits' % locals())[0]
 results = [lcatr.schema.fileref.make(bias_mean_file)]
-
 #
-# Persist the zoom of segment 1 of the Fe55 exposure.
+# Common metadata for persisted non-FITS files.
 #
-results.append(lcatr.schema.fileref.make('%(sensor_id)s_fe55_zoom.png' % locals()))
+md = siteUtils.DataCatalogMetadata(CCD_MANU=siteUtils.getCcdVendor().upper(),
+                                   LSST_NUM=sensor_id,
+                                   producer='SR-EOT-1',
+                                   TESTTYPE='FE55',
+                                   TEST_CATEGORY='EO')
+#
+# Persist various png files.
+#
+png_files = glob.glob('%(sensor_id)s_fe55*.png' % locals())
+png_filerefs = []
+for png_file in png_files:
+    dp = eotestUtils.png_data_product(png_file, sensor_id)
+    png_filerefs.append(lcatr.schema.fileref.make(png_file,
+                                                  metadata=md(DATA_PRODUCT=dp)))
+results.extend(png_filerefs)
 
 data = sensorTest.EOTestResults(gain_file)
 amps = data['AMP']
