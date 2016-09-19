@@ -3,6 +3,7 @@ import lsst.eotest.sensor as sensorTest
 import siteUtils
 import eotestUtils
 
+siteUtils.aggregate_job_ids()
 sensor_id = siteUtils.getUnitId()
 flat_files = siteUtils.dependency_glob('*_flat*flat?_*.fits',
                                        jobname=siteUtils.getProcessName('flat_acq'),
