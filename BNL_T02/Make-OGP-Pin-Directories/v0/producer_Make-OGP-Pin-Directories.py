@@ -7,8 +7,10 @@ import tkMessageBox
 import time
 
 
-ogpscriptname1 = "ITL_LatPos.RTN"
-ogpscriptname2 = "e2V_LatPos.RTN"
+#ogpscriptname1 = "ITL_LatPos.RTN"
+#ogpscriptname2 = "e2V_LatPos.RTN"
+ogpscriptname1 = ""
+ogpscriptname2 = ""
 
 ccd = os.environ["LCATR_UNIT_ID"]
 
@@ -45,6 +47,19 @@ os.system("chmod 777 %s" %  pindatedir)
 print "Making links to the data directories in %s" % os.getcwd()
 os.system("ln -s %s pinlink" % pindatedir);
 os.system("ls -lrt")
+
+versionsFile = open("%s/OGP-scripts/Production routines/RTN_versions.txt" % ogpscriptshome )
+for line in versionsFile:
+#    print "line = %s" % line
+    values = line.split("|")
+    if "ITL_LatPos" in values[0] :
+        ogpscriptname1 = values[0]
+        print "For ITL Lat Pos , using - %s" % line
+    if "e2V_LatPos" in values[0] :
+        ogpscriptname2 = values[0]
+        print "For e2V Lat Pos, using       - %s" % line
+
+
 
 #top = Tkinter.Tk()
 #M = Tkinter.Button(top, text ="Please setup the OGP MeasureMind application to store<br>edge scan results in %s edgedatedir<br>and<br>lateral pin results in %s" % (edgedatedir,flatdatedir), bg = "green")
