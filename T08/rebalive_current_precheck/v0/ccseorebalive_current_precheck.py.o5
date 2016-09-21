@@ -1,9 +1,9 @@
 ###############################################################################
-# REB aliveness exposure test
+# REB aliveness current_precheck test
 #
 # Ex:
 # source ts8setup-test
-# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_exposure --version v0
+# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_current_precheck --version v0
 #
 # author: homer    5/2016
 #
@@ -36,10 +36,9 @@ if (True):
     status_value = None
 
 
-#  Verify data link integrity.
+
     rebs = ""
     pstep = 1
-    istep = 1
     test_name = "Step%d_REB_devices" % (pstep)
     try:
         result = ts8sub.synchCommand(10,"getREBDevices");
@@ -49,52 +48,70 @@ if (True):
         status_value = "failed"
     fp.write("%s| %s\n" % (test_name,status_value));
 
-    for i in range(1) :
+    for rebid in rebs :
 #        fp.write("\n\nREB ID = %s\n" % rebid)
 #        fp.write("==============================\n")
+# Read 1-wire ID chip and record the value.
+        istep = pstep + 1
+        test_name = "Step%d_%s_1-wire_ID" % (istep,rebid)
+        try:
+# SCI's own address
+            result = ts8sub.synchCommand(10,"readRegister "+rebid+" 1");
+            sci_id = result.getResult();
+            status_value = sci_id
+        except:
+            status_value = "failed"
+        fp.write("%s|%s\n" % (test_name,status_value));
 
-#13. Configure the ASPICs to standard gain and RC time constant, and leave the inputs in clamped state.
 
-#        for i in range(6) :
-#            ts8asp[i].synchCommand(10,"change clamp 1");
+# Read the voltage and current consumption measured by the VP5 LTC2945 current monitor on the REB, record the value and compare to the current measured at the P/S.
 
+#R00.Reb2.DigV, R00.Reb2.DigI, R00.Reb2.AnaV, R00.Reb2.ClkV, R00.Reb2.ClkI, R00.Reb2.ODV, R00.Reb2.ODI, R00.Reb2.OD0V, R00.Reb2.OG0V, R00.Reb2.RD0V, R00.Reb2.GD0V, R00.Reb2.OD1V, R00.Reb2.OG1V, R00.Reb2.RD1V, R00.Reb2.GD1V, R00.Reb2.OD2V, R00.Reb2.OG2V, R00.Reb2.RD2V, R00.Reb2.GD2V, R00.Reb2.Ref05V, R00.Reb2.Ref15V, R00.Reb2.Ref25V, R00.Reb2.Ref125V,
 
-# Apply the CCD bias voltages and set the CCD clock rails (to E2V levels).                                               
-#        result = ts8sub.synchCommand(90,"loadSequencer","seq_1M.xml");
+        chans = ["6V","9V","24V","40V"]
+        curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60}) 
+        curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120}) 
 
-# E2V seq file
-#        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-model-geo2.seq");
-#        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-modelv2.seq");
-# ITL seq file
-        result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v4.seq");
- 
-#14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.
+        result = ts8sub.synchCommand(10,"getChannelNames");
+        chans = result.getResult();
 
-        ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
-
-# <LSST CCD SN>_<test type>_<image type>_<seq. info>_<time stamp>.fits
-
-        fitsfilename = "s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits"
-
-        print "fitsfilename = %s" % fitsfilename
-
-        ts8sub.synchCommand(10,"setTestType","FE55")
-        ts8sub.synchCommand(10,"setRaftLoc",str(raft))
-
-        
-        tm_start = time.time()
-        print "Ready to take image with exptime = %f at time = %f" % (0,tm_start)
-        
-#        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",100,False,False,fitsfilename);
-        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",15000,False,False,fitsfilename);
-        something = result.getResult();
-        tm_end = time.time()
-        print "done taking image with exptime = %f at time = %f" % (0,tm_end)
-        
         istep = istep + 1
-        rebid = "raft"
-        fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_start" % (istep,rebid),tm_start));
-        fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_end" % (istep,rebid),tm_end));
+        for chn in chans :
+            if rebid in chn and ("V" in chn or "I" in chn) :
+                print "chn = (%s)" % chn
+                test_name = "Step%d_%s_check0_VP5_LTC2945_%s" % (istep,rebid,chn)
+                try:
+                    result = ts8sub.synchCommand(10,"getChannelValue %s" % (chn));
+                    rebval = result.getResult();
+
+                    fp.write("%s|%f \n" % (test_name,rebval));
+
+                except:
+                    fp.write("%s| failed \n" % (test_name));
+
+    print "getting REB PS values"
+    result = pwrsub.synchCommand(10,"getChannelNames");
+    chans = result.getResult();
+
+    print "chans = "
+    print chans
+
+    istep = istep + 1
+    for ireb in range(3) :
+        for chn in chans :
+            print "chn = %s" % chn
+            prebid = "REB%d" % ireb
+            if prebid in chn and (".V" in chn or ".I" in chn) :
+                print "chn = (%s)" % chn
+                test_name = "Step%d_%s_check0_REB_PS_%s" % (istep,rebid,chn)
+                try:
+                    result = pwrsub.synchCommand(10,"getChannelValue %s" % (chn));
+                    rebval = result.getResult();
+
+                    fp.write("%s|%f \n" % (test_name,rebval));
+
+                except:
+                    fp.write("%s| failed \n" % (test_name));
 
 
     fp.close();
