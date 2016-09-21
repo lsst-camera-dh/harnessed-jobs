@@ -48,17 +48,6 @@ print "Making links to the data directories in %s" % os.getcwd()
 os.system("ln -s %s pinlink" % pindatedir);
 os.system("ls -lrt")
 
-versionsFile = open("%s/OGP-scripts/Production routines/RTN_versions.txt" % ogpscriptshome )
-for line in versionsFile:
-#    print "line = %s" % line
-    values = line.split("|")
-    if "ITL_LatPos" in values[0] :
-        ogpscriptname1 = values[0]
-        print "For ITL Lat Pos , using - %s" % line
-    if "e2V_LatPos" in values[0] :
-        ogpscriptname2 = values[0]
-        print "For e2V Lat Pos, using       - %s" % line
-
 
 
 #top = Tkinter.Tk()
@@ -87,6 +76,17 @@ print "untarring"
 os.system("cd %s ; tar -vzxf %s.tar.gz" % (ogpscriptshome,tag))
 print "making a link to it"
 os.system("cd %s ; ln -s OGP-scripts-%s OGP-scripts" % (ogpscriptshome,tag))
+
+versionsFile = open("%s/OGP-scripts/Production routines/RTN_versions.txt" % ogpscriptshome )
+for line in versionsFile:
+#    print "line = %s" % line
+    values = line.split("|")
+    if "ITL_LatPos" in values[0] :
+        ogpscriptname1 = values[0]
+        print "For ITL Lat Pos , using - %s" % line
+    if "e2V_LatPos" in values[0] :
+        ogpscriptname2 = values[0]
+        print "For e2V Lat Pos, using       - %s" % line
 
 os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname1,pindatedir))
 os.system("cp -vp %s/OGP-scripts/Production\ routines/%s %s" % (ogpscriptshome,ogpscriptname2,pindatedir))
