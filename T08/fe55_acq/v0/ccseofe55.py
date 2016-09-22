@@ -9,6 +9,7 @@ from java.lang import Exception
 import sys
 import time
 import eolib
+import string
 
 CCS.setThrowExceptions(True);
 
@@ -43,6 +44,8 @@ if (True):
 
 # prepare TS8: make sure temperature and vacuum are OK and load the sequencer
 #    eolib.EOSetup(tssub,RAFTID,CCSRAFTTYPE,cdir,sequence_file,vac_outlet,ts8sub)
+
+    result = monosub.synchCommand(20,"openShutter");
 
 # full path causes length problem: /home/ts8prod/lsst/redhat6-x86_64-64bit-gcc44/test/jh_inst/0.3.23/harnessed-jobs-0.3.23/config/BNL/sequencer-ts8-ITL-v4.seq
     acffile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v4.seq"
@@ -105,7 +108,8 @@ if (True):
 
                 print "Ready to take bias image. time = %f" % time.time()
 
-                ts8sub.synchCommand(10,"setTestType","BIAS")
+                ts8sub.synchCommand(10,"setTestType","FE55")
+                ts8sub.synchCommand(10,"setImageType","BIAS")
                 ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
 
                 print "after click click at %f" % time.time()
@@ -125,9 +129,6 @@ if (True):
                 nreads = 3000
                 nplc = (exptime+2.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
-
-            ts8sub.synchCommand(10,"setHeader","TestType","FE55",False)
-            ts8sub.synchCommand(10,"setHeader","ImageType","FLAT",False)
 
 
 # adjust timeout because we will be waiting for the data to become ready
@@ -165,8 +166,9 @@ if (True):
                 print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
 
                 ts8sub.synchCommand(10,"setTestType","FE55")
-                ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,True,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
-
+                ts8sub.synchCommand(10,"setImageType","FE55")
+                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,True,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
+                fitsfiles = result.getResult()
 
                 print "after click click at %f" % time.time()
 
@@ -183,14 +185,17 @@ if (True):
 
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
 
-                result = pdsub.synchCommand(1000,"readBuffer","/tmp/%s" % pdfilename);
+#                result = pdsub.synchCommand(1000,"readBuffer","/tmp/%s" % pdfilename);
+                result = pdsub.synchCommand(1000,"readBuffer","/%s/%s" % (cdir,pdfilename),"ts8prod@ts8-raft1");
                 buff = result.getResult()
                 print "Finished getting readings at %f" % time.time()
 
-
-# Note: note implemented yet
-#                result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+#                subprocess.Popen(["scp ts8prod@ts8-1","/tmp/%s" % pdfilename,cdir])
+                for ii in ["s00","s01","s02","s10","s11","s12","s20","s21","s22"] :
+                    fitsfilename = string.replace(fitsfiles, '${sensorLoc}', ii)
+                    result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
 #                fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
+
 # ------------------- end of imcount loop --------------------------------
 # reset timeout to something reasonable for a regular command
             pdsub.synchCommand(1000,"setTimeout",10.);
