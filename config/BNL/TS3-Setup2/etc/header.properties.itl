@@ -6,6 +6,6 @@ CCDManufacturer: ITL
 TestStand: BNL-TS3-2-Janeway
 Instrument: ArchonCCDController
 MonochromaterType: Cornerstone260
-CCDModel: STA3800C
+CCDModel: STA3800B
 #CCDSerialManufacturer: ITL-XXX
 Tag: CCS

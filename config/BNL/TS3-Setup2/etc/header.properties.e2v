@@ -2,10 +2,10 @@
 # unless overiden by a command or script
 
 Origin: BNL
-CCDManufacturer: ITL
+CCDManufacturer: E2V
 TestStand: BNL-TS3-2-Janeway
 Instrument: ArchonCCDController
 MonochromaterType: Cornerstone260
-CCDModel: STA3800C
+CCDModel: E2V11093-12-01
 #CCDSerialManufacturer: ITL-XXX
 Tag: CCS

@@ -1,0 +1,252 @@
+#********  RTM_Explore//measmode
+#** 
+#** type : int
+#********
+RTM_Explore//measmode = 4
+
+#********  RTM_Explore//startx
+#** 
+#** type : double
+#********
+RTM_Explore//startx = -73.
+
+#********  RTM_Explore//starty
+#** 
+#** type : double
+#********
+RTM_Explore//starty = -118.
+
+#********  RTM_Explore//stopx
+#** 
+#** type : double
+#********
+RTM_Explore//stopx = -8
+
+#********  RTM_Explore//stopy
+#** 
+#** type : double
+#********
+RTM_Explore//stopy = 6.
+
+#********  BASEPLATE//acceleration
+#** 
+#** type : double
+#********
+#BASEPLATE//acceleration = 1.0
+
+#********  BASEPLATE//cornerang
+#** 
+#** type : double
+#********
+#BASEPLATE//cornerang = 89.5
+
+#********  BASEPLATE//dx
+#** 
+#** type : double
+#********
+#BASEPLATE//dx = 4.0
+
+#********  BASEPLATE//dy
+#** 
+#** type : double
+#********
+#BASEPLATE//dy = 4.0
+
+#********  BASEPLATE//measmode
+#** 
+#** type : int
+#********
+#BASEPLATE//measmode = 0
+
+#********  BASEPLATE//nsamps
+#** 
+#** type : int
+#********
+#BASEPLATE//nsamps = 6
+
+#********  BASEPLATE//rotation
+#** 
+#** type : double
+#********
+#BASEPLATE//rotation = 0.0
+
+#********  BASEPLATE//startx
+#** 
+#** type : double
+#********
+#BASEPLATE//startx = 0.0
+
+#********  BASEPLATE//starty
+#** 
+#** type : double
+#********
+#BASEPLATE//starty = -44.0
+
+#********  BASEPLATE//stopx
+#** 
+#** type : double
+#********
+#BASEPLATE//stopx = 20.0
+
+#********  BASEPLATE//stopy
+#** 
+#** type : double
+#********
+#BASEPLATE//stopy = -32.0
+
+#********  RTM//acceleration
+#** 
+#** type : double
+#********
+#RTM//acceleration = 1.0
+
+#********  RTM//cornerang
+#** 
+#** type : double
+#********
+#RTM//cornerang = 89.5
+
+#********  RTM//dx
+#** 
+#** type : double
+#********
+#RTM//dx = 4.0
+
+#********  RTM//dy
+#** 
+#** type : double
+#********
+#RTM//dy = 4.0
+
+#********  RTM//measmode
+#** 
+#** type : int
+#********
+#RTM//measmode = 0
+
+#********  RTM//nsamps
+#** 
+#** type : int
+#********
+#RTM//nsamps = 6
+
+#********  RTM//rotation
+#** 
+#** type : double
+#********
+#RTM//rotation = 0.0
+
+#********  RTM//startx
+#** 
+#** type : double
+#********
+#RTM//startx = -18.0
+
+#********  RTM//starty
+#** 
+#** type : double
+#********
+#RTM//starty = -114.0
+
+#********  RTM//stopx
+#** 
+#** type : double
+#********
+#RTM//stopx = 107.0
+
+#********  RTM//stopy
+#** 
+#** type : double
+#********
+#RTM//stopy = 5.0
+
+#********  RTM_Explore//acceleration
+#** 
+#** type : double
+#********
+#RTM_Explore//acceleration = 1.0
+
+#********  RTM_Explore//cornerang
+#** 
+#** type : double
+#********
+#RTM_Explore//cornerang = 89.5
+
+#********  RTM_Explore//dx
+#** 
+#** type : double
+#********
+#RTM_Explore//dx = 2.0
+
+#********  RTM_Explore//dy
+#** 
+#** type : double
+#********
+#RTM_Explore//dy = 2.0
+
+#********  RTM_Explore//nsamps
+#** 
+#** type : int
+#********
+#RTM_Explore//nsamps = 6
+
+#********  RTM_Explore//rotation
+#** 
+#** type : double
+#********
+#RTM_Explore//rotation = 0.0
+
+#********  displacement//limitHi
+#** 
+#** type : double
+#********
+#displacement//limitHi = 1000.0
+
+#********  displacement//limitLo
+#** 
+#** type : double
+#********
+#displacement//limitLo = -1000.0
+
+#********  posX//limitHi
+#** 
+#** type : double
+#********
+#posX//limitHi = 1000.0
+
+#********  posX//limitLo
+#** 
+#** type : double
+#********
+#posX//limitLo = -1000.0
+
+#********  posY//limitHi
+#** 
+#** type : double
+#********
+#posY//limitHi = 1000.0
+
+#********  posY//limitLo
+#** 
+#** type : double
+#********
+#posY//limitLo = -1000.0
+
+#********  posZ//limitHi
+#** 
+#** type : double
+#********
+#posZ//limitHi = 1000.0
+
+#********  posZ//limitLo
+#** 
+#** type : double
+#********
+#posZ//limitLo = -1000.0
+
+#********  main//tickMillis
+#** 
+#** type : int
+#********
+#main//tickMillis = 5000
+
