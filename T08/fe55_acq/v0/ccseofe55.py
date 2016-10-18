@@ -9,9 +9,12 @@ from java.lang import Exception
 import sys
 import time
 import eolib
-import string
 
 CCS.setThrowExceptions(True);
+
+aa="jajd"
+aa=aa.replace('jd','de')
+print aa
 
 if (True):
 #attach CCS subsystem Devices for scripting
@@ -90,7 +93,7 @@ if (True):
             ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
 
 
-            ts8sub.synchCommand(10,"setTestType","FE55")
+            ts8sub.synchCommand(10,"setTestType","fe55")
             ts8sub.synchCommand(10,"setRaftLoc",str(raft))
 
 # probably not needed any more ... reduce count to 1
@@ -108,8 +111,8 @@ if (True):
 
                 print "Ready to take bias image. time = %f" % time.time()
 
-                ts8sub.synchCommand(10,"setTestType","FE55")
-                ts8sub.synchCommand(10,"setImageType","BIAS")
+                ts8sub.synchCommand(10,"setTestType","fe55")
+                ts8sub.synchCommand(10,"setImageType","bias")
                 ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
 
                 print "after click click at %f" % time.time()
@@ -165,9 +168,12 @@ if (True):
 
                 print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
 
-                ts8sub.synchCommand(10,"setTestType","FE55")
-                ts8sub.synchCommand(10,"setImageType","FE55")
-                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,True,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
+                ts8sub.synchCommand(10,"setTestType","fe55")
+                ts8sub.synchCommand(10,"setImageType","fe55")
+# test with no XED
+                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,False,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
+# normal XED actuation
+#                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,True,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
                 fitsfiles = result.getResult()
 
                 print "after click click at %f" % time.time()
@@ -190,10 +196,13 @@ if (True):
                 buff = result.getResult()
                 print "Finished getting readings at %f" % time.time()
 
-#                subprocess.Popen(["scp ts8prod@ts8-1","/tmp/%s" % pdfilename,cdir])
-                for ii in ["s00","s01","s02","s10","s11","s12","s20","s21","s22"] :
-                    fitsfilename = string.replace(fitsfiles, '${sensorLoc}', ii)
-                    result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+                time.sleep(10)
+#                for ii in ["00","01","02","10","11","12","20","21","22"] :
+                for fitsfilename in fitsfiles :
+                    print "adding binary table of PD values for %s" % fitsfilename
+#                    print "adding binary table of PD values for slot %s" % ii
+#                    fitsfilename = fitsfiles.replace('${sensorLoc}', ii)
+                    result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),"%s/%s" % (cdir,fitsfilename),"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
 #                fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
 # ------------------- end of imcount loop --------------------------------

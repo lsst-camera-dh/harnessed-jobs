@@ -18,24 +18,6 @@ import eolib
 CCS.setThrowExceptions(True);
 
 
-def current_check():
-        curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60})
-        curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120})
-
-    try:
-        result = ts8sub.synchCommand(10,"getREBDevices");
-        rebs = result.getResult();
-
-	for rebid in rebs:
-		result = pwrsub.synchCommand(10,"getChannelValue %s.digital.IaftLDO" % rebid.split('.')[0])
-		curri6v = result.getResult()
-
-		if (curri6v<curmin('6V') || curri6v>curmax('6V')) :
-			throw 'Current on 6V line is %f mA which is out of range of %f -> %f mA' % (curri6v,curmin('6V'),curmax('6V'))
-			cleardacs()
-			clearaspics()
-
-#	result = ts8sub.synchCommand(10,"getChannelValue %s" % (chn));
 
 
 if (True):
@@ -56,45 +38,19 @@ if (True):
 
     status_value = None
 
-    for i in range(3) :
-# attempt to apply the REB power
-        pstep = 0
-#ccs-rebps ccs>toggleNamedPower REB0 
-#master     digital    analog     od         clockhi    clocklo    heater     dphi       hvbias     
-#Error (type st for stacktrace): Error dispatching command: Error: Can't convert string 'REB0' to class int
-#ccs-rebps ccs>toggleNamedPower 0 digital
-#ccs-rebps ccs>toggleNamedPower 0 analog
 
-#        pstep = pstep + 1
-#        test_name = "Step%d_apply_analog_power_to_line %d" % (pstep,i)
-#        try:
-#            result = pwrsub.synchCommand(10,"toggleNamedPower %d analog"%i);
-#            status_value = "success";
-#        except:
-#            status_value = "failed"
-#        fp.write("%s|%s\n" % (test_name,status_value));
-
-#  Verify data link integrity.
+#  try to power ON rebs using the safepowerON method
     rebs = ""
     pstep = pstep + 1
     test_name = "Step%d_REB_devices" % (pstep)
     try:
-        result = ts8sub.synchCommand(10,"getREBDevices");
-        rebs = result.getResult();
-        status_value = rebs
+        result = ts8sub.synchCommand(10,"safePowerOn");
+        rebsOn = result.getResult();
+        status_value = rebsOn
     except:
         status_value = "failed"
     fp.write("%s| %s\n" % (test_name,status_value));
 
-    for rebid in rebs :
-#        fp.write("\n\nREB ID = %s\n" % rebid)
-#        fp.write("==============================\n")
-        istep = pstep + 1
-
-
-
-        curmin=dict({'6V':500.0, '9V':400.0, '24V':100, '40V':60})
-        curmax=dict({'6V':750.0, '9V':600.0, '24V':300, '40V':120})
 
 # record all DAC parameters
         istep = istep + 1
@@ -133,147 +89,6 @@ if (True):
             status_value = "failed"
         fp.write("%s|%s\n" % (test_name,status_value));
 
-# #############################################################################
-# record DACs and then clear them
-        print "gettings configured DAC values"
-        daclist = []
-
-        ts8dacs = CCS.attachSubsystem("ts8/%s.DACS" % rebid)
-        result = ts8dacs[i].synchCommand(10,"printConfigurableParameters")
-
-        dacslist = result.getResult()
-
-        print "setting all dacs to level 0"
-
-# pclkHigh=700, pclkHighSh=0, pclkLow=2600, pclkLowSh=0, rgHigh=1900, rgHighSh=0, rgLow=700, rgLowSh=0, sclkHigh=1200, sclkHighSh=0, sclkLow=1600, sclkLowSh=0
-        result = ts8dacs[i].synchCommand(10,"change pclkHigh 0")
-        result = ts8dacs[i].synchCommand(10,"change pclkHighSh 0")
-        result = ts8dacs[i].synchCommand(10,"change opclkLow 0")
-        result = ts8dacs[i].synchCommand(10,"change pclkLowSh 0")
-        result = ts8dacs[i].synchCommand(10,"change rgHigh 0")
-        result = ts8dacs[i].synchCommand(10,"change rgHighSh 0")
-        result = ts8dacs[i].synchCommand(10,"change rgLow 0")
-        result = ts8dacs[i].synchCommand(10,"change rgLowSh 0")
-        result = ts8dacs[i].synchCommand(10,"change sclkHigh 0")
-        result = ts8dacs[i].synchCommand(10,"change sclkHighSh 0")
-        result = ts8dacs[i].synchCommand(10,"change sclkLow 0")
-        result = ts8dacs[i].synchCommand(10,"change sclkLowSh 0")
-            
-        istep = istep + 1
-        print "doing loadDacs"
-        test_name = "Step%d_%s_level0_load_Dacs" % (istep,rebid)
-        try:
-            result = ts8sub.synchCommand(10,"loadDacs true");
-            status_value = result.getResult();
-        except:
-            print "command failure!"
-            status_value = "failed"
-        fp.write("%s|%s\n" % (test_name,status_value));
-
-        print "checking current"
-        current_check()
-
-        print "turning on dacs one at a time and rechecking currents"
-        for sdacs in dacslist :
-            dacsname = sdacs.split('=')[0]
-            dacsval  = sdacs.split('=')[1]
-            print "Setting %s to %s" % (dacsname,dacsval)
-            result = ts8dacs[i].synchCommand(10,"change %s %s" % (dacsname,dacsval))
-            test_name = "Step%d_%s_load_Dacs_%s" % (istep,rebid,dacsname)
-            try:
-                result = ts8sub.synchCommand(10,"loadDacs true");
-                status_value = result.getResult();
-            except:
-                print "command failure!"
-                status_value = "failed"
-            fp.write("%s|%s\n" % (test_name,status_value));
-
-# ccs>ts8/R00.Reb0.DAC printConfigurableParameters 
-#{csGate=[0,0,0], pclkHigh=700, pclkHighSh=0, pclkLow=2600, pclkLowSh=0, rgHigh=1900, rgHighSh=0, rgLow=700, rgLowSh=0, sclkHigh=1200, sclkHighSh=0, sclkLow=1600, sclkLowSh=0}
-
-# #############################################################################
-# record BIASs and then clear them
-        print "gettings configured BIAS values"
-        ts8bias = [0,0]
-        biaslist1 = []
-        biaslist2 = []
-        for i in range(2) :
-            ts8bias[i] = CCS.attachSubsystem("ts8/%s.BIAS%d" % (rebid,i))
-            result = ts8bias[i].synchCommand(10,"printConfigurableParameters")
-            if (i==0) :
-                biaslist1 = result.getResult()
-            if (i==1) :
-                biaslist2 = result.getResult()
-
-        print "setting all biases to level 0"
-        for i in range(2) :
-            result = ts8bias[i].synchCommand(10,"change gd 0")
-            result = ts8bias[i].synchCommand(10,"change og 0")
-            result = ts8bias[i].synchCommand(10,"change ogSh 0")
-            result = ts8bias[i].synchCommand(10,"change rd 0")
-            result = ts8bias[i].synchCommand(10,"change od 0")
-            
-        istep = istep + 1
-        print "doing loadBiasDacs"
-        test_name = "Step%d_%s_level0_load_BiasDacs" % (istep,rebid)
-        try:
-            result = ts8sub.synchCommand(10,"loadBiasDacs true");
-            status_value = result.getResult();
-        except:
-            print "command failure!"
-            status_value = "failed"
-        fp.write("%s|%s\n" % (test_name,status_value));
-
-        print "checking current"
-        current_check()
-
-        print "turning on bias dacs one at a time and rechecking currents"
-        for i in range(2) :
-            print "Bias%d" % i
-            for sbias in biaslist :
-                biasname = sbias.split('=')[0]
-                biasval  = sbias.split('=')[1]
-                print "Setting %s to %s" % (biasname,biasval)
-                result = ts8bias[i].synchCommand(10,"change %s %s" % (biasname,biasval))
-                test_name = "Step%d_%s_load_BiasDacs_%s" % (istep,rebid,biasname)
-                try:
-                    result = ts8sub.synchCommand(10,"loadBiasDacs true");
-                    status_value = result.getResult();
-                except:
-                    print "command failure!"
-                    status_value = "failed"
-                fp.write("%s|%s\n" % (test_name,status_value));
-
- ccs>ts8/R00.Reb0.DAC printConfigurableParameters 
-{csGate=[0,0,0], pclkHigh=700, pclkHighSh=0, pclkLow=2600, pclkLowSh=0, rgHigh=1900, rgHighSh=0, rgLow=700, rgLowSh=0, sclkHigh=1200, sclkHighSh=0, sclkLow=1600, sclkLowSh=0}
-
-
-
-
-# Apply the analog power supply voltages (VP15_UNREG, VN15_UNREG, VP7_UNREG, VP40_UNREG) to the REB in the correct sequence (check with Rick for sequence and voltage values). Abort the test if any supply hits it overcurrent limit. Readback voltages and current consumption at the P/S and at the REB LTC2945 sensors.
-# ccs-rafts loadNamedConfig, ccs-rafts loadDacs, ccs-rafts loadBiasDacs
-
-
-        istep = istep + 1
-        print "doing loadDacs"
-        test_name = "Step%d_%s_load_DACS" % (istep,rebid)
-        print "test_name = %s" % test_name
-
-        try:
-            print "sending loadDacs command"
-            result = ts8sub.synchCommand(10,"loadDacs true");
-            status_value = result.getResult();
-        except:
-            print "command failure!"
-            status_value = "failed"
-        fp.write("%s|%s\n" % (test_name,status_value));
-
-
-#
-# 
-#
-
-# Verify that all currents are within the expected range 
 
 # Record the value of the currents on each supply, both at the P/S and by the REB.
 
