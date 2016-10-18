@@ -24,8 +24,8 @@ reb0 = Reb.createReb("Reb0", 0, CCDType.ITL);
 raftGeometry.addChildGeometry(reb0, 0, 0);
 reb1 = Reb.createReb("Reb1", 1, CCDType.ITL);
 raftGeometry.addChildGeometry(reb1, 1, 0);
-//reb2 = Reb.createReb("Reb2", 2, CCDType.ITL);
-//raftGeometry.addChildGeometry(reb2, 2, 0);
+reb2 = Reb.createReb("Reb2", 2, CCDType.ITL);
+raftGeometry.addChildGeometry(reb2, 2, 0);
 
 def runMode = System.getProperty("org.lsst.ccs.run.mode","normal");
 System.out.println("Building TS8 subsystem in run mode: "+runMode);
@@ -294,7 +294,6 @@ builder.
                                      "${reb}", SlowAdcs.CHAN_VREF25_1, "BIAS", "", 0, 1,
                                      "FLAG", aDbl("limitLo", 0), 0, null,
                                      "FLAG", aDbl("limitHi", 0), 0, null))
-
 
             for (int js = 0; js < 3; js++) {
 
