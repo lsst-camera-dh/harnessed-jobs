@@ -114,8 +114,8 @@ def EOgetCCSVersions(tssub,cdir):
     ccsvfiles = open("%s/ccsversion" % cdir,"w");
     ccsvfiles.write("%s" % ccsversions)
     ccsvfiles.close()
-#    print "ccsversions = %s" % ccsversions
-    ssys = ""
+
+
 
     ts_version = ""
     archon_version = ""
@@ -123,27 +123,23 @@ def EOgetCCSVersions(tssub,cdir):
     archon_revision = ""
     for line in str(ccsversions).split("\t"):
         tokens = line.split()
-        if (len(tokens)>2) :
-            if ("ts" in tokens[2]) :
+        if ("Project   " in line) :
+            ssys = ""
+            if ("teststand" in tokens[2]) :
                 ssys = "ts"
             if ("archon" in tokens[2]) :
                 ssys = "archon"
-#            print "tokens[1] = %s " % tokens[1]
-            if (tokens[1] == "Version:") :
-                print "%s - version = %s" % (ssys,tokens[2])
-                if (ssys == "ts") :
-                    ts_version = tokens[2]
-                if (ssys == "archon") :
-                    archon_version = tokens[2]
-            if (len(tokens)>3) :
-                if (tokens[2] == "Rev:") :
-                    print "%s - revision = %s" % (ssys,tokens[3])
-                    if (ssys == "ts") :
-                        ts_revision = tokens[3]
-                    if (ssys == "archon") :
-                        archon_revision = tokens[3]
-#                print "tokens[2] = %s " % tokens[2]
-#       print "\nCCSVersions line = %s \n" % line
+        if ("Version:" in line) :
+            if (ssys == "ts") :
+                ts_version = tokens[2]
+            if (ssys == "archon") :
+                archon_version = tokens[2]
+            if ("Rev:" in line) :
+                print "%s - revision = %s" % (ssys,tokens[3])
+            if (ssys == "ts") :
+                ts_revision = tokens[3]
+            if (ssys == "archon") :
+                archon_revision = tokens[3]
     return(ts_version,archon_version,ts_revision,archon_revision)
 ###############################################################################
 # EOSetup: perform setup need from running standard EO jobs
