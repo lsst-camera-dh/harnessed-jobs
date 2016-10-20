@@ -1,0 +1,7 @@
+# -*- python -*-
+{
+    'schema_name' : 'SR-RSA-ASY-02',
+    'schema_version' : 0,
+    'stat' : int,
+}
+
