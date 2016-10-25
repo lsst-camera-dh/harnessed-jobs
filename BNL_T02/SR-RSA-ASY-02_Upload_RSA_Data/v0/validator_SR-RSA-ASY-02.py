@@ -8,7 +8,7 @@ import tkMessageBox
 #import siteUtils
 
 results = []
-ogpdir = subprocess.check_output("ls -rtd %s/../../../SR-RSA-ASY-02_step5/v0/* | tail -1" % os.getcwd(), shell=True)
+ogpdir = subprocess.check_output("ls -rtd %s/../../../../*/SR-RSA-ASY-02_Make_RSA_Directories/v0/* | tail -1" % os.getcwd(), shell=True)
 
 
 theogprsadir = os.path.realpath("%s/rsalink/" % ogpdir.strip("\n"))
