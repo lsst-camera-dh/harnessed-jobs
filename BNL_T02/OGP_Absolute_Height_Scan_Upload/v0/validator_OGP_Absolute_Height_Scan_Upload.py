@@ -8,7 +8,7 @@ import tkMessageBox
 #import siteUtils
 
 results = []
-ogpdir = subprocess.check_output("ls -rtd %s/../../../Make-OGP-Abs-Height-Directories/v0/* | tail -1" % os.getcwd(), shell=True)
+ogpdir = subprocess.check_output("ls -rtd %s/../../../../*/Make-OGP-Abs-Height-Directories/v0/* | tail -1" % os.getcwd(), shell=True)
 
 
 theogpabshghtdir = os.path.realpath("%s/abshghtlink/" % ogpdir.strip("\n"))

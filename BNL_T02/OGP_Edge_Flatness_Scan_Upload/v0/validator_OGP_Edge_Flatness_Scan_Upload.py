@@ -9,7 +9,7 @@ import tkMessageBox
 #import siteUtils
 
 results = []
-ogpdir = subprocess.check_output("ls -rtd %s/../../../Make-OGP-Edge-Flatness-Directories/v0/* | tail -1" % os.getcwd(), shell=True)
+ogpdir = subprocess.check_output("ls -rtd %s/../../../../*/Make-OGP-Edge-Flatness-Directories/v0/* | tail -1" % os.getcwd(), shell=True)
 
 
 theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))

@@ -10,7 +10,7 @@ import tkMessageBox
 #import siteUtils
 
 results = []
-ogpdir = subprocess.check_output("ls -rtd %s/../../../Run*Setup-InJig-Metrology-Directories-and-Scripts/v0/* | tail -1" % os.getcwd(), shell=True)
+ogpdir = subprocess.check_output("ls -rtd %s/../../../../*/Run*Setup-InJig-Metrology-Directories-and-Scripts/v0/* | tail -1" % os.getcwd(), shell=True)
 
 theogpedgedir = os.path.realpath("%s/edgelink/" % ogpdir.strip("\n"))
 theogpflatdir = os.path.realpath("%s/flatlink/" % ogpdir.strip("\n"))
