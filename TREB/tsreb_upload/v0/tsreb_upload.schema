@@ -1,0 +1,13 @@
+# -*- python -*-
+{
+    'schema_name' : 'tsreb_upload',
+    'schema_version' : 0,
+    'digital_current_check' : str,
+    'analog_current_check' : str,
+    'clock_current_check' : str,
+    'OD_current_check' : str,
+    'heater_current_check' : str,
+    'slice_check' : str,
+    'checker_board_check' : str,
+}
+
