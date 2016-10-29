@@ -8,7 +8,9 @@ results = []
 
 
 last_data = subprocess.check_output("ssh tsreb@130.199.47.42 ls -rtd /data/* | tail -1", shell=True)
-os.system("scp -vp tsreb@130.199.47.42 %s/\* ." % last_data)
+cmnd = "scp -rp tsreb@130.199.47.42:%s/\* %s" % (last_data.strip(),os.getcwd())
+print "execuing command: %s" % cmnd
+os.system(cmnd)
 
 
 os.system("chmod 644 *.*")
@@ -37,7 +39,7 @@ results.append(lcatr.schema.valid(lcatr.schema.get('tsreb_upload'),
                             slice_check=slice_check,
                             checker_board_check=checker_board_check))
 
-results.extend(siteUtils.jobInfo())
+#results.extend(siteUtils.jobInfo())
 
 
 
