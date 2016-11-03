@@ -30,15 +30,14 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
     if (abs(cur_ps)>0.0 and chkreb) :
         if (abs(cur_reb-cur_ps)/cur_ps > 0.20) :
             pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (rebid,pwr))
-            stat = "Current %s with value %f differs by > 20%% to current from reb channel %s with value %f. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (pwr_chan,cur_ps,reb_chan,cur_reb)
+            stat = "Current %s with value %f differs by > 10%% to current from reb channel %s with value %f. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (pwr_chan,cur_ps,reb_chan,cur_reb)
             raise Exception(stat)
 
     print stat
 
     return
 
-cdir = tsCWD
-sys.stdout = open("%s/rebalive_results.txt" % cdir, "w")
+
 
 if (True):
 #attach CCS subsystem Devices for scripting
@@ -86,7 +85,7 @@ if (True):
                 if 'heat' in pwr:
                     chkreb = True
                 try:
-                    print "turning on %s power at %s" % (pwr,time.ctime().split()[3])
+                    print "turning on %s power" % pwr
                     pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (i,pwr));
                 except:
                     print "failed to turn on current %s!" % pwr

@@ -34,11 +34,24 @@ schemaFile.write("    \'schema_name\' : \'%s_runtime\',\n"%jobName)
 schemaFile.write("    \'schema_version\' : 0,\n")
 
 statusFile = open("rebalive_results.txt")
+lnum = 0
 for line in statusFile:
     print "line = %s" % line
-    values = line.split("|")
-    statusAssignments[values[0]] = values[1].strip("[|]").strip(",")
-    schemaFile.write("    \'%s\' : str,\n"%values[0])
+
+    key = "line%d" % lnum
+    statusAssignments[key] = "%s" % line
+    schemaFile.write("    \'%s\' : str,\n" % key)
+
+    lnum = lnum + 1
+
+while (lnum<200):
+    key = "line%d" % lnum
+    statusAssignments[key] = "******************************************"
+    schemaFile.write("    \'%s\' : str,\n"%key)
+
+    lnum = lnum + 1
+
+
 schemaFile.write("}\n")
 schemaFile.close()
 
