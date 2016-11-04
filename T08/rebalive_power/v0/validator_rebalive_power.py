@@ -10,8 +10,9 @@ jobDir = siteUtils.getJobDir()
 
 shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
+shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
-#os.system("./rebalive_plots.sh")
+os.system("./rebalive_plots.sh")
 
 jobName = "rebalive_power"
 
@@ -38,15 +39,17 @@ lnum = 0
 for line in statusFile:
     print "line = %s" % line
 
-    key = "line%d" % lnum
+#    line = line.replace('OK','<font color="green">OK</font>').replace('FAILED','<font color="red">FAILED</font>')
+
+    key = "line%03d" % lnum
     statusAssignments[key] = "%s" % line
     schemaFile.write("    \'%s\' : str,\n" % key)
 
     lnum = lnum + 1
 
-while (lnum<200):
-    key = "line%d" % lnum
-    statusAssignments[key] = "******************************************"
+while (lnum<100):
+    key = "line%03d" % lnum
+    statusAssignments[key] = "blank"
     schemaFile.write("    \'%s\' : str,\n"%key)
 
     lnum = lnum + 1

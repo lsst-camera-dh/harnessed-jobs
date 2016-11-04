@@ -8,6 +8,7 @@
 
 from org.lsst.ccs.scripting import CCS
 from java.lang import Exception
+from java.lang import RuntimeException
 import sys
 import time
 
@@ -37,8 +38,12 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
 
     return
 
-cdir = tsCWD
-sys.stdout = open("%s/rebalive_results.txt" % cdir, "w")
+try:
+    cdir = tsCWD
+    sys.stdout = open("%s/rebalive_results.txt" % cdir, "w")
+    print "Running as a job harness. Results are being recorded in rebalive_results.txt"
+except:
+    print "Running standalone. Statements will be sent to standard output."
 
 if (True):
 #attach CCS subsystem Devices for scripting
@@ -56,14 +61,6 @@ if (True):
     rebids = ts8sub.synchCommand(10,"getREBIds").getResult()
 
     for i in rebids :
-#        print "Checking if REBID=%d is present" % i
-#        present = False
-#        for ch in channames:
-#            if "REB%d" % i in ch:
-#                present = True
-
-#        if present :
-#            print "Checking REBID=%d : " % i
 
 
 # verify that all power is OFF
@@ -71,8 +68,7 @@ if (True):
 #                result = pwrsub.synchCommand(10,"setNamedPowerOn",i,"master",False);
                 result = pwrsub.synchCommand(10,"setNamedPowerOn %d master False" % i);
             except Exception, e:
-#                print "REB with id %d  appears not to be present - SKIPPING" % i
-#                continue
+
                 print "FAILED TO TURN POWER OFF! %s" % e
                 raise Exception
 
@@ -100,16 +96,21 @@ if (True):
                     check_currents(i,"analog","AnaI",400.,600.,chkreb)
                     check_currents(i,"OD","ODI",60.,120.,chkreb)
                     check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
-#                    check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
-#                check_currents(i,"heater","???",0.100,0.300,chkreb)
+#                   check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
+#                   check_currents(i,"heater","???",0.100,0.300,chkreb)
                 except Exception, e:
                     print "CURRENT CHECK FAILED! %s" % e
                     raise Exception
                 time.sleep(2)
 
     print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
-    stat = ts8sub.synchCommand(120,"powerOn").getResult()
-    print stat
+    try:
+        stat = ts8sub.synchCommand(120,"powerOn").getResult()
+        print stat
+    except RuntimeException, e:
+        print e
+    except Exception, e:
+        print e
 
     print "DONE"
 

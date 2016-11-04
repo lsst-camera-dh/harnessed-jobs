@@ -4,17 +4,13 @@
 #
 ###############################################################################
 
-from org.lsst.ccs.scripting import *
+from org.lsst.ccs.scripting import CCS
 from java.lang import Exception
 import sys
 import time
 import eolib
 
 CCS.setThrowExceptions(True);
-
-aa="jajd"
-aa=aa.replace('jd','de')
-print aa
 
 if (True):
 #attach CCS subsystem Devices for scripting
@@ -90,7 +86,7 @@ if (True):
 
 
             print "setting location of bias fits directory"
-            ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
+            ts8sub.synchCommand(10,"setDefaultImageDirectory","%s" % (cdir));
 
 
             ts8sub.synchCommand(10,"setTestType","fe55")

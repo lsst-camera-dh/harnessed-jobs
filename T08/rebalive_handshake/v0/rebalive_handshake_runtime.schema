@@ -5,8 +5,4 @@
     'Step1_REB_devices' : str,
     'Step2_R00.Reb0_1-wire_ID' : str,
     'Step3_R00.Reb0_REB_firmware_version' : str,
-    'Step2_R00.Reb1_1-wire_ID' : str,
-    'Step3_R00.Reb1_REB_firmware_version' : str,
-    'Step2_R00.Reb2_1-wire_ID' : str,
-    'Step3_R00.Reb2_REB_firmware_version' : str,
 }

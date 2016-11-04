@@ -49,7 +49,7 @@ if (True):
         status_value = "failed"
     fp.write("%s| %s\n" % (test_name,status_value));
 
-    for i in range(1) :
+    for i in range(50) :
 #        fp.write("\n\nREB ID = %s\n" % rebid)
 #        fp.write("==============================\n")
 
@@ -64,13 +64,13 @@ if (True):
 
 # E2V seq file
 #        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-model-geo2.seq");
-#        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-modelv2.seq");
+ #        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-modelv2.seq");
 # ITL seq file
         result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v4.seq");
  
 #14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.
 
-        ts8sub.synchCommand(10,"setFitsFilesOutputDirectory","%s" % (cdir));
+        ts8sub.synchCommand(10,"setDefaultImageDirectory","%s" % (cdir));
 
 # <LSST CCD SN>_<test type>_<image type>_<seq. info>_<time stamp>.fits
 
@@ -79,6 +79,8 @@ if (True):
         print "fitsfilename = %s" % fitsfilename
 
         ts8sub.synchCommand(10,"setTestType","FE55")
+
+        raft = CCDID
         ts8sub.synchCommand(10,"setRaftLoc",str(raft))
 
         
