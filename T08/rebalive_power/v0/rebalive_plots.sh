@@ -16,7 +16,12 @@ echo id for $i is $id
 
 
 #set selection = 'set @tstart=UNIX_TIMESTAMP(NOW())*1000 - 120000;select tstampmills/1000.,doubleData from rawdata where tstampmills>@tstart and descr_id='$id' order by -tstampmills;'
-set selection = 'set @tstart='$now'*1000 - 30000;select tstampmills/1000.,doubleData from rawdata where tstampmills>@tstart and descr_id='$id' order by -tstampmills;'
+
+set tstart = `grep "start tstamp" rebalive_results.txt | cut -d ":" -f 2`
+set tstop = `grep "stop tstamp" rebalive_results.txt | cut -d ":" -f 2`
+
+#set selection = 'set @tstart='$now'*1000 - 30000;select tstampmills/1000.,doubleData from rawdata where tstampmills>@tstart and descr_id='$id' order by -tstampmills;'
+set selection = 'set @tstart='$tstart'*1000;set @tstop='$tstop'*1000;select tstampmills/1000.,doubleData from rawdata where tstampmills>@tstart and tstampmills<@tstop and descr_id='$id' order by -tstampmills;'
 echo "selection=($selection)"
 set outfl = `echo $i | awk -F '/' '{print $2}'`
 echo "title time "$i >! $outfl.dat

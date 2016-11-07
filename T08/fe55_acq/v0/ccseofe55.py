@@ -12,6 +12,15 @@ import eolib
 
 CCS.setThrowExceptions(True);
 
+doPD = False
+runnum = "no-eTrav"
+try:
+    runnum = tsCWD.split('/')[len(tsCWD.split('/'))-4]
+except:
+    pass
+
+print "Run number = %s" % runnum
+
 if (True):
 #attach CCS subsystem Devices for scripting
     print "Attaching teststand subsystems"
@@ -86,7 +95,9 @@ if (True):
 
 
             print "setting location of bias fits directory"
-            ts8sub.synchCommand(10,"setDefaultImageDirectory","%s" % (cdir));
+#/<raft ID>/<run ID>/<acquisition type>/<test version>/<activity ID>/S<2-digit location in raft>
+
+            ts8sub.synchCommand(10,"setDefaultImageDirectory","%s/${sensorLoc}" % (cdir));
 
 
             ts8sub.synchCommand(10,"setTestType","fe55")
@@ -96,7 +107,8 @@ if (True):
             for i in range(1):
                 timestamp = time.time()
                 print "Ready to take clearing bias image. time = %f" % time.time()
-                ts8sub.synchCommand(90,"exposeAcquireAndSave",0,False,False,"tst25-${sensorLoc}_r${raftLoc}_${test_type}_${image_type}.fits");
+# <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
+                ts8sub.synchCommand(90,"exposeAcquireAndSave",0,False,False,"${sensorId}_${raftLoc}_${test_type}_${image_type}_%s_${timestamp}.fits" % runnum );
 
                 print "after click click at %f" % time.time()
 
@@ -109,7 +121,7 @@ if (True):
 
                 ts8sub.synchCommand(10,"setTestType","fe55")
                 ts8sub.synchCommand(10,"setImageType","bias")
-                ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
+                ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"${sensorId}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
 
                 print "after click click at %f" % time.time()
 #                time.sleep(3.0)
@@ -144,16 +156,17 @@ if (True):
                 print "call accumBuffer to start PD recording at %f" % time.time()
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
 
-                while(True) :
-                    result = pdsub.synchCommand(10,"isAccumInProgress");
-                    rply = result.getResult();
-                    print "checking for PD accumulation in progress at %f" % time.time()
-                    if rply==True :
-                        print "accumulation running"
-                        break
-                    print "accumulation hasn't started yet"
-                    time.sleep(0.25)
-                print "recording should now be in progress and the time is %f" % time.time()
+                if (doPD) :
+                    while(True) :
+                        result = pdsub.synchCommand(10,"isAccumInProgress");
+                        rply = result.getResult();
+                        print "checking for PD accumulation in progress at %f" % time.time()
+                        if rply==True :
+                            print "accumulation running"
+                            break
+                        print "accumulation hasn't started yet"
+                        time.sleep(0.25)
+                    print "recording should now be in progress and the time is %f" % time.time()
 
 # start acquisition
                 timestamp = time.time()
@@ -167,7 +180,9 @@ if (True):
                 ts8sub.synchCommand(10,"setTestType","fe55")
                 ts8sub.synchCommand(10,"setImageType","fe55")
 # test with no XED
-                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,False,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
+
+# <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
+                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum);
 # normal XED actuation
 #                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,True,"s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
                 fitsfiles = result.getResult()
@@ -177,28 +192,29 @@ if (True):
                 print "done with exposure # %d" % i
                 print "getting photodiode readings at time = %f" % time.time();
 
-                pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),seq,i+1)
+                if (doPD) :
+                    pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),seq,i+1)
 # the primary purpose of this is to guarantee that the accumBuffer method has completed
-                print "starting the wait for an accumBuffer done status message at %f" % time.time()
-                tottime = pdresult.get();
+                    print "starting the wait for an accumBuffer done status message at %f" % time.time()
+                    tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
-                time.sleep(2.)
+                    time.sleep(2.)
 
-                print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
+                    print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
 
 #                result = pdsub.synchCommand(1000,"readBuffer","/tmp/%s" % pdfilename);
-                result = pdsub.synchCommand(1000,"readBuffer","/%s/%s" % (cdir,pdfilename),"ts8prod@ts8-raft1");
-                buff = result.getResult()
-                print "Finished getting readings at %f" % time.time()
+                    result = pdsub.synchCommand(1000,"readBuffer","/%s/%s" % (cdir,pdfilename),"ts8prod@ts8-raft1");
+                    buff = result.getResult()
+                    print "Finished getting readings at %f" % time.time()
 
-                time.sleep(10)
+                    time.sleep(10)
 #                for ii in ["00","01","02","10","11","12","20","21","22"] :
-                for fitsfilename in fitsfiles :
-                    print "adding binary table of PD values for %s" % fitsfilename
-#                    print "adding binary table of PD values for slot %s" % ii
-#                    fitsfilename = fitsfiles.replace('${sensorLoc}', ii)
-                    result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),"%s/%s" % (cdir,fitsfilename),"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+                    for fitsfilename in fitsfiles :
+                        print "adding binary table of PD values for %s" % fitsfilename
+                        #                    print "adding binary table of PD values for slot %s" % ii
+                        #                    fitsfilename = fitsfiles.replace('${sensorLoc}', ii)
+                        result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),"%s/%s" % (cdir,fitsfilename),"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
 #                fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
 
 # ------------------- end of imcount loop --------------------------------

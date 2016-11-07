@@ -47,7 +47,7 @@ for line in statusFile:
 
     lnum = lnum + 1
 
-while (lnum<100):
+while (lnum<240):
     key = "line%03d" % lnum
     statusAssignments[key] = "blank"
     schemaFile.write("    \'%s\' : str,\n"%key)

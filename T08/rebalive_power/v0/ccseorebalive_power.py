@@ -22,17 +22,22 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
     cur_reb = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.%s" % (rebid,reb_chan)).getResult()
 
 #    print "verifying that the current is with limits"
-    stat = "%10.10s : OK - PS value is %8.3f , REB value is %8.3f" % (pwr_chan,cur_ps,cur_reb)
+    if (chkreb) :
+        stat = "%s: - checking %10.10s : OK - PS value is %8.3f Amps, REB value is %8.3f Amps" % (rebname,pwr_chan,cur_ps,cur_reb)
+    else :
+        stat = "%s: - checking %10.10s : OK - PS value is %8.3f Amps, REB not yet ON" % (rebname,pwr_chan,cur_ps)
+
 #    if (cur_ps < low_lim or 
     if (cur_ps> high_lim) :
         pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (rebid,pwr))
-        stat = "Current %s with value %f mA NOT in range %f mA to %f mA. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (pwr_chan,cur_ps,low_lim,high_lim)
+        stat = "%s: Current %s with value %f mA NOT in range %f mA to %f mA. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (rebname, pwr_chan,cur_ps,low_lim,high_lim)
         raise Exception
     if (abs(cur_ps)>0.0 and chkreb) :
-        if (abs(cur_reb-cur_ps)/cur_ps > 0.20) :
-            pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (rebid,pwr))
-            stat = "Current %s with value %f differs by > 20%% to current from reb channel %s with value %f. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (pwr_chan,cur_ps,reb_chan,cur_reb)
-            raise Exception(stat)
+        if (abs(cur_reb-cur_ps)/cur_ps > 0.10 and abs(cur_reb)>0.5) :
+            stat = "%s: Current %s with value %f differs by > 20%% to current from reb channel %s with value %f!" % (rebname,pwr_chan,cur_ps,reb_chan,cur_reb)
+#            pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (rebid,pwr))
+#            stat = "%s: Current %s with value %f differs by > 20%% to current from reb channel %s with value %f. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (rebname,pwr_chan,cur_ps,reb_chan,cur_reb)
+#            raise Exception(stat)
 
     print stat
 
@@ -40,10 +45,14 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
 
 try:
     cdir = tsCWD
+    unit = CCDID
     sys.stdout = open("%s/rebalive_results.txt" % cdir, "w")
     print "Running as a job harness. Results are being recorded in rebalive_results.txt"
 except:
     print "Running standalone. Statements will be sent to standard output."
+
+
+print "start tstamp: %f" % time.time()
 
 if (True):
 #attach CCS subsystem Devices for scripting
@@ -60,7 +69,15 @@ if (True):
 #    print channames
     rebids = ts8sub.synchCommand(10,"getREBIds").getResult()
 
-    for i in rebids :
+    print "setting tick and monitoring period to 0.5s"
+    ts8sub.synchCommand(10,"setTickMillis 500")
+
+    for rebid in rebids :
+            i = rebid
+            rebname = 'REB%d' % i
+            print "****************************************************"
+            print " Starting power ON procedure for %s" % rebname
+            print "****************************************************"
 
 
 # verify that all power is OFF
@@ -69,7 +86,7 @@ if (True):
                 result = pwrsub.synchCommand(10,"setNamedPowerOn %d master False" % i);
             except Exception, e:
 
-                print "FAILED TO TURN POWER OFF! %s" % e
+                print "%s: FAILED TO TURN POWER OFF! %s" % (rebname,e)
                 raise Exception
 
             time.sleep(2.0)
@@ -79,13 +96,13 @@ if (True):
             chkreb = False
 
             for pwr in powers :
-                if 'heat' in pwr:
+                if 'clocklo' in pwr:
                     chkreb = True
                 try:
-                    print "turning on %s power at %s" % (pwr,time.ctime().split()[3])
+                    print "%s: turning on %s power at %s" % (rebname,pwr,time.ctime().split()[3])
                     pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (i,pwr));
                 except:
-                    print "failed to turn on current %s!" % pwr
+                    print "%s: failed to turn on current %s!" % (rebname,pwr)
                     throw
 
                 time.sleep(2.0)
@@ -99,19 +116,26 @@ if (True):
 #                   check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
 #                   check_currents(i,"heater","???",0.100,0.300,chkreb)
                 except Exception, e:
-                    print "CURRENT CHECK FAILED! %s" % e
-                    raise Exception
+                    print "%s: CURRENT CHECK FAILED! %s" % (rebname,e)
+#                    raise Exception
+                    exit
                 time.sleep(2)
 
-    print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
-    try:
-        stat = ts8sub.synchCommand(120,"powerOn").getResult()
-        print stat
-    except RuntimeException, e:
-        print e
-    except Exception, e:
-        print e
+            print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
+            try:
+                stat = ts8sub.synchCommand(120,"powerOn %d" % rebid).getResult()
+                print stat
+
+                print "------ %s Complete ------\n" % rebname 
+            except RuntimeException, e:
+                print e
+            except Exception, e:
+                print e
+
+
+    print "setting tick and monitoring period to 10s"
+    ts8sub.synchCommand(10,"setTickMillis 10000")
 
     print "DONE"
 
-
+print "stop tstamp: %f" % time.time()
