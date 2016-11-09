@@ -23,7 +23,7 @@ cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
 
 cdir = tsCWD
 
-target_temp = -30. 
+target_temp = -60. 
 
 cur_temp = cryosub.synchCommand(20,"getTemp B").getResult())
 
