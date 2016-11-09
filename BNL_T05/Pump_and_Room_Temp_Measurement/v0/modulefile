@@ -1,0 +1,3 @@
+#%Module1.0 #-*-tcl-*-#
+source "$::env(LCATR_MODULES)/lcatr.tcl"
+lcatr_package producer_Pump-and-Room-Temp-Measurement.py validator_Pump-and-Room-Temp-Measurement.py

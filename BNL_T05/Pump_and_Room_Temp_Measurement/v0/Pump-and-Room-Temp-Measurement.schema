@@ -1,0 +1,10 @@
+# -*- python -*-
+{
+    'schema_name' : 'Pump-and-Room-Temp-Measurement',
+    'schema_version' : 0,
+    'stat' : int,
+    'teststand_version' : str,
+    'teststand_revision' : str,
+    'archon_version' : str,
+    'archon_revision' : str
+}
