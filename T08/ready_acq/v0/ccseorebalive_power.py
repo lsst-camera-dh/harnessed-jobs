@@ -1,5 +1,5 @@
 ###############################################################################
-# REB-PS safe power off
+# REB-PS safe power on
 #
 #
 # author: homer    10/2016
@@ -70,41 +70,37 @@ if (True):
     rebids = ts8sub.synchCommand(10,"getREBIds").getResult()
 
     print "setting tick and monitoring period to 0.5s"
-#    ts8sub.synchCommand(10,"setTickMillis 500")
+    ts8sub.synchCommand(10,"setTickMillis 500")
 
     for rebid in rebids :
             i = rebid
             rebname = 'REB%d' % i
             print "****************************************************"
-            print " Starting power off procedure for %s" % rebname
+            print " Starting power ON procedure for %s" % rebname
             print "****************************************************"
 
 
-            print "TURNING OFF REB CLOCK AND RAIL VOLTAGES"
+# verify that all power is OFF
             try:
-                stat = ts8sub.synchCommand(120,"powerOff %d" % rebid).getResult()
-                print stat
-
-                print "------ %s Complete ------\n" % rebname 
-            except RuntimeException, e:
-                print e
+#                result = pwrsub.synchCommand(10,"setNamedPowerOn",i,"master",False);
+                result = pwrsub.synchCommand(10,"setNamedPowerOn %d master False" % i);
             except Exception, e:
-                print e
+
+                print "%s: FAILED TO TURN POWER OFF! %s" % (rebname,e)
+                raise Exception
 
             time.sleep(2.0)
 
-# attempt to turn off the REB power -- line by line
-            print "TURNING OFF REB PS VOLTAGES"
-
-            powers = ['od', 'heater', 'clocklo', 'clockhi', 'analog', 'digital', 'master']
-            chkreb = True
+# attempt to apply the REB power -- line by line
+            powers = ['master', 'digital', 'analog', 'clockhi', 'clocklo', 'heater', 'od']
+            chkreb = False
 
             for pwr in powers :
                 if 'clocklo' in pwr:
-                    chkreb = False
+                    chkreb = True
                 try:
-                    print "%s: turning off %s power at %s" % (rebname,pwr,time.ctime().split()[3])
-                    pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (i,pwr));
+                    print "%s: turning on %s power at %s" % (rebname,pwr,time.ctime().split()[3])
+                    pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (i,pwr));
                 except:
                     print "%s: failed to turn on current %s!" % (rebname,pwr)
                     throw
@@ -125,10 +121,20 @@ if (True):
                     exit
                 time.sleep(2)
 
+            print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
+            try:
+                stat = ts8sub.synchCommand(120,"powerOn %d" % rebid).getResult()
+                print stat
+
+                print "------ %s Complete ------\n" % rebname 
+            except RuntimeException, e:
+                print e
+            except Exception, e:
+                print e
 
 
     print "setting tick and monitoring period to 10s"
-#    ts8sub.synchCommand(10,"setTickMillis 10000")
+    ts8sub.synchCommand(10,"setTickMillis 10000")
 
     print "DONE"
 
