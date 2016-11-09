@@ -1,6 +1,6 @@
 ###############################################################################
-# dark
-# Acquire dark images for RAFT EO testing at TS8
+# sflat
+# Acquire sflat images for RAFT EO testing at TS8
 #
 ###############################################################################
 
@@ -55,16 +55,17 @@ if (True):
 
     result = monosub.synchCommand(20,"openShutter");
 
+# full path causes length problem: /home/ts8prod/lsst/redhat6-x86_64-64bit-gcc44/test/jh_inst/0.3.23/harnessed-jobs-0.3.23/config/BNL/sequencer-ts8-ITL-v4.seq
     acffile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v4.seq"
 
     print "sequencer file = %s " % acffile
     result = ts8sub.synchCommand(90,"loadSequencer",acffile);
 
 
-    lo_lim = float(eolib.getCfgVal(acqcfgfile, 'DARK_LOLIM', default='1.0'))
-    hi_lim = float(eolib.getCfgVal(acqcfgfile, 'DARK_HILIM', default='120.0'))
-    bcount = int(eolib.getCfgVal(acqcfgfile, 'DARK_BCOUNT', default='1'))
-    imcount = int(eolib.getCfgVal(acqcfgfile, 'DARK_IMCOUNT', default='1'))
+    lo_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_LOLIM', default='1.0'))
+    hi_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_HILIM', default='120.0'))
+    bcount = int(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default='1'))
+    imcount = int(eolib.getCfgVal(acqcfgfile, 'SFLAT_IMCOUNT', default='1'))
 
     bcount = 1
 
@@ -77,16 +78,18 @@ if (True):
     raft = CCDID
     print "Working on RAFT %s" % raft
 
-# go through config file looking for 'dark' instructions
-    print "Scanning config file for DARK specifications";
+# go through config file looking for 'sflat' instructions
+    print "Scanning config file for SFLAT specifications";
     fp = open(acqcfgfile,"r");
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
     for line in fp:
         tokens = str.split(line)
-        if ((len(tokens) > 0) and (tokens[0] == 'dark')):
-            exptime = float(tokens[1])
-            imcount = int(tokens[2])
+        if ((len(tokens) > 0) and (tokens[0] == 'sflat')):
+
+            target = float(tokens[1])
+
+            print "target exposure = %d" % (target);
 
 #
 # take bias images
@@ -99,7 +102,7 @@ if (True):
             ts8sub.synchCommand(10,"setDefaultImageDirectory","%s/${sensorLoc}" % (cdir));
 
 
-            ts8sub.synchCommand(10,"setTestType","dark")
+            ts8sub.synchCommand(10,"setTestType","sflat")
             ts8sub.synchCommand(10,"setRaftLoc",str(raft))
 
 # probably not needed any more ... reduce count to 1
@@ -118,7 +121,7 @@ if (True):
 
                 print "Ready to take bias image. time = %f" % time.time()
 
-                ts8sub.synchCommand(10,"setTestType","dark")
+                ts8sub.synchCommand(10,"setTestType","sflat")
                 ts8sub.synchCommand(10,"setImageType","bias")
                 ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"${sensorId}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
 
@@ -126,6 +129,37 @@ if (True):
 #                time.sleep(3.0)
 
 
+# do in-job flux calibration
+# #####################################################################################3
+# dispose of first image
+
+                testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
+                
+                time.sleep(2.0)
+
+                testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
+
+                fluxsum = 0.0
+                nflux = 0
+                for flncal in testfitsfiles:
+                    flncal = result.getResult();
+                    result = ts8sub.synchCommand(10,"getFluxStats",flncal);
+                    fluxsum += float(result.getResult());
+                    nflux ++;
+
+                flux = fluxsum / nflux;
+
+                print "The flux is determined to be %f" % flux
+
+                owl = wl
+# ####################################################################################3
+            exptime = target/flux
+            print "needed exposure time = %f" % exptime
+            if (exptime > hi_lim) :
+                exptime = hi_lim
+            if (exptime < lo_lim) :
+                exptime = lo_lim
+            print "adjusted exposure time = %f" % exptime
 
 # prepare to readout diodes
             if (exptime>0.5) :
@@ -176,11 +210,11 @@ if (True):
 
                 print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
 
-                ts8sub.synchCommand(10,"setTestType","dark")
-                ts8sub.synchCommand(10,"setImageType","dark")
+                ts8sub.synchCommand(10,"setTestType","sflat")
+                ts8sub.synchCommand(10,"setImageType","sflat")
 
 # <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum);
+                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),True,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum);
 
                 fitsfiles = result.getResult()
 
@@ -199,7 +233,6 @@ if (True):
                     time.sleep(2.)
 
                     print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-
 
                     result = pdsub.synchCommand(1000,"readBuffer","/%s/%s" % (cdir,pdfilename),"ts8prod@ts8-raft1");
                     buff = result.getResult()
@@ -242,7 +275,7 @@ if (True):
 #    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
 #    rply = result.getResult();
 try:
-    result = ts8sub.synchCommand(10,"setTestType","DARK-END")
+    result = ts8sub.synchCommand(10,"setTestType","SFLAT-END")
     print "something"
 
 except Exception, ex:
@@ -270,4 +303,4 @@ except ScriptingTimeoutException, exx:
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % exx)
 
 
-print "DARK: END"
+print "SFLAT!: END"
