@@ -31,6 +31,9 @@ def getLSSTId():
 def getUnitType():
     return os.environ['LCATR_UNIT_TYPE']
 
+def getRunNumber():
+    return os.environ['LCATR_RUN_NUMBER']
+
 def getCcdVendor():
     unit_id = getUnitType()
     vendor = unit_id.split('-')[0]

@@ -69,9 +69,9 @@ try:
             print "Something is wrong ... we will never make it to a suitable state"
             exit
         if (temp>5.0 and temp<999.) :
-            print "TURNING OFF POWER TO THE TURBO PUMP!"
-            result = pdusub.synchCommand(120,"setOutletState",pump_outlet,False);
-            rply = result.getResult();
+            print "Would be TURNING OFF POWER TO THE TURBO PUMP!"
+#            result = pdusub.synchCommand(120,"setOutletState",pump_outlet,False);
+#            rply = result.getResult();
             break
         time.sleep(5.)
 

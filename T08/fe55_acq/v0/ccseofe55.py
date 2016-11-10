@@ -15,7 +15,8 @@ CCS.setThrowExceptions(True);
 doPD = False
 runnum = "no-eTrav"
 try:
-    runnum = tsCWD.split('/')[len(tsCWD.split('/'))-4]
+    runnum = RUNNUM
+#tsCWD.split('/')[len(tsCWD.split('/'))-4]
 except:
     pass
 

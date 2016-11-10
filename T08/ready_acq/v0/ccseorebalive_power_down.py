@@ -23,9 +23,9 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
 
 #    print "verifying that the current is with limits"
     if (chkreb) :
-        stat = "%s: - checking %10.10s : OK - PS value is %8.3f Amps, REB value is %8.3f Amps" % (rebname,pwr_chan,cur_ps,cur_reb)
+        stat = "%s: - checking %10.10s : OK - PS value is %8.3f mAmps, REB value is %8.3f mAmps" % (rebname,pwr_chan,cur_ps,cur_reb)
     else :
-        stat = "%s: - checking %10.10s : OK - PS value is %8.3f Amps, REB not yet ON" % (rebname,pwr_chan,cur_ps)
+        stat = "%s: - checking %10.10s : OK - PS value is %8.3f mAmps, REB not yet ON" % (rebname,pwr_chan,cur_ps)
 
 #    if (cur_ps < low_lim or 
     if (cur_ps> high_lim) :
@@ -70,6 +70,7 @@ if (True):
     rebids = ts8sub.synchCommand(10,"getREBIds").getResult()
 
     print "setting tick and monitoring period to 0.5s"
+    ts8sub.synchCommand(10,"change tickMillis 500");
 #    ts8sub.synchCommand(10,"setTickMillis 500")
 
     for rebid in rebids :
@@ -128,6 +129,7 @@ if (True):
 
 
     print "setting tick and monitoring period to 10s"
+    ts8sub.synchCommand(10,"change tickMillis 10000");
 #    ts8sub.synchCommand(10,"setTickMillis 10000")
 
     print "DONE"

@@ -71,7 +71,8 @@ try:
 except:
     print "Taking longer than it should to move filter wheel to position 1. Not critical."
 
-try:
+#try:
+if (True) :
     for i in range(2):
         timestamp = time.time()
         arcsub.synchCommand(10,"setFitsFilename","");
@@ -229,6 +230,8 @@ try:
     print "           INDICATE WHETHER THE DATA LOOKS OK\n"
     print " =====================================================\n"
 
+try:
+    print "skipped trying"
 except Exception, ex:
 
 # move TS to ready state                    

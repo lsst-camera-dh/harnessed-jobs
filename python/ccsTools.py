@@ -56,6 +56,10 @@ class CcsSetup(OrderedDict):
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
         self['LSSTID'] = _quote(siteUtils.getLSSTId())
+        try:
+            self['RUNNUM'] = _quote(siteUtils.getRunNumber())
+        except:
+            self['RUNNUM'] = "no_lcatr_run_number"
         self._read(os.path.join(siteUtils.getJobDir(), configFile))
         CCDTYPE = _quote(siteUtils.getUnitType())
         print "CCDTYPE = %s" % CCDTYPE
@@ -191,6 +195,7 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
 
     # @todo Sort out which files really need to be curated.
     files = glob.glob('*.fits')
+    files = files+glob.glob('*/*.fits')
     files = files+glob.glob('*log*')
     files = files+glob.glob('*summary*')
     files = files+glob.glob('*.png')

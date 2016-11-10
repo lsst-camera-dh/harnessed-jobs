@@ -228,10 +228,12 @@ try:
 
             print "starting acquisition step for lambda = %8.2f with exptime %8.2f s" % (wl, exptime)
 
+# ##########################################################################################
             print "throw away first image"
 # wait an amount of time equivalent to the last flux image taken
 #            time.sleep(2.0)
-            arcsub.synchCommand(10,"setParameter","ExpTime","0");
+            arcsub.synchCommand(10,"setParameter","Light","1");
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
             result = arcsub.synchCommand(10,"setFitsFilename","");
             print "Ready to take disposable image. time = %f" % time.time()
             result = arcsub.synchCommand(500,"exposeAcquireAndSave");
@@ -240,7 +242,7 @@ try:
             rply = result.getResult();
             print "done waiting for throw away image to be acquired %f" % time.time()
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
-
+# ##########################################################################################
             for i in range(imcount):
                 print "starting image setup and PD reading accumulation at %f" % time.time()
                 print "nreads set to %d and nplc set to %f" % (int(nreads),float(nplc))

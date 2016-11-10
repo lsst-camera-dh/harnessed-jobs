@@ -155,6 +155,13 @@ try:
         stt = result.getResult()
         result = tssub.synchCommand(120,"setstate",stt);
 
+        arcsub.synchCommand(10,"setFitsFilename","");
+        result = arcsub.synchCommand(10,"setHeader","TestType","preImage")
+        print "taking pre-image. time = %f" % time.time()
+        arcsub.synchCommand(200,"exposeAcquireAndSave").getResult();
+
+        time.sleep(2.5)
+
         for i in range(1):
             print "starting acquisition step for lambda = %8.2f" % wl
 # PD from PD setup
@@ -187,8 +194,9 @@ try:
             time.sleep(0.2);
  
             print "Ready to take image. time = %f" % time.time()
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-            fitsfilename = result.getResult();
+            fitsfilename = arcsub.synchCommand(200,"exposeAcquireAndSave").getResult();
+            arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
             print "after click click at %f" % time.time()
 
             print "done with exposure # %d" % i
