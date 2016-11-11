@@ -15,7 +15,8 @@ CCS.setThrowExceptions(True);
 doPD = False
 runnum = "no-eTrav"
 try:
-    runnum = tsCWD.split('/')[len(tsCWD.split('/'))-4]
+    runnum = RUNNUM
+#    runnum = tsCWD.split('/')[len(tsCWD.split('/'))-4]
 except:
     pass
 
@@ -107,9 +108,10 @@ if (True):
                 timestamp = time.time()
                 print "Ready to take clearing bias image. time = %f" % time.time()
 # <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-                ts8sub.synchCommand(90,"exposeAcquireAndSave",0,False,False,"${sensorId}_${raftLoc}_${test_type}_${image_type}_%s_${timestamp}.fits" % runnum );
+                ts8sub.synchCommand(900,"exposeAcquireAndSave",0,False,False,"${sensorId}_${raftLoc}_${test_type}_${image_type}_%s_${timestamp}.fits" % runnum );
 
-                print "after click click at %f" % time.time()
+                tend = time.time()
+                print "after click click at %f which is %f s after start" % (tend,tend-timestamp)
 
             time.sleep(3.0)
 
@@ -120,7 +122,7 @@ if (True):
 
                 ts8sub.synchCommand(10,"setTestType","dark")
                 ts8sub.synchCommand(10,"setImageType","bias")
-                ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"${sensorId}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
+                ts8sub.synchCommand(500,"exposeAcquireAndSave",0,False,False,"${sensorId}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
 
                 print "after click click at %f" % time.time()
 #                time.sleep(3.0)
@@ -180,7 +182,7 @@ if (True):
                 ts8sub.synchCommand(10,"setImageType","dark")
 
 # <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),False,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum);
+                result = ts8sub.synchCommand(800,"exposeAcquireAndSave",int(exptime*1000),False,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum);
 
                 fitsfiles = result.getResult()
 

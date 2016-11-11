@@ -29,17 +29,17 @@ time.sleep(3.)
 
 cdir = tsCWD
 
-ts_version = ""
-ts8_version = ""
-ts_revision = ""
-ts8_revision = ""
+ts_version = "NA"
+ts8_version = "NA"
+ts_revision = "NA"
+ts8_revision = "NA"
 
-ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetCCSVersions(tssub,cdir)
+#ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
 # make sure the BSS is off
 biassub.synchCommand(10,"setVoltage",0.0)
 
-#eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,arcsub,"setTSIdle","setTSIdle")
+#eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,ts8sub,"setTSIdle","setTSIdle")
 
 print "Setting the current ranges on the Bias and PD devices"
 biassub.synchCommand(10,"setCurrentRange",0.0002)
@@ -53,7 +53,7 @@ seq = 0
 nplc = 1
 
 ccd = CCDID
-result = arcsub.synchCommand(10,"setCCDnum",ccd)
+
 print "Working on CCD %s" % ccd
 
 print "set filter position"
@@ -101,8 +101,6 @@ try:
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
 
-                result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
-
                 print "getting filter wheel setting"
                 result = monosub.synchCommand(60,"getFilter");
                 ifl = result.getResult()
@@ -125,6 +123,7 @@ try:
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(2.0);
  
+                timestamp = time.time()
                 result = monosub.synchCommand(900,"openShutter");
                 rwl = result.getResult()
                 time.sleep(exptime)
@@ -145,9 +144,11 @@ try:
                 time.sleep(10.)
 
                 print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
-                result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
+                result = pdsub.synchCommand(1000,"readBuffer","/%s/%s" % (cdir,pdfilename),"ts8prod@ts8-raft1");
+#                result = pdsub.synchCommand(1000,"readBuffer","%s/%s" % (cdir,pdfilename));
                 buff = result.getResult()
                 print "Finished getting readings at %f" % time.time()
+#               time.sleep(10)
 
 # reset timeout to something reasonable for a regular command
                 pdsub.synchCommand(1000,"setTimeout",10.);

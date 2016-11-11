@@ -103,6 +103,7 @@ if (True):
 
             ts8sub.synchCommand(10,"setTestType","fe55")
             ts8sub.synchCommand(10,"setRaftLoc",str(raft))
+            ts8sub.synchCommand(10,"setRunNumber",runnum)
 
 # probably not needed any more ... reduce count to 1
             for i in range(1):
