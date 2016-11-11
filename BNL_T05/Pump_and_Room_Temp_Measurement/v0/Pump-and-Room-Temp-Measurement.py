@@ -18,7 +18,7 @@ CCS.setThrowExceptions(True);
 print "Attaching METROLOGY subsystems"
 ts5sub  = CCS.attachSubsystem("metrology");
 print "Attaching CRYO subystems"
-cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
+cryosub = CCS.attachSubsystem("ts/Cryo" );
 
 
 cdir = tsCWD
@@ -71,19 +71,19 @@ ts5sub.synchCommand(30,"setCfgStateByName RTM")
 tstart = time.time()
 start_temp = {}
 for temp in ["A","B","C","D"]:
-    start_temp.append(cryosub.synchCommand(20,"getTemp %s" % temp).getResult())
+    start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
 
 ts5sub.synchCommand(3000,"noStepScan  %s/RSA-warm-1.dat" % cdir)
 
 tstop = time.time()
 stop_temp = {}
 for temp in ["A","B","C","D"]:
-    stop_temp.append(cryosub.synchCommand(20,"getTemp %s" % temp).getResult())
+    stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
 
 fpdat = open("%s/RSA-warm-1.dat" % (cdir),"a");
 fpdat.write("start time = %f , stop time = %f\n" % (tstart,tstop))
 for temp in ["A","B","C","D"]:
-    fpdat.write("temperature %s at start %f C at end %f C\n" % (temp,start_temp[idx],stop_temp[idx]))
+    fpdat.write("temperature %s at start %f C at end %f C\n" % (temp,start_temp[temp],stop_temp[temp]))
 
 fpdat.close()
 

@@ -23,7 +23,7 @@ cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
 
 cdir = tsCWD
 
-ts5sub.synchCommand(30,"setCfgStateByName RTM-calib")
+ts5sub.synchCommand(30,"setCfgStateByName RTM_calib")
 
 tstart = time.time()
 start_temp = {}
