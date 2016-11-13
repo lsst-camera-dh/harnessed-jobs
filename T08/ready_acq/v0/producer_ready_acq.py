@@ -7,7 +7,7 @@ import os
 
 ccsProducer('ready_acq', 'ccseorebalive_power.py')
 ccsProducer('ready_acq', 'ccseorebalive_exposure.py')
-ccsProducer('ready_acq', 'ccseorebalive_power_down.py')
+#ccsProducer('ready_acq', 'ccseorebalive_power_down.py')
 
 apptxt = "Please check the FLAT image that is about to be projected in ds9\nfor correct bias regions.\nClick on this window when ready."
 

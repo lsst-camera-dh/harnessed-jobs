@@ -1,0 +1,7 @@
+# -*- python -*-
+{
+    'schema_name' : 'ts8_cool_down_acq',
+    'schema_version' : 0,
+    'stat' : int
+}
+
