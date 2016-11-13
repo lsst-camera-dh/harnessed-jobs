@@ -155,7 +155,6 @@ if (True):
                 fluxsum = 0.0
                 nflux = 0
                 for flncal in testfitsfiles:
-                    flncal = result.getResult();
                     result = ts8sub.synchCommand(10,"getFluxStats",flncal);
                     fluxsum += float(result.getResult());
                     nflux ++;

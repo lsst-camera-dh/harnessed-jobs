@@ -9,6 +9,7 @@ from java.lang import Exception
 import sys
 import time
 import eolib
+import glob
 
 CCS.setThrowExceptions(True);
 
@@ -66,6 +67,7 @@ if (True):
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_HILIM', default='120.0'))
     bcount = int(eolib.getCfgVal(acqcfgfile, 'FLAT_BCOUNT', default='1'))
     imcount = int(eolib.getCfgVal(acqcfgfile, 'FLAT_IMCOUNT', default='2'))
+    wl     = float(eolib.getCfgVal(acqcfgfile, 'FLAT_WL', default = "550.0"))
 
     bcount = 1
 
@@ -110,7 +112,7 @@ if (True):
                 timestamp = time.time()
                 print "Ready to take clearing bias image. time = %f" % time.time()
 # <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-                ts8sub.synchCommand(90,"exposeAcquireAndSave",0,False,False,"${sensorId}_${raftLoc}_${test_type}_${image_type}_%s_${timestamp}.fits" % runnum );
+                ts8sub.synchCommand(90,"exposeAcquireAndSave",0,False,False,"${sensorId}_${raftLoc}_${test_type}_${image_type}_%s_${timestamp}.fits" % runnum ).getResult();
 
                 print "after click click at %f" % time.time()
 
@@ -123,10 +125,10 @@ if (True):
 
                 ts8sub.synchCommand(10,"setTestType","flat")
                 ts8sub.synchCommand(10,"setImageType","bias")
-                ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"${sensorId}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
+                ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"${sensorId}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits").getResult();
 
                 print "after click click at %f" % time.time()
-#                time.sleep(3.0)
+                time.sleep(2.0)
 
 
 # do in-job flux calibration
@@ -139,13 +141,17 @@ if (True):
 
                 testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
 
+                print "fitsfiles = "
+                print testfitsfiles
+
                 fluxsum = 0.0
                 nflux = 0
                 for flncal in testfitsfiles:
-                    flncal = result.getResult();
-                    result = ts8sub.synchCommand(10,"getFluxStats",flncal);
+                    flncalpath = glob.glob("%s/*/%s" % (tsCWD,flncal))[0]
+                    print "full flux file path = %s" % flncalpath
+                    result = ts8sub.synchCommand(10,"getFluxStats","%s" % flncalpath);
                     fluxsum += float(result.getResult());
-                    nflux ++;
+                    nflux=nflux+1;
 
                 flux = fluxsum / nflux;
 
@@ -153,6 +159,10 @@ if (True):
 
                 owl = wl
 # ####################################################################################3
+            if (flux < 0.001) :
+                # must be a test
+                flux = 300.0
+                print "SETTING A DEFAULT TEST FLUX OF 300 DUE TO APPARENT NO SENSOR TEST IN PROGRESS"
             exptime = target/flux
             print "needed exposure time = %f" % exptime
             if (exptime > hi_lim) :
@@ -238,12 +248,12 @@ if (True):
                     buff = result.getResult()
                     print "Finished getting readings at %f" % time.time()
 
-                    time.sleep(10)
+                    time.sleep(10.0)
 
                     for fitsfilename in fitsfiles :
                         print "adding binary table of PD values for %s" % fitsfilename
 
-                        result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),"%s/%s" % (cdir,fitsfilename),"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+                        ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),"%s/%s" % (cdir,fitsfilename),"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp).getResult()
 
 
 # ------------------- end of imcount loop --------------------------------

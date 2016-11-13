@@ -113,7 +113,7 @@ if (True):
     
                 try:
 #                    print "checking currrents"
-                    check_currents(i,"digital","DigI",500.,750.,chkreb)
+                    check_currents(i,"digital","DigI",500.,770.,chkreb)
                     check_currents(i,"analog","AnaI",400.,600.,chkreb)
                     check_currents(i,"OD","ODI",60.,120.,chkreb)
                     check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
