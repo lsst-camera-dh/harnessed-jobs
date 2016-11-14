@@ -134,8 +134,8 @@ def EOgetCCSVersions(tssub,cdir):
                 ts_version = tokens[2]
             if (ssys == "archon") :
                 archon_version = tokens[2]
-            if ("Rev:" in line) :
-                print "%s - revision = %s" % (ssys,tokens[3])
+        if ("Rev:" in line) :
+            print "%s - revision = %s" % (ssys,tokens[3])
             if (ssys == "ts") :
                 ts_revision = tokens[3]
             if (ssys == "archon") :
