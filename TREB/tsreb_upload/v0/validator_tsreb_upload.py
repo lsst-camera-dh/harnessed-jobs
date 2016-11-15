@@ -5,7 +5,7 @@ import subprocess
 from collections import OrderedDict
 
 class tsreb_products(object):
-    LS_DIR_DATA = "ls -rtd /data/reb* | tail -1"
+    LS_DIR_DATA = "ls -rtd /data/reb*%s* | tail -1"
 
     def __init__(self, reb_id, remote=None):
         self.remote = remote    # "tsreb@130.199.47.42"
@@ -42,9 +42,9 @@ class tsreb_products(object):
 
     def __get_files__(self):
         if (self.remote != None):
-            cmd = "ssh " + self.remote + " " + tsreb_products.LS_DIR_DATA
+            cmd = "ssh " + self.remote + " " + tsreb_products.LS_DIR_DATA % self.reb_id
         else:
-            cmd = tsreb_products.LS_DIR_DATA
+            cmd = tsreb_products.LS_DIR_DATA % self.reb_id
 
         data_lst = subprocess.check_output(cmd, shell=True)
         data_lst = data_lst.strip()
@@ -64,6 +64,8 @@ class tsreb_products(object):
             cmd = "scp -rp " + self.remote + ":" + data_lst + " " + os.getcwd()
         else:
             cmd = "cp -rva " + data_lst + " " + os.getcwd()
+
+        print cmd
         exit_code = os.system(cmd)
         if (exit_code != 0):
             raise Exception("Failed to execute: %s", cmd)
@@ -110,7 +112,7 @@ def do_lcatr():
     reb_id = reb_id.split("-")[1]
     tsp = tsreb_products(reb_id, remote="tsreb@tsreb")
     tsp()
-    tsp.write_schema(0, fname="/opt/lsst/redhat6-x86_64-64bit-gcc44/test/lsst-jh/harnessed-jobs/TREB/tsreb_upload/v0/tsreb_upload.schema")
+    tsp.write_schema(0, fname="%s/TREB/tsreb_upload/v0/tsreb_upload.schema" % os.environ['HARNESSEDJOBSDIR'])
 
     results = []
     data_products = []

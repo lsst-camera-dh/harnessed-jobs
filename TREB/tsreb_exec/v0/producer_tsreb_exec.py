@@ -6,15 +6,16 @@ import subprocess
 reb = os.environ["LCATR_UNIT_ID"]
 
 class tsreb_test(object):
-    EXEC_TSREB = "source /opt/lsst/setup_tsreb;tsreb_wizard --%s" % reb_id
+    EXEC_TSREB = "gnome-terminal --command='/home/tsreb/exectsreb %s'"
     def __init__(self, reb_id, remote=None):
         self.remote = remote  
         self.reb_id = int(reb_id)
         if (self.remote != None):
-            cmd = "ssh " + self.remote + " " + EXEC_TSREB
+            cmd = "ssh -X -t " + self.remote + " \"" + tsreb_test.EXEC_TSREB % self.reb_id + "\""
         else:
-            cmd = EXEC_TSREB
+            cmd = tsreb_test.EXEC_TSREB % self.reb_id
 
+        print cmd
         data_lst = subprocess.check_output(cmd, shell=True)
         data_lst = data_lst.strip()
 
