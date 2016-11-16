@@ -16,7 +16,8 @@ CCS.setThrowExceptions(True);
 doPD = False
 runnum = "no-eTrav"
 try:
-    runnum = tsCWD.split('/')[len(tsCWD.split('/'))-4]
+    runnum = RUNNUM
+#tsCWD.split('/')[len(tsCWD.split('/'))-4]
 except:
     pass
 
@@ -40,6 +41,8 @@ if (True):
 
     time.sleep(3.)
 
+    ts8sub.synchCommand(10,"setRunNumber",runnum)
+
     cdir = tsCWD
 
     ts_version = ""
@@ -61,6 +64,9 @@ if (True):
 
     print "sequencer file = %s " % acffile
     result = ts8sub.synchCommand(90,"loadSequencer",acffile);
+
+# stop ticking so that register reads won't interfer
+    ts8sub.synchCommand(10,"change tickMillis 0");
 
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_LOLIM', default='1.0'))
@@ -128,18 +134,18 @@ if (True):
                 ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"${sensorId}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits").getResult();
 
                 print "after click click at %f" % time.time()
-                time.sleep(2.0)
+                time.sleep(5.0)
 
 
 # do in-job flux calibration
 # #####################################################################################3
 # dispose of first image
 
-                testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
+                testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,False,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
                 
                 time.sleep(2.0)
 
-                testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
+                testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,False,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
 
                 print "fitsfiles = "
                 print testfitsfiles
@@ -224,7 +230,7 @@ if (True):
                 ts8sub.synchCommand(10,"setImageType","flat")
 
 # <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-                result = ts8sub.synchCommand(50,"exposeAcquireAndSave",int(exptime*1000),True,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum);
+                result = ts8sub.synchCommand(200,"exposeAcquireAndSave",int(exptime*1000),False,False,"${sensorId}_${test_type}_%07.2f_${image_type}_${seq_info}_%s_${timestamp}.fits" % (exptime,runnum));
 
                 fitsfiles = result.getResult()
 
@@ -263,6 +269,9 @@ if (True):
 
     fpfiles.close();
     fp.close();
+
+# restore tick rate to normal
+    ts8sub.synchCommand(10,"change tickMillis 10000");
 
     fp = open("%s/status.out" % (cdir),"w");
 
