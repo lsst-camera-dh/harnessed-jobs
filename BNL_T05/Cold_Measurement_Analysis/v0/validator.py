@@ -6,12 +6,13 @@ from MetrologyData import md_factory
 
 producer = 'SR-RSA-MET-07'
 testtype = 'FLATNESS'
-results = metUtils.aggregate_filerefs(producer, testtype)
+results = []
+#results = metUtils.aggregate_filerefs(producer, testtype)
 
-sensorData = md_factory.load('flatness.pickle')
-results.append(lcatr.schema.valid(lcatr.schema.get('flatness'),
-                                  residual_025=sensorData.quantiles['0.025'],
-                                  residual_975=sensorData.quantiles['0.975']))
+#sensorData = md_factory.load('flatness.pickle')
+#results.append(lcatr.schema.valid(lcatr.schema.get('flatness'),
+#                                  residual_025=sensorData.quantiles['0.025'],
+#                                  residual_975=sensorData.quantiles['0.975']))
 
 results.append(siteUtils.packageVersions())
 
