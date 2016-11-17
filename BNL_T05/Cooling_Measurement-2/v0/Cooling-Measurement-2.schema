@@ -1,6 +1,6 @@
 # -*- python -*-
 {
-    'schema_name' : 'Cooling-Measurement-1',
+    'schema_name' : 'Cooling-Measurement-2',
     'schema_version' : 0,
     'stat' : int,
     'teststand_version' : str,
