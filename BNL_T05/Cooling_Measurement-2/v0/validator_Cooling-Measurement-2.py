@@ -8,4 +8,4 @@ os.system("grep \"^#\" %s > temp.dat" % datfile)
 os.system("grep -v \"^#\" %s >> temp.dat" % datfile)
 os.system("mv temp.dat %s" % datfile)
 
-ccsValidator('Cooling-Measurement-2")
+ccsValidator('Cooling-Measurement-2')
