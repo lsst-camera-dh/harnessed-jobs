@@ -17,16 +17,15 @@ CCS.setThrowExceptions(True);
 #attach CCS subsystem Devices for scripting
 print "Attaching METROLOGY subsystems"
 ts5sub  = CCS.attachSubsystem("metrology");
-#print "Attaching CRYO subystems"
-#cryosub = CCS.attachSubsystem("ts/Cryo" );
+print "Attaching CRYO subystems"
+cryosub = CCS.attachSubsystem("ts/Cryo" );
 
 
 cdir = tsCWD
 
-target_temp = -30. 
+target_temp = -100. 
 
-#cur_temp = cryosub.synchCommand(20,"getTemp B").getResult()
-cur_temp = 20.
+cur_temp = cryosub.synchCommand(20,"getTemp B").getResult()
 
 # number of degrees per minute
 trate = 1.0
@@ -60,21 +59,21 @@ tstart = time.time()
 start_temp = {}
 
 for temp in ["A","B","C","D"]:
-#    start_temp.append(cryosub.synchCommand(20,"getTemp %s" % temp).getResult())
-    start_temp[temp]=20.0
+    start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
+#    start_temp[temp]=20.0
 
 ts5sub.synchCommand(3000,"noStepScan  %s/Cold-Measurement.dat" % cdir)
 
 tstop = time.time()
 stop_temp = {}
 for temp in ["A","B","C","D"]:
-#    stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
-    stop_temp[temp]=20.0
+    stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
+#    stop_temp[temp]=20.0
 
 fpdat = open("%s/Cold-Measurement.dat" % (cdir),"a");
-fpdat.write("start time = %f , stop time = %f\n" % (tstart,tstop))
+fpdat.write("# start time = %f , stop time = %f\n" % (tstart,tstop))
 for temp in ["A","B","C","D"]:
-    fpdat.write("temperature %s at start %f C at end %f C\n" % (temp,start_temp[temp],stop_temp[idx]))
+    fpdat.write("# temperature %s at start %f C at end %f C\n" % (temp,start_temp[temp],stop_temp[temp]))
 
 fpdat.close()
 

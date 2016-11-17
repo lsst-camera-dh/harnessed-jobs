@@ -25,7 +25,7 @@ cdir = tsCWD
 
 target_temp = 20. 
 
-cur_temp = cryosub.synchCommand(20,"getTemp B").getResult())
+cur_temp = cryosub.synchCommand(20,"getTemp B").getResult()
 
 # number of degrees per minute
 trate = 1.0
@@ -40,6 +40,7 @@ nsteps = abs(target_temp - cur_temp)
 
 ########################################################################################
 # Check Pressure
+if (False) :
     starttim = time.time()
     while True:
         print "checking if pressure is low enough to turn on turbo pump";
@@ -64,7 +65,7 @@ nsteps = abs(target_temp - cur_temp)
 
 
 
-cryosub.synchCommand(20,"rampTemp",period,target_temp,nsteps).getResult()
+    cryosub.synchCommand(20,"rampTemp",period,target_temp,int(nsteps)).getResult()
 
 ts5sub.synchCommand(30,"setCfgStateByName RTM")
 
@@ -81,9 +82,9 @@ for temp in ["A","B","C","D"]:
     stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
 
 fpdat = open("%s/RSA-warm-1.dat" % (cdir),"a");
-fpdat.write("start time = %f , stop time = %f\n" % (tstart,tstop))
+fpdat.write("# start time = %f , stop time = %f\n" % (tstart,tstop))
 for temp in ["A","B","C","D"]:
-    fpdat.write("temperature %s at start %f C at end %f C\n" % (temp,start_temp[temp],stop_temp[temp]))
+    fpdat.write("# temperature %s at start %f C at end %f C\n" % (temp,start_temp[temp],stop_temp[temp]))
 
 fpdat.close()
 
