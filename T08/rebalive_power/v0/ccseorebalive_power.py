@@ -11,6 +11,11 @@ from java.lang import Exception
 from java.lang import RuntimeException
 import sys
 import time
+import subprocess
+#import siteUtils
+
+#jobDir = siteUtils.getJobDir()
+
 
 CCS.setThrowExceptions(True);
 
@@ -27,8 +32,7 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
     else :
         stat = "%s: - checking %10.10s : OK - PS value is %8.3f mAmps, REB not yet ON" % (rebname,pwr_chan,cur_ps)
 
-#    if (cur_ps < low_lim or 
-    if (cur_ps> high_lim) :
+    if (cur_ps < low_lim or cur_ps> high_lim) :
         pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (rebid,pwr))
         stat = "%s: Current %s with value %f mA NOT in range %f mA to %f mA. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (rebname, pwr_chan,cur_ps,low_lim,high_lim)
         raise Exception(stat)
@@ -61,7 +65,7 @@ if (True):
     pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
 
 
-    status_value = None
+    status_value = True
 
     result = pwrsub.synchCommand(10,"getChannelNames");
     channames = result.getResult()
@@ -73,10 +77,11 @@ if (True):
     ts8sub.synchCommand(10,"loadConfiguration")
 
     print "setting tick and monitoring period to 0.5s"
-    ts8sub.synchCommand(10,"change tickMillis 500");
-#    ts8sub.synchCommand(10,"setTickMillis 500")
+    ts8sub.synchCommand(10,"change tickMillis 100");
+#    ts8sub.synchCommand(10,"setTickMillis 100")
 
     for rebid in rebids :
+        if status_value :
             i = rebid
             rebname = 'REB%d' % i
             print "****************************************************"
@@ -93,15 +98,20 @@ if (True):
                 print "%s: FAILED TO TURN POWER OFF! %s" % (rebname,e)
                 raise Exception
 
-            time.sleep(2.0)
+            time.sleep(5.0)
 
+            pwron = ""
 # attempt to apply the REB power -- line by line
             powers = ['master', 'digital', 'analog', 'clockhi', 'clocklo', 'heater', 'od']
             chkreb = False
 
             for pwr in powers :
-                if 'clocklo' in pwr:
+                pwron = pwron + pwr + " "
+                if 'clockhi' in pwr:
                     chkreb = True
+                    sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
+                    print sout
+                    time.sleep(2.0)
                 try:
                     print "%s: turning on %s power at %s" % (rebname,pwr,time.ctime().split()[3])
                     pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (i,pwr));
@@ -109,38 +119,59 @@ if (True):
                     print "%s: failed to turn on current %s!" % (rebname,pwr)
                     throw
 
-                time.sleep(2.0)
+                time.sleep(10.0)
     
                 try:
-#                    print "checking currrents"
-                    check_currents(i,"digital","DigI",500.,770.,chkreb)
-                    check_currents(i,"analog","AnaI",400.,600.,chkreb)
-                    check_currents(i,"OD","ODI",60.,120.,chkreb)
-                    check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
-#                   check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
-#                   check_currents(i,"heater","???",0.100,0.300,chkreb)
+#                    print "checking currents"
+                    
+                    if 'digital' in pwron :
+                        check_currents(i,"digital","DigI",6.,800.,chkreb)
+                    if 'analog' in pwron :
+                        check_currents(i,"analog","AnaI",6.,600.,chkreb)
+                    if 'od' in pwron :
+                        check_currents(i,"OD","ODI",6.,190.,chkreb)
+                    if 'clockhi' in pwron :
+                        check_currents(i,"clockhi","ClkI",6.0,300.,chkreb)
+                    if 'clocklo' in pwron :
+                        check_currents(i,"clocklo","ClkI",6.,300.,chkreb)
+#                    if 'digital' in pwron :
+#                        check_currents(i,"digital","DigI",500.,770.,chkreb)
+#                    if 'analog' in pwron :
+#                        check_currents(i,"analog","AnaI",400.,600.,chkreb)
+#                    if 'od' in pwron :
+#                        check_currents(i,"OD","ODI",60.,120.,chkreb)
+#                    if 'clockhi' in pwron :
+#                        check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
+#                    if 'clocklo' in pwron :
+#                        check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
+##                   check_currents(i,"heater","???",0.100,0.300,chkreb)
                 except Exception, e:
                     print "%s: CURRENT CHECK FAILED! %s" % (rebname,e)
-#                    raise Exception
-                    exit
+                    status_value = False
+                    raise Exception
+                    break
                 time.sleep(2)
-
-            print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
-            try:
-                stat = ts8sub.synchCommand(120,"powerOn %d" % rebid).getResult()
-                print stat
-
-                print "------ %s Complete ------\n" % rebname 
-            except RuntimeException, e:
-                print e
-            except Exception, e:
-                print e
-
+            if status_value :
+                print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
+                try:
+                    stat = ts8sub.synchCommand(120,"powerOn %d" % rebid).getResult()
+                    print stat
+    
+                    print "------ %s Complete ------\n" % rebname 
+                except RuntimeException, e:
+                    print e
+                except Exception, e:
+                    print e
+    
 
     print "setting tick and monitoring period to 10s"
     ts8sub.synchCommand(10,"change tickMillis 10000");
 #    ts8sub.synchCommand(10,"setTickMillis 10000")
 
-    print "DONE"
+    if status_value :
+        print "DONE with successful powering of"
+        print rebids
+    else :
+        print "FAILED to turn on all requested rebs"
 
 print "stop tstamp: %f" % time.time()
