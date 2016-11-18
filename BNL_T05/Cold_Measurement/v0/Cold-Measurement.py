@@ -56,13 +56,18 @@ if (False):
 ts5sub.synchCommand(30,"setCfgStateByName RTM")
 
 tstart = time.time()
+
+aa=time.ctime().split(" ")
+tstart_human = (aa[4]+aa[1]+aa[2]+"-"+aa[3]).replace(":","")
+fln = %s_WarmColdMet_%s_%s_%dC.csv % (UNITID,RUNNUM,tstart_human,target_temp)
+
 start_temp = {}
 
 for temp in ["A","B","C","D"]:
     start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
 #    start_temp[temp]=20.0
 
-ts5sub.synchCommand(3000,"noStepScan  %s/Cold-Measurement.dat" % cdir)
+ts5sub.synchCommand(3000,"noStepScan  %s/%s" % (cdir,fln))
 
 tstop = time.time()
 stop_temp = {}
@@ -70,7 +75,7 @@ for temp in ["A","B","C","D"]:
     stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
 #    stop_temp[temp]=20.0
 
-fpdat = open("%s/Cold-Measurement.dat" % (cdir),"a");
+fpdat = open("%s/%s" % (cdir,fln),"a");
 fpdat.write("# start time = %f , stop time = %f\n" % (tstart,tstop))
 for temp in ["A","B","C","D"]:
     fpdat.write("# temperature %s at start %f C at end %f C\n" % (temp,start_temp[temp],stop_temp[temp]))

@@ -55,6 +55,7 @@ class CcsSetup(OrderedDict):
         self['tsCWD'] = _quote(os.getcwd())
         self['labname'] = _quote(siteUtils.getSiteName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
+        self['UNITID'] = _quote(siteUtils.getUnitId())
         self['LSSTID'] = _quote(siteUtils.getLSSTId())
         try:
             self['RUNNUM'] = _quote(siteUtils.getRunNumber())
