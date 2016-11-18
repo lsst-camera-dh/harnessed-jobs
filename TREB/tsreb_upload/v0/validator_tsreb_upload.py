@@ -109,8 +109,16 @@ class tsreb_products(object):
 def do_lcatr():
     import lcatr.schema
     reb_id = os.environ["LCATR_UNIT_ID"]
+    if (len(reb_id.split("-")) != 2):
+        raise Exception("ERROR: Invalid REB ID format: %s" % (reb_id))
+	return
+
+    remote = None
+    if (os.environ.has_key('TSREB_SSH_LOGIN')):
+	remote = os.environ('TSREB_SSH_LOGIN')
+
     reb_id = reb_id.split("-")[1]
-    tsp = tsreb_products(reb_id, remote="tsreb@tsreb")
+    tsp = tsreb_products(reb_id, remote=remote)
     tsp()
     tsp.write_schema(0, fname="%s/TREB/tsreb_upload/v0/tsreb_upload.schema" % os.environ['HARNESSEDJOBSDIR'])
 
