@@ -59,7 +59,7 @@ tstart = time.time()
 
 aa=time.ctime().split(" ")
 tstart_human = (aa[4]+aa[1]+aa[2]+"-"+aa[3]).replace(":","")
-fln = %s_WarmColdMet_%s_%s_%dC.csv % (UNITID,RUNNUM,tstart_human,target_temp)
+fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,RUNNUM,tstart_human,target_temp)
 
 start_temp = {}
 
