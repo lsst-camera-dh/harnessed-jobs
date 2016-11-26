@@ -8,6 +8,88 @@ import ConfigParser
 import lcatr.schema
 import lcatr.harness.helpers
 import harnessedJobs as hj
+from eTraveler.clientAPI.connection import Connection
+from lcatr.harness.et_wrapper import getHardwareHierarchy
+
+
+def getCCDNames() :
+    topdir = os.getcwd()
+    topparts = topdir.split('/')
+    activity_id = topparts[len(topparts)-1]
+    if not topdir:
+        raise RuntimeError, 'cannot determine top-level data directory'
+    
+# Connect to eTraveler (prod) server with intent to use Dev database
+    conn = Connection('homer', 'Dev', prodServer=False)
+    if not conn:
+        raise RuntimeError, 'unable to authenticate'
+    
+    ccdnames = {}
+    ccdmanunames = {}
+    rsp = []
+    try:
+        rsp = conn.getHardwareHierarchy(experimentSN=getUnitId(),
+                                          htype=getUnitType(),
+                                          noBatched='false')
+        print "Results from getHardwareHierarchy unfiltered:"
+        iDict = 0
+        for d in rsp:
+#            print('Examining array element %d' % (iDict))
+            isaccd = False
+            ccd_sn = ""
+            ccd_slot = ""
+            ccd_htype = ""
+            ccd_manu_sn = ""
+            got_ccd_manu = False
+            for k in d:
+#                print('For key {0} value is {1}'.format(k, d[k]))
+                if ('child_hardwareTypeName' in str(k) and ('itl-ccd' in str(d[k].lower()) or 'e2v-ccd' in str(d[k].lower())) ) :
+                    isaccd = True
+                    print "found CCD specs"
+                if (isaccd and 'child_experimentSN' in str(k)) :
+                    ccd_sn = str(d[k])
+                    print "CCD SN = %s" % ccd_sn
+                if (isaccd and 'slotName' in str(k)) :
+                    ccd_slot = str(d[k])
+                    print "slot = %s" % ccd_slot
+                if (isaccd and 'child_hardwareTypeName' in str(k)) :
+                    ccd_htype = str(d[k])
+                if (isaccd and ccd_sn != "" and ccd_htype != "" and not got_ccd_manu) :
+                    print "trying to get Manufacturer ID for ccd_sn=%s , ccd_htype=%s" % (ccd_sn,ccd_htype)
+                    try:
+                        ccd_manu_sn = conn.getManufacturerId(experimentSN=ccd_sn,
+                                                       htype=ccd_htype)
+                        print 'Manufacturer ID: ', ccd_manu_sn
+                        got_ccd_manu = True
+                    except ValueError,msg:
+                        print 'Operation failed with ValueError: ', msg
+                    except Exception,msg:
+                        print 'Operation failed with exception: '
+                        print  msg
+                        sys.exit(1)
+            iDict +=1
+            if (isaccd) :
+                ccdnames[ccd_slot] = ccd_sn
+                ccdmanunames[ccd_slot] = ccd_manu_sn
+    except Exception,msg:
+        print 'Operation failed with exception: '
+        print  msg
+        sys.exit(1)
+    
+    print "Returning the following list of CCD names and locations"
+    print "ccdnames"
+    return ccdnames,ccdmanunames
+
+#examining array element 15
+#For key child_hardwareTypeName value is ITL-CCD
+#For key parent_experimentSN value is LCA-10753_RSA-002_CTE_ETU
+#For key level value is 0
+#For key relationshipTypeName value is RSA_contains_ITL-CCDs
+#For key child_experimentSN value is ITL-NULL5_CTE-ETU
+#For key parent_hardwareTypeName value is LCA-10753_RSA
+#For key parent_id value is 704
+#For key child_id value is 756
+#For key slotName value is S20
 
 def cast(value):
     if value == 'None':
@@ -35,21 +117,10 @@ def getRunNumber():
     return os.environ['LCATR_RUN_NUMBER']
 
 def getCcdVendor():
-    default = 'ITL'
     unit_id = getUnitType()
-    unit_parts = unit_id.split('-')[0]
-    if (len(unit_parts)>0) :
-        vendor = unit_id.split('-')[0]
-        if vendor not in ('ITL', 'E2V', 'e2v'):
-            if 'rsa' not in unit_id.lower() :
-                raise RuntimeError("Unrecognized CCD vendor for unit id %s" % unit_id)
-            else :
-                vendor = default
-    elif 'rsa' not in unit_id.lower() :
+    vendor = unit_id.split('-')[0]
+    if vendor not in ('ITL', 'E2V', 'e2v'):
         raise RuntimeError("Unrecognized CCD vendor for unit id %s" % unit_id)
-    else :
-        vendor = default
-
     return vendor
 
 def getJobName():

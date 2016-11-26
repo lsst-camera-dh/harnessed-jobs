@@ -38,9 +38,13 @@ if (True):
 
     ts8sub  = CCS.attachSubsystem("ts8");
 
+
     time.sleep(3.)
 
     cdir = tsCWD
+
+    raft = UNITID
+
 
     ts_version = ""
     ts8_version = ""
@@ -49,18 +53,44 @@ if (True):
 
 
 # get the software versions to include in the data products to be persisted in the DB
-#    ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetCCSVersions(tssub,cdir)
+    ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetTS8CCSVersions(tssub,cdir)
+
+
+    ccdnames = {}
+    ccdmanunames = {}
+    try:
+        ccdnames["00"] = CCDS00
+        ccdmanunames["00"] = CCDMANUS00
+        ccdnames["01"] = CCDS01
+        ccdmanunames["01"] = CCDMANUS01
+        ccdnames["02"] = CCDS02
+        ccdmanunames["02"] = CCDMANUS02
+    except:
+        pass
+    try:
+        ccdnames["10"] = CCDS10
+        ccdmanunames["10"] = CCDMANUS10
+        ccdnames["11"] = CCDS11
+        ccdmanunames["11"] = CCDMANUS11
+        ccdnames["12"] = CCDS12
+        ccdmanunames["12"] = CCDMANUS12
+    except:
+        pass
+    try:
+        ccdnames["20"] = CCDS20
+        ccdmanunames["20"] = CCDMANUS20
+        ccdnames["21"] = CCDS21
+        ccdmanunames["21"] = CCDMANUS21
+        ccdnames["22"] = CCDS22
+        ccdmanunames["22"] = CCDMANUS22
+    except:
+        pass
 
 # prepare TS8: make sure temperature and vacuum are OK and load the sequencer
-#    eolib.EOSetup(tssub,RAFTID,CCSRAFTTYPE,cdir,sequence_file,vac_outlet,ts8sub)
+    rafttype = "ITL"
+    eolib.EOTS8Setup(tssub,ts8sub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
 
     result = monosub.synchCommand(20,"openShutter");
-
-# full path causes length problem: /home/ts8prod/lsst/redhat6-x86_64-64bit-gcc44/test/jh_inst/0.3.23/harnessed-jobs-0.3.23/config/BNL/sequencer-ts8-ITL-v4.seq
-    acffile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v4.seq"
-
-    print "sequencer file = %s " % acffile
-    result = ts8sub.synchCommand(90,"loadSequencer",acffile);
 
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'FE55_LOLIM', default='1.0'))
@@ -69,14 +99,11 @@ if (True):
     imcount = int(eolib.getCfgVal(acqcfgfile, 'FE55_IMCOUNT', default='1'))
 
     bcount = 1
-
     seq = 0
 
 #number of PLCs between readings
     nplc = 1.0
 
-#    raft = RAFTID
-    raft = CCDID
     print "Working on RAFT %s" % raft
 
 # go through config file looking for 'fe55' instructions
@@ -99,7 +126,6 @@ if (True):
 #/<raft ID>/<run ID>/<acquisition type>/<test version>/<activity ID>/S<2-digit location in raft>
 
             ts8sub.synchCommand(10,"setDefaultImageDirectory","%s/${sensorLoc}" % (cdir));
-
 
             ts8sub.synchCommand(10,"setTestType","fe55")
             ts8sub.synchCommand(10,"setRaftLoc",str(raft))
@@ -147,10 +173,10 @@ if (True):
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*2.00 ;
             print "Setting timeout to %f s" % mywait
-            pdsub.synchCommand(1000,"setTimeout",mywait);
+#temp            pdsub.synchCommand(1000,"setTimeout",mywait);
 
 
-            result = ts8sub.synchCommand(90,"loadSequencer",acffile);
+#            result = ts8sub.synchCommand(90,"loadSequencer",acffile);
 
             for i in range(imcount):
                 print "image number = %d" % i
@@ -221,7 +247,7 @@ if (True):
 
 # ------------------- end of imcount loop --------------------------------
 # reset timeout to something reasonable for a regular command
-            pdsub.synchCommand(1000,"setTimeout",10.);
+#            pdsub.synchCommand(1000,"setTimeout",10.);
             seq = seq + 1
 
     fpfiles.close();

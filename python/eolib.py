@@ -141,8 +141,80 @@ def EOgetCCSVersions(tssub,cdir):
             if (ssys == "archon") :
                 archon_revision = tokens[3]
     return(ts_version,archon_version,ts_revision,archon_revision)
+
 ###############################################################################
-# EOSetup: perform setup need from running standard EO jobs
+# EOgetTS8CCSVersions: getTS8CCSVersions
+def EOgetTS8CCSVersions(tssub,cdir):
+    result = tssub.synchCommand(10,"getCCSVersions");
+    ccsversions = result.getResult()
+    ccsvfiles = open("%s/ccsversion" % cdir,"w");
+    ccsvfiles.write("%s" % ccsversions)
+    ccsvfiles.close()
+
+
+
+    ts_version = ""
+    ts8_version = ""
+    ts_revision = ""
+    ts8_revision = ""
+    for line in str(ccsversions).split("\t"):
+        tokens = line.split()
+        if ("Project   " in line) :
+            ssys = ""
+            if ("teststand" in tokens[2]) :
+                ssys = "ts"
+            if ("ts8" in tokens[2]) :
+                ssys = "ts8"
+        if ("Version:" in line) :
+            if (ssys == "ts") :
+                ts_version = tokens[2]
+            if (ssys == "ts8") :
+                ts8_version = tokens[2]
+        if ("Rev:" in line) :
+            print "%s - revision = %s" % (ssys,tokens[3])
+            if (ssys == "ts") :
+                ts_revision = tokens[3]
+            if (ssys == "ts8") :
+                ts8_revision = tokens[3]
+    return(ts_version,ts8_version,ts_revision,ts8_revision)
+
+###############################################################################
+# EOTS8Setup: perform setup needed for running standard EO TS8 jobs
+def EOTS8Setup(tssub,ts8sub,raftid,ccdtype,ccdnames,ccdmanunames,cdir,seqfile,vac_outlet,state1="setTSReady",state2="setTSTEST"):
+
+
+    print "Forcing CcdType to be ITL"
+    ts8sub.synchCommand(10,"setCcdType","ITL")
+
+
+    geo = ts8sub.synchCommand(2,"printGeometry 3").getResult();
+    for line in geo.split('\n') :
+        if len(line.split('.'))==3  :
+            linelen = len(line)
+            slot = line[linelen-2] + line[linelen-1];
+            sn = ccdnames[slot]
+            ts8sub.synchCommand(2,"setLsstSerialNumber %s %s" % (line.split(' ')[1],sn))
+            manu_sn = ccdmanunames[slot]
+            if (len(manu_sn)>0) :
+                ts8sub.synchCommand(2,"setManufacturerSerialNumber %s %s" % (line.split(' ')[1],manu_sn))
+
+# Pre TS Initialization
+#    tssub.synchCommand(11000,"eoSetupPreCfg",state1).getResult();
+
+# DAQ Setup
+
+
+# full path causes length problem: /home/ts8prod/lsst/redhat6-x86_64-64bit-gcc44/test/jh_inst/0.3.23/harnessed-jobs-0.3.23/config/BNL/sequencer-ts8-ITL-v4.seq                                                             
+
+    seqfile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v4.seq"
+    print "sequencer file = %s " % seqfile
+    result = ts8sub.synchCommand(90,"loadSequencer",seqfile);
+
+# Post TS Initialization
+#    tssub.synchCommand(11000,"eoSetupPostCfg",vac_outlet,state2).getResult();
+
+###############################################################################
+# EOSetup: perform setup needed for running standard EO jobs
 def EOSetup(tssub,ccdid,ccdtype,cdir,acffile,vac_outlet,arcsub,state1="setTSReady",state2="setTSTEST"):
 
     result = arcsub.synchCommand(10,"setHeader","MonochromatorWavelength",-1.0)

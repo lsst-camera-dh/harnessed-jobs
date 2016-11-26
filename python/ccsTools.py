@@ -57,6 +57,19 @@ class CcsSetup(OrderedDict):
         self['CCDID'] = _quote(siteUtils.getUnitId())
         self['UNITID'] = _quote(siteUtils.getUnitId())
         self['LSSTID'] = _quote(siteUtils.getLSSTId())
+        ccdnames = {}
+        ccdmanunames = {}
+        ccdnames,ccdmanunames = siteUtils.getCCDNames()
+        print "retrieved the following LSST CCD names list"
+        print ccdnames
+        print "retrieved the following Manufacturers CCD names list"
+        print ccdmanunames
+        for slot in ccdnames :
+            print "CCD %s is in slot %s" % (ccdnames[slot],slot)
+            self['CCD%s'%slot] = _quote(ccdnames[slot])
+        for slot in ccdmanunames :
+            print "CCD %s is in slot %s" % (ccdmanunames[slot],slot)
+            self['CCDMANU%s'%slot] = _quote(ccdmanunames[slot])
         try:
             self['RUNNUM'] = _quote(siteUtils.getRunNumber())
         except:
@@ -64,6 +77,7 @@ class CcsSetup(OrderedDict):
         self._read(os.path.join(siteUtils.getJobDir(), configFile))
         CCDTYPE = _quote(siteUtils.getUnitType())
         print "CCDTYPE = %s" % CCDTYPE
+        self['sequence_file'] = _quote("NA")
         self['acffile'] = self['itl_acffile']
         self['CCSCCDTYPE'] = _quote("ITL")
         if ("RTM" in CCDTYPE) :
