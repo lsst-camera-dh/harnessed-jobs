@@ -142,7 +142,7 @@ if (True):
             ts8sub.synchCommand(10,"setDefaultImageDirectory","%s/${sensorLoc}" % (cdir));
 
             ts8sub.synchCommand(10,"setTestType",acqname.lower())
-            ts8sub.synchCommand(10,"setRaftLoc",str(raft))
+            ts8sub.synchCommand(10,"setRaftName",str(raft))
             ts8sub.synchCommand(10,"setRunNumber",runnum)
 
 # probably not needed any more ... reduce count to 1
