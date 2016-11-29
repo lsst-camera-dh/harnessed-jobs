@@ -9,6 +9,7 @@ from java.lang import Exception
 import sys
 import time
 import eolib
+import glob
 
 CCS.setThrowExceptions(True);
 
@@ -99,6 +100,7 @@ if (True):
     hi_lim = float(eolib.getCfgVal(acqcfgfile, '%s_HILIM' % acqname, default='600.0'))
     bcount = int(eolib.getCfgVal(acqcfgfile, '%s_BCOUNT' % acqname, default='1'))
     imcount = int(eolib.getCfgVal(acqcfgfile, '%s_IMCOUNT' % acqname, default='1'))
+    wl     = float(eolib.getCfgVal(acqcfgfile, '%s_WL' % acqname, default = "550.0"))
 
     bcount = 1
     seq = 0
@@ -109,28 +111,31 @@ if (True):
     print "Working on RAFT %s" % raft
 
 # go through config file looking for instructions
-    print "Scanning config file for specifications";
+    print "Scanning config file for specifications for %s" % acqname.lower();
     fp = open(acqcfgfile,"r");
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
     for line in fp:
         tokens = str.split(line)
         if ((len(tokens) > 0) and (tokens[0] == acqname.lower())):
-          if (not ('FLAT' in acqname or 'LAMBDA' in acqname)) :            
-            exptime  = float(tokens[1])
-            imcount = int(tokens[2])
-          else
+
+            if 'FLAT' in acqname :
 # exptime will be set later using the flux calib
-            exptime = -1
-            target = float(tokens[1])
+              exptime = -1
+              target = float(tokens[1])
 # imcount was already set
+            elif 'LAMBDA' in acqname :
+                wl = int(tokens[1])
+                target = float(tokens[2])
+                print "wl = %f" % wl;
+            else :
+                exptime  = float(tokens[1])
+                imcount = int(tokens[2])
+                print "found instructions for exptime = %f and image count = %d" % (exptime,imcount)
 
-
-#
+# ==================================================
 # take bias images
-# 
-
-
+# ==================================================
             print "setting location of bias fits directory"
 #/<raft ID>/<run ID>/<acquisition type>/<test version>/<activity ID>/S<2-digit location in raft>
 
@@ -167,8 +172,7 @@ if (True):
 
 ########################## Start of flux calib section #############################
             if ('FLAT' in acqname or 'LAMBDA' in acqname) :
-# dispose of first image                                                                                                                                                                                                                   
-
+# dispose of first image
                 testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,False,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
 
                 time.sleep(2.0)
@@ -192,7 +196,8 @@ if (True):
                 print "The flux is determined to be %f" % flux
 
                 owl = wl
-# ####################################################################################3                                                                                                                                                    
+# ####################################################################################
+                print "raw flux value = %f" % flux
                 if (flux < 0.001) :
                 # must be a test                                                                                                                                                                                                           
                     flux = 300.0
