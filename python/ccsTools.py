@@ -54,6 +54,7 @@ class CcsSetup(OrderedDict):
 # it and it has not been defined then I want it to crash
         self['tsCWD'] = _quote(os.getcwd())
         self['labname'] = _quote(siteUtils.getSiteName())
+        self['jobname'] = _quote(siteUtils.getJobName())
         self['CCDID'] = _quote(siteUtils.getUnitId())
         self['UNITID'] = _quote(siteUtils.getUnitId())
         self['LSSTID'] = _quote(siteUtils.getLSSTId())

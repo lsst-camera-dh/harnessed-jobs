@@ -184,7 +184,7 @@ def EOTS8Setup(tssub,ts8sub,raftid,ccdtype,ccdnames,ccdmanunames,cdir,seqfile,va
 
 
     print "Forcing CcdType to be ITL"
-    ts8sub.synchCommand(10,"setCcdType","ITL")
+#    ts8sub.synchCommand(10,"setCcdType","itl")
 
 
     geo = ts8sub.synchCommand(2,"printGeometry 3").getResult();
@@ -206,7 +206,8 @@ def EOTS8Setup(tssub,ts8sub,raftid,ccdtype,ccdnames,ccdmanunames,cdir,seqfile,va
 
 # full path causes length problem: /home/ts8prod/lsst/redhat6-x86_64-64bit-gcc44/test/jh_inst/0.3.23/harnessed-jobs-0.3.23/config/BNL/sequencer-ts8-ITL-v4.seq                                                             
 
-    seqfile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v4.seq"
+#    seqfile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v4.seq"
+    seqfile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v5-LE.seq"
     print "sequencer file = %s " % seqfile
     result = ts8sub.synchCommand(90,"loadSequencer",seqfile);
 

@@ -116,8 +116,15 @@ if (True):
     for line in fp:
         tokens = str.split(line)
         if ((len(tokens) > 0) and (tokens[0] == acqname.lower())):
+          if (not ('FLAT' in acqname or 'LAMBDA' in acqname)) :            
             exptime  = float(tokens[1])
             imcount = int(tokens[2])
+          else
+# exptime will be set later using the flux calib
+            exptime = -1
+            target = float(tokens[1])
+# imcount was already set
+
 
 #
 # take bias images
