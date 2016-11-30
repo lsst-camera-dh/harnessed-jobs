@@ -122,20 +122,20 @@ if (True):
                 try:
                     if 'digital' in pwroff :
                         check_currents(i,"digital","DigI",500.,770.,chkreb)
-                    if 'analog' in pwron :
+                    if 'analog' in pwroff :
                         check_currents(i,"analog","AnaI",400.,600.,chkreb)
-                    if 'od' in pwron :
+                    if 'od' in pwroff :
                         check_currents(i,"OD","ODI",60.,120.,chkreb)
-                    if 'clockhi' in pwron :
+                    if 'clockhi' in pwroff :
                         check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
-                    if 'clocklo' in pwron :
+                    if 'clocklo' in pwroff :
                         check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
 #                   check_currents(i,"heater","???",0.100,0.300,chkreb)
                 except Exception, e:
                     print "%s: CURRENT CHECK FAILED! %s" % (rebname,e)
 #                    raise Exception
                     exit
-                time.sleep(2)
+                time.sleep(2.0)
 
 
 

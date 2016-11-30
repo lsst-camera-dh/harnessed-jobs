@@ -92,7 +92,7 @@ if (True):
 # verify that all power is OFF
             try:
 #                result = pwrsub.synchCommand(10,"setNamedPowerOn",i,"master",False);
-                result = pwrsub.synchCommand(10,"setNamedPowerOn %d master False" % i);
+                result = pwrsub.synchCommand(20,"setNamedPowerOn %d master False" % i);
             except Exception, e:
 
                 print "%s: FAILED TO TURN POWER OFF! %s" % (rebname,e)
@@ -119,7 +119,7 @@ if (True):
                     print "%s: failed to turn on current %s!" % (rebname,pwr)
                     throw
 
-                time.sleep(10.0)
+                time.sleep(2.0)
     
                 try:
 #                    print "checking currents"
