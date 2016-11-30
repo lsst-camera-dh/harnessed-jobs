@@ -102,34 +102,50 @@ if (True):
     lo_lim = float(eolib.getCfgVal(acqcfgfile, '%s_LOLIM' % acqname, default='0.025'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, '%s_HILIM' % acqname, default='600.0'))
     bcount = int(eolib.getCfgVal(acqcfgfile, '%s_BCOUNT' % acqname, default='1'))
-    imcount = int(eolib.getCfgVal(acqcfgfile, '%s_IMCOUNT' % acqname, default='1'))
+
+    imcount = 0
+    if 'FLAT' in acqname :
+        imcount = int(eolib.getCfgVal(acqcfgfile, '%s_IMCOUNT' % acqname, default='2'))
+    else :
+        imcount = int(eolib.getCfgVal(acqcfgfile, '%s_IMCOUNT' % acqname, default='1'))
     wl     = float(eolib.getCfgVal(acqcfgfile, '%s_WL' % acqname, default = "550.0"))
 
+# bias image count
     bcount = 1
+# sequence number
     seq = 0
-
-#number of PLCs between readings
+# old wave length setting
+    owl = -1.0
+# number of PulseLinceCounts between readings
     nplc = 1.0
+# exposure time
+    exptime = -1
 
     print "Working on RAFT %s" % raft
-
-# go through config file looking for instructions
+# go through EO test config file looking for instructions
     print "Scanning config file for specifications for %s" % acqname.lower();
     fp = open(acqcfgfile,"r");
+
+# keep list of produced files
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
     for line in fp:
+
+# split the instruction according to test type
         tokens = str.split(line)
         if ((len(tokens) > 0) and (tokens[0] == acqname.lower())):
 
             if 'FLAT' in acqname :
 # exptime will be set later using the flux calib
-              exptime = -1
               target = float(tokens[1])
+# .. indicate that the exposure time must be recalculated
+              exptime = -1
 # imcount was already set
             elif 'LAMBDA' in acqname :
                 wl = int(tokens[1])
                 target = float(tokens[2])
+# .. indicate that the exposure time must be recalculated
+                exptime = -1
                 print "wl = %f" % wl;
             else :
                 exptime  = float(tokens[1])
@@ -157,40 +173,78 @@ if (True):
                 ts8sub.synchCommand(10,"setTestType",acqname.lower())
                 ts8sub.synchCommand(10,"setImageType","biasclear")
 #                ts8sub.synchCommand(10,"setSeqInfo",str(seq))
-                ts8sub.synchCommand(90,"exposeAcquireAndSave",0,False,False);
+                try:
+                    rply = ts8sub.synchCommand(90,"exposeAcquireAndSave",0,False,False).getResult()
+                except:
+                    pass
                 print "after click click at %f" % time.time()
 
             time.sleep(3.0)
+# now do the useful bias acquisitions
+            num_tries = 0
+            max_tries = 3
+            while i<bcount:
+                try:
+                    timestamp = time.time()
 
-            for i in range(bcount):
-                timestamp = time.time()
+                    print "Ready to take bias image. time = %f" % time.time()
 
-                print "Ready to take bias image. time = %f" % time.time()
-
-                ts8sub.synchCommand(10,"setTestType",acqname.lower())
-                ts8sub.synchCommand(10,"setImageType","bias")
-                ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False)
+                    ts8sub.synchCommand(10,"setTestType",acqname.lower())
+                    ts8sub.synchCommand(10,"setImageType","bias")
+                    rply = ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False).getResult()
+                    i += 1
+                    num_tries = 0
+                except Exception, ex:
+                    num_tries += 1
+                    if num_tries < max_tries:
+                        print "RETRYING BIAS EXPOSURE"
+                        time.sleep(10.0)
+                    else:
+                        raise Exception("EXCEEDED MAX RETRIES ON BIAS EXPOSURE: %s" % str(ex))
 
                 print "after click click at %f" % time.time()
 #                time.sleep(3.0)
 
 
-
 ########################## Start of flux calib section #############################
-            if ('FLAT' in acqname or 'LAMBDA' in acqname) :
+            if (('FLAT' in acqname or 'LAMBDA' in acqname) and wl!=owl):
+                                            
+                print "Setting monochromator lambda = %8.2f" % wl
+                result = monosub.synchCommand(60,"setWaveAndFilter",wl);
+                rwl = result.getResult()
+                time.sleep(10.0)
+                print "publishing state"
+                result = tssub.synchCommand(60,"publishState");
+
+
 # dispose of first image
                 ts8sub.synchCommand(10,"setTestType",acqname.lower())
                 ts8sub.synchCommand(10,"setImageType","prefluxcalib")
 #                ts8sub.synchCommand(10,"setSeqInfo",str(seq))
-                testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,False,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
-
+                try:
+                    testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,False,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
+                except:
+                    pass
                 time.sleep(2.0)
 
-                ts8sub.synchCommand(10,"setTestType",acqname.lower())
-                ts8sub.synchCommand(10,"setImageType","fluxcalib")
+# now do the useful exposure for the flux calibration
+                success = False
+                num_tries = 0
+                max_tries = 3
+                while not success:
+                    try:
+                        ts8sub.synchCommand(10,"setTestType",acqname.lower())
+                        ts8sub.synchCommand(10,"setImageType","fluxcalib")
 #                ts8sub.synchCommand(10,"setSeqInfo",str(seq))
-                testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,False,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
-
+                        testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,False,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
+                        success = True
+                    except Exception, ex:
+                        num_tries += 1
+                        if num_tries > max_tries :
+                            raise Exception("EXCEEDED MAXIMUM NUMBER OF RETRIES FOR FLUX CALIB: %s" % str(ex))
+                        else:
+                            print "RETRYING FLUX CALIB EXPOSURE"
+                            time.sleep(10.0)
                 print "fitsfiles = "
                 print testfitsfiles
 
@@ -210,13 +264,16 @@ if (True):
                 owl = wl
 # ####################################################################################
                 print "raw flux value = %f" % flux
-                if (flux < 0.001) :
-                # must be a test                                                                                                                                                                                                           
+                if (flux < 2.0) :
+                # must be a test
                     flux = 300.0
                 print "SETTING A DEFAULT TEST FLUX OF 300 DUE TO APPARENT NO SENSOR TEST IN PROGRESS"
-                exptime = target/flux
 
 ####################### End of flux calib section ###########################################
+
+# check if exptime needs to be recalculated
+            if (exptime < 0.):
+                exptime = target/flux
 
             print "needed exposure time = %f" % exptime
             if (exptime > hi_lim) :
@@ -250,15 +307,16 @@ if (True):
 # =====================================================================================
             num_tries = 0
             max_tries = 3
-            i=0
-            while i<imcount :
+            imdone=0
+            print "starting exposure sequence %d for %d images" % (seq,imcount)
+            while imdone<imcount :
                 try:
-                    print "image number = %d" % i
-
-                    print "call accumBuffer to start PD recording at %f" % time.time()
-                    pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
+                    print "images completed number = %d" % imdone
 
                     if (doPD) :
+                        print "call accumBuffer to start PD recording at %f" % time.time()
+                        pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
+
                         while(True) :
                             result = pdsub.synchCommand(10,"isAccumInProgress");
                             rply = result.getResult();
@@ -287,7 +345,7 @@ if (True):
                     fitsfiles = ts8sub.synchCommand(700,"exposeAcquireAndSave",int(exptime*1000),False,False).getResult();
 
                     print "after click click at %f" % time.time()
-                    print "done with exposure # %d" % i
+                    print "done with exposure # %d" % imdone
 
 # =======================================
 #  retrieve the photodiode readings
@@ -317,22 +375,26 @@ if (True):
                             print "adding binary table of PD values for %s" % fitsfilename
                             result = ts8sub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),"%s/%s" % (cdir,fitsfilename),"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
                             fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
-
-# ------------------- end of imcount loop --------------------------------
-
-# reset timeout to something reasonable for a regular command
-#            pdsub.synchCommand(1000,"setTimeout",10.);
-
-                    seq += 1
-                    i += 1
+# ===================== end of PD value retrieval and end of exposure section ======================
+                    print "successful exposure .... incrementing images completed count"
+                    imdone = imdone + 1
                     num_tries = 0
                 except Exception, ex:
                     num_tries += 1
                     if num_tries > max_tries :
                         raise Exception('TOO MANY RETRIES! %s' % str(ex))
                     else :
-                        print "something went wrong during the exposure ... RETRYING"
+                        print "something went wrong during the exposure ... RETRYING: %s" % str(ex)
                         rply = pdsub.synchCommand(10,"softReset").getResult()
+                        time.sleep(10.0)
+                print "checking ... imdone = %d" % imdone
+            print "incrementing sequence number"
+            seq += 1
+# ------------------- end of imcount loop --------------------------------
+
+# reset timeout to something reasonable for a regular command
+#            pdsub.synchCommand(1000,"setTimeout",10.);
+
 
     fpfiles.close();
     fp.close();
