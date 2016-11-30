@@ -1,3 +1,4 @@
 #!/usr/bin/env python
-from ccsTools import ccsProducer
+import os
 
+os.system("cp -vp /home/ts8prod/workdir/connectivity-check-data/* .")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from ccsTools import ccsValidator
 import glob
 import lcatr.schema
 import os
