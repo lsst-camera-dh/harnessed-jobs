@@ -120,37 +120,68 @@ if (True):
     nplc = 1.0
 # exposure time
     exptime = -1
+# default file pattern
+    def_pat = "${CCDSerialLSST}_${TestType}_${ImageType}_${SequenceInfo}_${RunNumber}_${timestamp}.fits"
+    ts8sub.synchCommand(10,"setFitsFileNamePattern",def_pat)
+# flat file pattern
+# E2V-CCD250-179_flat_0065.07_flat2_20161130064552.fits
+    flat_pat = '${CCDSerialLSST}_${TestType}_%07.2f_${ImageType}%d_${SequenceInfo}_${RunNumber}_${timestamp}.fits'
+# qe file pattern
+# E2V-CCD250-179_lambda_flat_1100_076_20161130124533.fits
+    qe_pat = '${CCDSerialLSST}_${TestType}_${ImageType}_%4.4d_${SequenceInfo}_${RunNumber}_${timestamp}.fits'
+
 
     print "Working on RAFT %s" % raft
-# go through EO test config file looking for instructions
-    print "Scanning config file for specifications for %s" % acqname.lower();
-    fp = open(acqcfgfile,"r");
 
 # keep list of produced files
     fpfiles = open("%s/acqfilelist" % cdir,"w");
 
+# count how many instructions there are
+    fp = open(acqcfgfile,"r");
+    number_instr = 0
+    for line in fp:
+        tokens = str.split(line)
+        if ((len(tokens) > 0) and (tokens[0] == acqname.lower())):
+            number_instr += 1
+    fp.close()
+
+# ---- now start --------------
+# go through EO test config file looking for instructions
+    print "Scanning config file for specifications for %s" % acqname.lower();
+    fp = open(acqcfgfile,"r");
     for line in fp:
 
 # split the instruction according to test type
         tokens = str.split(line)
         if ((len(tokens) > 0) and (tokens[0] == acqname.lower())):
 
+            print "==== working on sequence %d  Total# = %d" % (seq,number_instr)
+
+            doXED = False
+            doLight = False
+
             if 'FLAT' in acqname :
 # exptime will be set later using the flux calib
-              target = float(tokens[1])
+                target = float(tokens[1])
 # .. indicate that the exposure time must be recalculated
-              exptime = -1
+                exptime = -1
+                doLight = True
 # imcount was already set
             elif 'LAMBDA' in acqname :
                 wl = int(tokens[1])
                 target = float(tokens[2])
 # .. indicate that the exposure time must be recalculated
                 exptime = -1
+                doLight = True
                 print "wl = %f" % wl;
-            else :
-                exptime  = float(tokens[1])
-                imcount = int(tokens[2])
-                print "found instructions for exptime = %f and image count = %d" % (exptime,imcount)
+            else
+                exptime = float(tokens[1])
+                imcount = float(tokens[2])
+                if 'PPUMP' in acqname :
+                    nshifts  = float(tokens[3])
+                else if 'FE55' in acqname :
+                    doXED = True
+            print "found instructions for exptime = %f and image count = %d" % (exptime,imcount)
 
 # ==================================================
 # setup meta data for these exposures
@@ -172,10 +203,12 @@ if (True):
                 print "Ready to take clearing bias image. time = %f" % time.time()
                 ts8sub.synchCommand(10,"setTestType",acqname.lower())
                 ts8sub.synchCommand(10,"setImageType","biasclear")
-#                ts8sub.synchCommand(10,"setSeqInfo",str(seq))
+                ts8sub.synchCommand(10,"setSeqInfo",seq)
                 try:
-                    rply = ts8sub.synchCommand(90,"exposeAcquireAndSave",0,False,False).getResult()
-                except:
+                    rply = ts8sub.synchCommand(200,"exposeAcquireAndSave",0,False,False).getResult()
+                    print "clearing acquisition completed"
+                except Exception, ex:
+                    print "Proceeding despite error: %s" % str(ex)
                     pass
                 print "after click click at %f" % time.time()
 
@@ -192,12 +225,13 @@ if (True):
                     ts8sub.synchCommand(10,"setTestType",acqname.lower())
                     ts8sub.synchCommand(10,"setImageType","bias")
                     rply = ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False).getResult()
+                    print "completed bias exposure"
                     i += 1
                     num_tries = 0
                 except Exception, ex:
                     num_tries += 1
                     if num_tries < max_tries:
-                        print "RETRYING BIAS EXPOSURE"
+                        print "RETRYING BIAS EXPOSURE - Error was: %s" % ex
                         time.sleep(10.0)
                     else:
                         raise Exception("EXCEEDED MAX RETRIES ON BIAS EXPOSURE: %s" % str(ex))
@@ -220,9 +254,9 @@ if (True):
 # dispose of first image
                 ts8sub.synchCommand(10,"setTestType",acqname.lower())
                 ts8sub.synchCommand(10,"setImageType","prefluxcalib")
-#                ts8sub.synchCommand(10,"setSeqInfo",str(seq))
+                ts8sub.synchCommand(10,"setSeqInfo",seq)
                 try:
-                    testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,False,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
+                    testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False).getResult();
                 except:
                     pass
                 time.sleep(2.0)
@@ -235,8 +269,10 @@ if (True):
                     try:
                         ts8sub.synchCommand(10,"setTestType",acqname.lower())
                         ts8sub.synchCommand(10,"setImageType","fluxcalib")
-#                ts8sub.synchCommand(10,"setSeqInfo",str(seq))
-                        testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,False,False,"fluxcalib_${sensorId}_${test_type}_${image_type}_${seq_info}_%s_${timestamp}.fits" % runnum).getResult();
+                        ts8sub.synchCommand(10,"setSeqInfo",seq)
+
+                        testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False).getResult();
+
                         success = True
                     except Exception, ex:
                         num_tries += 1
@@ -337,12 +373,16 @@ if (True):
                 
                     ts8sub.synchCommand(10,"setTestType",acqname.lower())
                     ts8sub.synchCommand(10,"setImageType",acqname.lower())
-#                    if (not 'FLAT' in acqname) :
-#                        ts8sub.synchCommand(10,"setSeqInfo",str(seq))
-#                    else :
+                    ts8sub.synchCommand(10,"setSeqInfo",seq)
 #                        ts8sub.synchCommand(10,"setSeqInfo","%s_%07.2f" % (str(seq),exptime))
-#
-                    fitsfiles = ts8sub.synchCommand(700,"exposeAcquireAndSave",int(exptime*1000),False,False).getResult();
+
+                    if 'FLAT' in acqname :
+                        ts8sub.synchCommand(10,"setFitsFileNamePattern",flat_pat % (exptime,imdone+1))
+                    if 'LAMBDA' in acqname :
+                        ts8sub.synchCommand(10,"setFitsFileNamePattern",qe_pat % int(wl))
+
+                    fitsfiles = ts8sub.synchCommand(700,"exposeAcquireAndSave",int(exptime*1000),doLight,doXED).getResult();
+                    ts8sub.synchCommand(10,"setFitsFileNamePattern",def_pat)
 
                     print "after click click at %f" % time.time()
                     print "done with exposure # %d" % imdone
