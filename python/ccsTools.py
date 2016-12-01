@@ -212,6 +212,7 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     # @todo Sort out which files really need to be curated.
     files = glob.glob('*.fits')
     files = files+glob.glob('*/*.fits')
+    files = files+glob.glob('*/*.fits.gz')
     files = files+glob.glob('*log*')
     files = files+glob.glob('*summary*')
     files = files+glob.glob('*.png')

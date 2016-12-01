@@ -174,12 +174,12 @@ if (True):
                 exptime = -1
                 doLight = True
                 print "wl = %f" % wl;
-            else
+            else :
                 exptime = float(tokens[1])
                 imcount = float(tokens[2])
                 if 'PPUMP' in acqname :
                     nshifts  = float(tokens[3])
-                else if 'FE55' in acqname :
+                elif 'FE55' in acqname :
                     doXED = True
             print "found instructions for exptime = %f and image count = %d" % (exptime,imcount)
 
