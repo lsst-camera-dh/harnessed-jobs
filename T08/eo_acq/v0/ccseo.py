@@ -125,10 +125,10 @@ if (True):
     ts8sub.synchCommand(10,"setFitsFileNamePattern",def_pat)
 # flat file pattern
 # E2V-CCD250-179_flat_0065.07_flat2_20161130064552.fits
-    flat_pat = '${CCDSerialLSST}_${TestType}_%07.2f_${ImageType}%d_${SequenceInfo}_${RunNumber}_${timestamp}.fits'
+    flat_pat = '${CCDSerialLSST}_${TestType}_%07.2fs_${ImageType}%d_${RunNumber}_${timestamp}.fits'
 # qe file pattern
 # E2V-CCD250-179_lambda_flat_1100_076_20161130124533.fits
-    qe_pat = '${CCDSerialLSST}_${TestType}_${ImageType}_%4.4d_${SequenceInfo}_${RunNumber}_${timestamp}.fits'
+    qe_pat = '${CCDSerialLSST}_${TestType}_${ImageType}_%4.4dnm_${RunNumber}_${timestamp}.fits'
 
 
     print "Working on RAFT %s" % raft

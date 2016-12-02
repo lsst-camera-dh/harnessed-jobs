@@ -16,8 +16,6 @@ CCS.setThrowExceptions(True);
 #attach CCS subsystem Devices for scripting
 print "Attaching teststand subsystems"
 tssub  = CCS.attachSubsystem("%s" % ts);
-print "attaching Bias subsystem"
-biassub = CCS.attachSubsystem("%s/Bias" % ts);
 print "attaching PD subsystem"
 pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
 print "attaching Mono subsystem"
@@ -36,13 +34,9 @@ ts8_revision = "NA"
 
 #ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-# make sure the BSS is off
-biassub.synchCommand(10,"setVoltage",0.0)
-
 #eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,ts8sub,"setTSIdle","setTSIdle")
 
-print "Setting the current ranges on the Bias and PD devices"
-biassub.synchCommand(10,"setCurrentRange",0.0002)
+print "Setting the current ranges on the PD device"
 pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
 imcount = 1
@@ -185,7 +179,7 @@ try:
 except Exception, ex:
 
 # move TS to ready state                    
-    tssub.synchCommand(60,"setTSIdle");
+#    tssub.synchCommand(60,"setTSIdle");
 
 # get the glowing vacuum gauge back on
 #    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
