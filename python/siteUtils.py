@@ -117,10 +117,21 @@ def getRunNumber():
     return os.environ['LCATR_RUN_NUMBER']
 
 def getCcdVendor():
+    default = 'ITL'
     unit_id = getUnitType()
-    vendor = unit_id.split('-')[0]
-    if vendor not in ('ITL', 'E2V', 'e2v'):
+    unit_parts = unit_id.split('-')[0]
+    if (len(unit_parts)>0) :
+        vendor = unit_id.split('-')[0]
+        if vendor not in ('ITL', 'E2V', 'e2v'):
+            if 'rsa' not in unit_id.lower() :
+                raise RuntimeError("Unrecognized CCD vendor for unit id %s" % unit_id)
+            else :
+                vendor = default
+    elif 'rsa' not in unit_id.lower() :
         raise RuntimeError("Unrecognized CCD vendor for unit id %s" % unit_id)
+    else :
+        vendor = default
+
     return vendor
 
 def getJobName():
