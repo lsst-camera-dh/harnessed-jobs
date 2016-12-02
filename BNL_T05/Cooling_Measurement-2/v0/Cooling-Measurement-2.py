@@ -40,7 +40,7 @@ nsteps = abs(target_temp - cur_temp)
 ###################################################################
 # Once at a safe pressure, begin cooling the device
 starttim = time.time()
-if (False):
+if (True):
     while True:
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
