@@ -217,6 +217,9 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     files = files+glob.glob('*summary*')
     files = files+glob.glob('*.png')
     files = files+glob.glob('*.dat')
+    files = files+glob.glob('*.txt')
+    files = files+glob.glob('*.csv')
+    files = files+glob.glob('*.pickles')
 
     print "The files that will be registered in lims from %s are:" % os.getcwd()
     for line in files :
