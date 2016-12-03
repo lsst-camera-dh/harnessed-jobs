@@ -58,7 +58,7 @@ if (True):
 
     while (True) :
         now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
-        if (abs(target_temp-now_temp)<2.0) :
+        if (abs(target_temp-now_temp)<0.5) :
             break
         time.sleep(5.0)
         print "waiting for target temp to be reached. current temp = %fC" % now_temp
