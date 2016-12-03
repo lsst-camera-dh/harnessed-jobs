@@ -1,5 +1,5 @@
 ###############################################################################
-# Pump_and_Room_Temp_Measurement
+# Pump-and-Room-Temp-Measurement
 # TS5 KEYENCE METROLOGY SCAN
 #      Date: 11/07
 #      Authors: Homer and Rebecca
@@ -19,6 +19,9 @@ print "Attaching METROLOGY subsystems"
 ts5sub  = CCS.attachSubsystem("metrology");
 print "Attaching CRYO subystems"
 cryosub = CCS.attachSubsystem("ts/Cryo" );
+vacsub = CCS.attachSubsystem("ts/VQMonitor");
+pdusub = CCS.attachSubsystem("ts/PDU");
+
 
 
 cdir = tsCWD
@@ -26,47 +29,41 @@ cdir = tsCWD
 target_temp = 20. 
 
 cur_temp = cryosub.synchCommand(20,"getTemp B").getResult()
+#cur_temp = 20.
 
 # number of degrees per minute
-trate = 1.0
+trate = 0.2
 
 # duration in seconds
-period = (target_temp - cur_temp) / (trate/60.0); 
+period = abs(target_temp - cur_temp) / (trate/60.0); 
 
 # steps
 # - lets do one for every degree
 nsteps = abs(target_temp - cur_temp)
 
-
-########################################################################################
-# Check Pressure
-if (True) :
-    starttim = time.time()
+###################################################################
+# Once at a safe pressure, begin cooling the device
+starttim = time.time()
+if (True):
     while True:
-        print "checking if pressure is low enough to turn on turbo pump";
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
         print "time = %f , P = %f\n" % (time.time(),pres)
-        if ((time.time()-starttim)>7200):
-            print "Something is wrong ... we will never make it to a low enough pressure for turning on the turbo pump"
-            exit
         if (pres>0.0 and pres<0.1) :
             break
         time.sleep(5.)
+#        result = pdusub.synchCommand(120,"setOutletState",pump_outlet,True);                      
+#        rply = result.getResult();                                                                
+###################################################################
 
-# Turn on power to the turbo pump
-    result = vacsub.synchCommand(20,"readPressure");
-    pres = result.getResult();
-    if (pres>0.0 and pres<0.1) :
-        print "TURNING ON POWER TO THE TURBO PUMP!"
-        result = pdusub.synchCommand(120,"setOutletState",pump_outlet,True);
-        rply = result.getResult();
-########################################################################################
+    cryosub.synchCommand(20000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
 
-
-
-    cryosub.synchCommand(20,"rampTemp",period,target_temp,int(nsteps)).getResult()
-
+    while (True) :
+        now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
+        if (abs(target_temp-now_temp)<2.0) :
+            break
+        time.sleep(5.0)
+        print "waiting for target temp to be reached. current temp = %fC" % now_temp
 
 ts5sub.synchCommand(30,"setCfgStateByName RTM")
 
@@ -77,16 +74,21 @@ tstart_human = (aa[4]+aa[1]+aa[2]+"-"+aa[3]).replace(":","")
 fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,RUNNUM,tstart_human,target_temp)
 
 start_temp = {}
+
 for temp in ["A","B","C","D"]:
     start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
+#    start_temp[temp]=20.0
 
+#ts5sub.synchCommand(3000,"noStepScan  %s/Pump-and-Room-Temp-Measurement.dat" % cdir)
 ts5sub.synchCommand(3000,"noStepScan  %s/%s" % (cdir,fln))
 
 tstop = time.time()
 stop_temp = {}
 for temp in ["A","B","C","D"]:
     stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
+#    stop_temp[temp]=20.0
 
+#fpdat = open("%s/Pump-and-Room-Temp-Measurement.dat" % (cdir),"a");
 fpdat = open("%s/%s" % (cdir,fln),"a");
 fpdat.write("# start time = %f , stop time = %f\n" % (tstart,tstop))
 for temp in ["A","B","C","D"]:
@@ -116,4 +118,4 @@ print "            TS5 KEYENCE METROLOGY SCAN DONE\n"
 print " =====================================================\n"
 
 
-print "Pump_and_Room_Temp_Measurement: COMPLETED"
+print "Pump-and-Room-Temp-Measurement: COMPLETED"

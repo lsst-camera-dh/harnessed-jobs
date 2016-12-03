@@ -19,19 +19,23 @@ print "Attaching METROLOGY subsystems"
 ts5sub  = CCS.attachSubsystem("metrology");
 print "Attaching CRYO subystems"
 cryosub = CCS.attachSubsystem("ts/Cryo" );
+vacsub = CCS.attachSubsystem("ts/VQMonitor");
+pdusub = CCS.attachSubsystem("ts/PDU");
+
 
 
 cdir = tsCWD
 
-target_temp = 15. 
+target_temp = 20. 
 
 cur_temp = cryosub.synchCommand(20,"getTemp B").getResult()
+#cur_temp = 20.
 
 # number of degrees per minute
-trate = 1.0
+trate = 0.2
 
 # duration in seconds
-period = (target_temp - cur_temp) / (trate/60.0); 
+period = abs(target_temp - cur_temp) / (trate/60.0); 
 
 # steps
 # - lets do one for every degree
@@ -50,8 +54,14 @@ if (True):
         time.sleep(5.)
 ###################################################################
 
-        cryosub.synchCommand(20,"rampTemp",period,target_temp,nsteps).getResult()
+    cryosub.synchCommand(20000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
 
+    while (True) :
+        now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
+        if (abs(target_temp-now_temp)<2.0) :
+            break
+        time.sleep(5.0)
+        print "waiting for target temp to be reached. current temp = %fC" % now_temp
 
 ts5sub.synchCommand(30,"setCfgStateByName RTM")
 
@@ -65,14 +75,18 @@ start_temp = {}
 
 for temp in ["A","B","C","D"]:
     start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
+#    start_temp[temp]=20.0
 
+#ts5sub.synchCommand(3000,"noStepScan  %s/Room-Temp-Measurement-After-Thermal-Cycle.dat" % cdir)
 ts5sub.synchCommand(3000,"noStepScan  %s/%s" % (cdir,fln))
 
 tstop = time.time()
 stop_temp = {}
 for temp in ["A","B","C","D"]:
     stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
+#    stop_temp[temp]=20.0
 
+#fpdat = open("%s/Room-Temp-Measurement-After-Thermal-Cycle.dat" % (cdir),"a");
 fpdat = open("%s/%s" % (cdir,fln),"a");
 fpdat.write("# start time = %f , stop time = %f\n" % (tstart,tstop))
 for temp in ["A","B","C","D"]:

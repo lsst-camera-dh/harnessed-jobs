@@ -20,7 +20,7 @@ def getCCDNames() :
         raise RuntimeError, 'cannot determine top-level data directory'
     
 # Connect to eTraveler (prod) server with intent to use Dev database
-    conn = Connection('homer', 'Dev', prodServer=False)
+    conn = Connection('homer', 'Prod', prodServer=False)
     if not conn:
         raise RuntimeError, 'unable to authenticate'
     
