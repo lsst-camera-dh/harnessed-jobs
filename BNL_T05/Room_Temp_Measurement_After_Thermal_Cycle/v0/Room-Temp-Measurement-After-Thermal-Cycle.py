@@ -32,7 +32,7 @@ cur_temp = cryosub.synchCommand(20,"getTemp B").getResult()
 #cur_temp = 20.
 
 # number of degrees per minute
-trate = 0.2
+trate = 0.5
 
 # duration in seconds
 period = abs(target_temp - cur_temp) / (trate/60.0); 
@@ -54,7 +54,7 @@ if (True):
         time.sleep(5.)
 ###################################################################
 
-    cryosub.synchCommand(20000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
+    cryosub.synchCommand(40000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
 
     while (True) :
         now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
