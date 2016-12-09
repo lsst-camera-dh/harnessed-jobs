@@ -11,6 +11,18 @@ class tsreb_products(object):
         self.remote = remote    # "tsreb@130.199.47.42"
         self.reb_id = int(reb_id)
 
+    def __parse_version_file__(self, ver_file):
+        f = open(ver_file, "r")
+        ret_dict = OrderedDict()
+
+        for l in f.readlines():
+            lsplit = l.split(": ")
+            if (len(lsplit) != 2):
+                raise Exception("ERROR: Invalid version file format")
+            ret_dict["version_" + lsplit[0]] = lsplit[1].strip()           
+
+        return ret_dict
+
     def __parse_tex_file__(self, tex_file):
         f = open(tex_file, "r")
         summary_table = []
@@ -73,14 +85,14 @@ class tsreb_products(object):
         self.pdf_report = glob(dirname+"/*.pdf")
         self.raw_data   = glob(dirname+"/data/*.csv")
         self.raw_data.extend(glob(dirname+"/data/*.fits"))
-        self.tsreb_version = glob(dirname+"/data/*VERSION*")
+        self.tsreb_version = glob(dirname+"/data/*VERSION*")[0]
         self.tex_file = glob(dirname+"/data/*.tex")[0]
 
     def __call__(self):
         self.__get_files__()
 
     def write_schema(self, version, fname="tsreb_upload.schema", schema_name="tsreb_upload"):
-        schema_dict = self.__parse_tex_file__(self.tex_file)
+        schema_dict = self.get_results_dict()
 
         f = open(fname, "w")
         f.write("# -*- python -*-\n{\n")
@@ -98,7 +110,9 @@ class tsreb_products(object):
         f.close()
 
     def get_results_dict(self):
-        return self.__parse_tex_file__(self.tex_file)
+        res_dict = self.__parse_tex_file__(self.tex_file)
+	res_dict.update(self.__parse_version_file__(self.tsreb_version))
+        return res_dict
 
     def get_file_list(self):
         lst = self.pdf_report

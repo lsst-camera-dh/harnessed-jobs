@@ -23,5 +23,8 @@
     'Dynamic Range' : str,
     'System Gain' : str,
     'Checker Board' : str,
+    'version_tag' : str,
+    'version_ref' : str,
+    'version_date' : str,
 }
 
