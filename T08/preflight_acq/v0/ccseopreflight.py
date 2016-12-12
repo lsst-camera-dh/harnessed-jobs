@@ -22,31 +22,86 @@ print "attaching Mono subsystem"
 monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
 print "attaching PDU subsystem"
 pdusub = CCS.attachSubsystem("%s/PDU" % ts );
+print "Attaching teststand 8 subsystem"
+ts8sub  = CCS.attachSubsystem("ts8");
+
+ccdnames = {}
+ccdmanunames = {}
+try:
+    ccdnames["00"] = CCDS00
+    ccdmanunames["00"] = CCDMANUS00
+    ccdnames["01"] = CCDS01
+    ccdmanunames["01"] = CCDMANUS01
+    ccdnames["02"] = CCDS02
+    ccdmanunames["02"] = CCDMANUS02
+except:
+    pass
+try:
+    ccdnames["10"] = CCDS10
+    ccdmanunames["10"] = CCDMANUS10
+    ccdnames["11"] = CCDS11
+    ccdmanunames["11"] = CCDMANUS11
+    ccdnames["12"] = CCDS12
+    ccdmanunames["12"] = CCDMANUS12
+except:
+    pass
+try:
+    ccdnames["20"] = CCDS20
+    ccdmanunames["20"] = CCDMANUS20
+    ccdnames["21"] = CCDS21
+    ccdmanunames["21"] = CCDMANUS21
+    ccdnames["22"] = CCDS22
+    ccdmanunames["22"] = CCDMANUS22
+except:
+    pass
 
 time.sleep(3.)
 
 cdir = tsCWD
 
-ts_version = "NA"
-ts8_version = "NA"
-ts_revision = "NA"
-ts8_revision = "NA"
+raft = UNITID
 
-#ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetCCSVersions(tssub,cdir)
 
-#eolib.EOSetup(tssub,CCDID,CCSCCDTYPE,cdir,acffile,vac_outlet,ts8sub,"setTSIdle","setTSIdle")
+ts_version = ""
+ts8_version = ""
+ts_revision = ""
+ts8_revision = ""
 
-print "Setting the current ranges on the PD device"
+
+# get the software versions to include in the data products to be persisted in the DB                                                        
+ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetTS8CCSVersions(tssub,cdir)
+
+# prepare TS8: make sure temperature and vacuum are OK and load the sequencer                                                                
+rafttype = "ITL"
+
+usets8 = False
+try:
+    eolib.EOTS8Setup(tssub,ts8sub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
+    usets8 = True
+    print "REBs appear to be attached and ready for exposure. Shutter control will be done via REBs"
+except Exception, ex:
+    print "REBs appear not be be attached or ready for exposure. Perform test using mono shutter only."
+    print "EOTS8Setup failed on %s" % str(ex)
+#    raise Exception(ex)
+
+print "Setting the current range on the PD device"
 pdsub.synchCommand(10,"setCurrentRange",0.00002)
 
 imcount = 1
-
 seq = 0
 
 #number of PLCs between readings
 nplc = 1
-
 ccd = CCDID
+
+# flat file pattern
+# E2V-CCD250-179_flat_0065.07_flat2_20161130064552.fits
+flat_pat = '${CCDSerialLSST}_${TestType}_%07.2fs_${ImageType}%d_${RunNumber}_${timestamp}.fits'
+
+if usets8 :
+    rwl = monosub.synchCommand(900,"openShutter").getResult();
+else :
+    rwl = monosub.synchCommand(900,"closeShutter").getResult();
 
 print "Working on CCD %s" % ccd
 
@@ -84,6 +139,7 @@ try:
 
             monosub.synchCommand(60,"setTimeout",300.);
 
+            imdone = 0
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
 
@@ -103,7 +159,7 @@ try:
                 
 
 # adjust timeout because we will be waiting for the data to become ready
-                mywait = nplc/60.*nreads*1.10 ;
+                mywait = nplc/60.*nreads*1.5;
                 print "Setting timeout to %f s" % mywait
                 pdsub.synchCommand(1000,"setTimeout",mywait);
 
@@ -115,14 +171,28 @@ try:
 
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(2.0);
+                time.sleep(1.0);
  
                 timestamp = time.time()
-                result = monosub.synchCommand(900,"openShutter");
-                rwl = result.getResult()
-                time.sleep(exptime)
-                result = monosub.synchCommand(900,"closeShutter");
-                rwl = result.getResult()
+                if usets8 :
+
+                    print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
+
+                    acqname = "preflight"
+                    ts8sub.synchCommand(10,"setTestType",acqname.lower())
+                    ts8sub.synchCommand(10,"setImageType",acqname.lower())
+                    ts8sub.synchCommand(10,"setSeqInfo",seq)
+                    ts8sub.synchCommand(10,"setFitsFileNamePattern",flat_pat % (exptime,imdone+1))
+                    doLight = False
+                    doXED = False
+                    fitsfiles = ts8sub.synchCommand(100,"exposeAcquireAndSave",int(exptime*1000),doLight,doXED).getResult();
+                    print fitsfiles
+                else :
+
+                    rwl = monosub.synchCommand(900,"openShutter").getResult();
+                    time.sleep(exptime)
+                    rwl = monosub.synchCommand(900,"closeShutter").getResult();
+
 
                 print "Done exposing at %f" % time.time()
 
@@ -147,6 +217,8 @@ try:
 # reset timeout to something reasonable for a regular command
                 pdsub.synchCommand(1000,"setTimeout",10.);
 
+                imdone += 1
+
             seq = seq + 1
 
     fpfiles.close();
@@ -165,6 +237,8 @@ try:
     fp.close();
 
 
+# make sure to leave the monochromator shutter open
+    rwl = monosub.synchCommand(900,"openShutter").getResult();
 # get the glowing vacuum gauge back on
 #    print "turning the vacuum gauge back on"
 #    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);

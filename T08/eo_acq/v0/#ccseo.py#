@@ -212,7 +212,7 @@ if (True):
                 ts8sub.synchCommand(10,"setImageType","biasclear")
                 ts8sub.synchCommand(10,"setSeqInfo",seq)
                 try:
-                    rply = ts8sub.synchCommand(200,"exposeAcquireAndSave",0,False,False).getResult()
+                    rply = ts8sub.synchCommand(200,"exposeAcquireAndSave",0,False,False,"").getResult()
                     print "clearing acquisition completed"
                 except Exception, ex:
                     print "Proceeding despite error: %s" % str(ex)
@@ -233,7 +233,7 @@ if (True):
                     ts8sub.synchCommand(10,"setTestType",acqname.lower())
                     ts8sub.synchCommand(10,"setImageType","bias")
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
-                    rply = ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False).getResult()
+                    rply = ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False,"").getResult()
                     print "completed bias exposure"
                     i += 1
                     num_tries = 0
@@ -265,7 +265,7 @@ if (True):
                 ts8sub.synchCommand(10,"setImageType","prefluxcalib")
                 ts8sub.synchCommand(10,"setSeqInfo",seq)
                 try:
-                    testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False).getResult();
+                    testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False,"").getResult();
                 except:
                     pass
                 time.sleep(2.0)
@@ -280,7 +280,7 @@ if (True):
                         ts8sub.synchCommand(10,"setImageType","fluxcalib")
                         ts8sub.synchCommand(10,"setSeqInfo",seq)
 
-                        testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False).getResult();
+                        testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False,"").getResult();
 
                         success = True
                     except Exception, ex:

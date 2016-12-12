@@ -76,7 +76,7 @@ valbasesum = 0.
 for line in fp1:
     thisval = float(line.split(" ")[1])
     print "measurement = %11.3e" % thisval
-    if (thisval < -1e-11) :
+    if (thisval < -1e-9) :
 #        print "adding signal value"
         valsum  = valsum + thisval
         nval=nval+1.0
@@ -86,6 +86,9 @@ for line in fp1:
         valbasesum  = valbasesum + thisval
         nvalbase=nvalbase+1.0
         print "nvalbase = %f" % nvalbase
+
+nval = max(nval,1.0)
+nvalbase = max(nvalbase,1.0)
 
 mondiode1 = valsum / nval - valbasesum / nvalbase
 fp1.close()
@@ -97,12 +100,15 @@ valsum = 0.
 valbasesum = 0.
 for line in fp1:
     thisval = float(line.split(" ")[1])
-    if (thisval < -1e-11) :
+    if (thisval < -1e-9) :
         valsum  = valsum + thisval
         nval=nval+1.0
     else :
         valbasesum  = valbasesum + thisval
         nvalbase=nvalbase+1.0
+
+nval = max(nval,1.0)
+nvalbase = max(nvalbase,1.0)
 
 mondiode2 = valsum / nval - valbasesum / nvalbase
 fp1.close()
