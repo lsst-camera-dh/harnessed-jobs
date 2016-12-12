@@ -29,6 +29,7 @@ tstart = time.time()
 start_temp = {}
 for temp in ["A","B","C","D"]:
     start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
+    time.sleep(1.0)
 
 ts5sub.synchCommand(3000,"noStepScan  %s/RSA-calib.dat" % cdir)
 
@@ -36,6 +37,7 @@ tstop = time.time()
 stop_temp = {}
 for temp in ["A","B","C","D"]:
     stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
+    time.sleep(1.0)
 
 fpdat = open("%s/RSA-calib.dat" % (cdir),"a");
 fpdat.write("start time = %f , stop time = %f\n" % (tstart,tstop))

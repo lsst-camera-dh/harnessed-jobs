@@ -32,7 +32,7 @@ cur_temp = cryosub.synchCommand(20,"getTemp B").getResult()
 #cur_temp = 20.
 
 # number of degrees per minute
-trate = 0.2
+trate = 0.4
 
 # duration in seconds
 period = abs(target_temp - cur_temp) / (trate/60.0); 
@@ -57,10 +57,14 @@ if (True):
     cryosub.synchCommand(20000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
 
     while (True) :
-        now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
-        if (abs(target_temp-now_temp)<0.5) :
-            break
-        time.sleep(5.0)
+        try:
+            now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
+            if (abs(target_temp-now_temp)<0.5) :
+                break
+        except:
+            print "unable to read temperature"
+            pass
+        time.sleep(10.0)
         print "waiting for target temp to be reached. current temp = %fC" % now_temp
 
 ts5sub.synchCommand(30,"setCfgStateByName RTM")
