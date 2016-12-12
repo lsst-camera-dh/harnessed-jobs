@@ -19,7 +19,19 @@ def getCCDNames() :
     if not topdir:
         raise RuntimeError, 'cannot determine top-level data directory'
     
-# Connect to eTraveler (prod) server with intent to use Dev database
+    folder = ""
+    try:
+        folder = os.environ['LCATR_DATACATALOG_FOLDER']
+    except :
+        pass
+    if ('/Prod/' in folder) :
+        print "Connecting to eTraveler Prod"
+        conn = Connection('homer', 'Prod', prodServer=False)
+    else :
+        print "Connecting to eTraveler Dev"
+        conn = Connection('homer', 'Dev', prodServer=False)
+
+
     conn = Connection('homer', 'Prod', prodServer=False)
     if not conn:
         raise RuntimeError, 'unable to authenticate'
