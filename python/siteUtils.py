@@ -31,8 +31,6 @@ def getCCDNames() :
         print "Connecting to eTraveler Dev"
         conn = Connection('homer', 'Dev', prodServer=False)
 
-
-    conn = Connection('homer', 'Prod', prodServer=False)
     if not conn:
         raise RuntimeError, 'unable to authenticate'
     
