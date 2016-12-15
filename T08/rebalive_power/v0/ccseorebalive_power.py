@@ -154,7 +154,7 @@ if (True):
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
                 try:
-                    stat = ts8sub.synchCommand(120,"powerOn %d" % rebid).getResult()
+                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
                     print stat
     
                     print "------ %s Complete ------\n" % rebname 

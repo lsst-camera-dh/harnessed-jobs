@@ -183,8 +183,8 @@ try:
                     ts8sub.synchCommand(10,"setImageType",acqname.lower())
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
                     ts8sub.synchCommand(10,"setFitsFileNamePattern",flat_pat % (exptime,imdone+1))
-                    doLight = False
-                    doXED = False
+                    doLight = True
+                    doXED = True
                     fitsfiles = ts8sub.synchCommand(100,"exposeAcquireAndSave",int(exptime*1000),doLight,doXED).getResult();
                     print fitsfiles
                 else :
