@@ -83,21 +83,17 @@ if (True):
         raft = CCDID
 #        ts8sub.synchCommand(10,"setRaftLoc",str(raft))
 
-        exptime=4.0
+        exptime=0.0
 
         tm_start = time.time()
         print "Ready to take image with exptime = %f at time = %f" % (0,tm_start)
 
         ts8sub.synchCommand(10,"setTestType CONN")
-        ts8sub.synchCommand(10,"setImageType FLAT")
-# test with no XED
+        ts8sub.synchCommand(10,"setImageType BIAS")
 
 # <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-        result = ts8sub.synchCommand(700,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits");
-#
-#        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",100,False,False,fitsfilename);
-#        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",15000,False,False,fitsfilename);
-        something = result.getResult();
+        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",0,False,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
         
@@ -105,6 +101,24 @@ if (True):
         rebid = "raft"
         fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_start" % (istep,rebid),tm_start));
         fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_end" % (istep,rebid),tm_end));
+
+
+        ts8sub.synchCommand(10,"setTestType CONN")
+        ts8sub.synchCommand(10,"setImageType FLAT")
+
+        exptime=0.100
+
+        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_100ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+
+        exptime=4.000
+
+        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_4000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+
+        exptime=20.000
+
+        rply = ts8sub.synchCommand(180,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_20000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+
+
 
 
     fp.close();

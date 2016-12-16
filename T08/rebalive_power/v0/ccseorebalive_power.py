@@ -12,13 +12,14 @@ from java.lang import RuntimeException
 import sys
 import time
 import subprocess
-#import siteUtils
 
-#jobDir = siteUtils.getJobDir()
 
 
 CCS.setThrowExceptions(True);
 
+#################################################################
+#   Check that PS current levels are within acceptable range
+#################################################################
 def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
 
 #    print "Retrieving REB PS current %s " % pwr_chan
@@ -47,6 +48,14 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
 
     return
 
+
+######################################################################################
+########################      MAIN             #######################################
+########################          MAIN         #######################################
+######################################################################################
+
+# The following will cause an exception if not run as part of a harnessed job because
+# tsCWD and CCDID will not be defined in that case
 try:
     cdir = tsCWD
     unit = CCDID
@@ -73,6 +82,26 @@ if (True):
 #    print channames
     rebids = ts8sub.synchCommand(10,"getREBIds").getResult()
 
+    idmap = []
+
+    print "length = %d" % len(sys.argv)
+    print str(sys.argv)
+
+    for arg in sys.argv :
+        if ":" in arg :
+            idmap.append(arg)
+
+    if (len(idmap)==0) :
+        for rebid in rebids :
+            print "rebid = %s" % rebid
+            idmap.append("%d:%d" % (int(rebid),int(rebid)))
+
+    print "Will attempt to power on:"
+    for ids in idmap :
+        pwrid = int(ids.split(":")[0])
+        rebid = int(ids.split(":")[1])
+        print "power line %d for REB ID %d" % (pwrid,rebid)
+
 #    load default configuration
     ts8sub.synchCommand(10,"loadConfiguration")
 
@@ -80,12 +109,16 @@ if (True):
     ts8sub.synchCommand(10,"change tickMillis 100");
 #    ts8sub.synchCommand(10,"setTickMillis 100")
 
-    for rebid in rebids :
+#    for rebid in rebids :
+    for ids in idmap :
+        pwrid = int(ids.split(":")[0])
+        rebid = int(ids.split(":")[1])
+
         if status_value :
-            i = rebid
+            i = pwrid
             rebname = 'REB%d' % i
             print "****************************************************"
-            print " Starting power ON procedure for %s" % rebname
+            print " Starting power ON procedure for REB power line %s and REB %s" % (pwrid,rebname)
             print "****************************************************"
 
 
@@ -153,20 +186,24 @@ if (True):
                 time.sleep(2)
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
-                try:
-                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
-                    print stat
-    
-                    print "------ %s Complete ------\n" % rebname 
+
+                stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
+                print stat
+                
+                print "------ %s Complete ------\n" % rebname 
                 except RuntimeException, e:
                     print e
+                    print "setting tick and monitoring period to 10s"
+                    ts8sub.synchCommand(10,"change tickMillis 10000");
+                    raise e
                 except Exception, e:
                     print e
-    
+                    print "setting tick and monitoring period to 10s"
+                    ts8sub.synchCommand(10,"change tickMillis 10000");
+                    raise e
 
     print "setting tick and monitoring period to 10s"
     ts8sub.synchCommand(10,"change tickMillis 10000");
-#    ts8sub.synchCommand(10,"setTickMillis 10000")
 
     if status_value :
         print "DONE with successful powering of"
