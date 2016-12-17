@@ -102,8 +102,6 @@ if (True):
         rebid = int(ids.split(":")[1])
         print "power line %d for REB ID %d" % (pwrid,rebid)
 
-#    load default configuration
-    ts8sub.synchCommand(10,"loadConfiguration")
 
     print "setting tick and monitoring period to 0.5s"
     ts8sub.synchCommand(10,"change tickMillis 100");
@@ -186,11 +184,14 @@ if (True):
                 time.sleep(2)
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
-
-                stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
-                print stat
+#    load default configuration
+                ts8sub.synchCommand(10,"loadConfiguration Rafts:itl")
+                ts8sub.synchCommand(10,"loadConfiguration RaftsLimits:itl")
+                try:
+                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
+                    print stat
                 
-                print "------ %s Complete ------\n" % rebname 
+                    print "------ %s Complete ------\n" % rebname
                 except RuntimeException, e:
                     print e
                     print "setting tick and monitoring period to 10s"
