@@ -21,7 +21,7 @@ def getCCDNames() :
     
     folder = ""
     try:
-        folder = os.environ['LCATR_DATACATALOG_FOLDER']
+        folder = os.environ['LCATR_LIMS_URL']
     except :
         pass
     if ('/Prod/' in folder) :
