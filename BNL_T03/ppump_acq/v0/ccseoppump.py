@@ -51,7 +51,7 @@ try:
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
     wl     = float(eolib.getCfgVal(acqcfgfile, 'PPUMP_WL', default = "550.0"))
-    pcount = float(eolib.getCfgVal(acqcfgfile, 'PPUMP_BCOUNT', default = "25"))
+    pcount = int(eolib.getCfgVal(acqcfgfile, 'PPUMP_BCOUNT', default = "25"))
     imcount = 2
     
     print "setting the monochromator wavelength"
@@ -96,7 +96,7 @@ try:
         if ((len(tokens) > 0) and (tokens[0] == 'ppump')):
     
             exptime = float(tokens[1])
-            imcount = float(tokens[2])
+            imcount = int(tokens[2])
             nshifts  = float(tokens[3])
 
             result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)

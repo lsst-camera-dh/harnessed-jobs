@@ -193,8 +193,8 @@ try:
 #    xedsub.synchCommand(30,"retractFe55");
 
     print "Now collect some parameters from the config file"
-    bcount = float(eolib.getCfgVal(acqcfgfile, 'FE55_BCOUNT', default = "2"))
-    dcount = float(eolib.getCfgVal(acqcfgfile, 'FE55_DCOUNT', default = "2"))
+    bcount = int(eolib.getCfgVal(acqcfgfile, 'FE55_BCOUNT', default = "2"))
+    dcount = int(eolib.getCfgVal(acqcfgfile, 'FE55_DCOUNT', default = "2"))
 
     seq = 0
 
