@@ -13,15 +13,15 @@ import siteUtils
 def utc_now_isoformat():
     return datetime.datetime.utcnow().isoformat()
 
-def getSensorGains(jobname='fe55_analysis'):
-    sensor_id = siteUtils.getUnitId()
-    processName = siteUtils.getProcessName(jobname)
+def getSensorGains(jobname='fe55_analysis', sensor_id=None):
+    if sensor_id is None:
+        sensor_id = siteUtils.getUnitId()
     try:
         gain_file = dependency_glob('%s_eotest_results.fits' % sensor_id,
-                                    jobname=processName)[0]
+                                    jobname=jobname)[0]
     except IndexError:
         raise RuntimeError('eotestUtils.getSensorGains: %s %s'
-                           % (sensor_id, processName))
+                           % (sensor_id, jobname))
     data = sensorTest.EOTestResults(gain_file)
     amps = data['AMP']
     gains = data['GAIN']
@@ -49,7 +49,7 @@ def getEotestCalibsFile():
 
 def getEotestCalibs():
     """
-    Return calibration file names for the current test stand.  
+    Return calibration file names for the current test stand.
     """
     try:
         pars = siteUtils.Parfile(getEotestCalibsFile(), getTestStandHostName())
