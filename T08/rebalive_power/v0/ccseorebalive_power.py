@@ -185,11 +185,11 @@ if (True):
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
 #    load default configuration
-                ts8sub.synchCommand(10,"loadConfiguration Rafts:itl")
-                ts8sub.synchCommand(10,"loadConfiguration RaftsLimits:itl")
+                ts8sub.synchCommand(10,"loadCategories Rafts:itl")
+                ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
                 try:
-                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
-                    print stat
+#                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
+#                    print stat
                 
                     print "------ %s Complete ------\n" % rebname
                 except RuntimeException, e:

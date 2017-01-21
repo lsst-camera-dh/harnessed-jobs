@@ -253,8 +253,15 @@ if (True):
             if (('FLAT' in acqname or 'LAMBDA' in acqname) and wl!=owl):
                                             
                 print "Setting monochromator lambda = %8.2f" % wl
-                result = monosub.synchCommand(60,"setWaveAndFilter",wl);
-                rwl = result.getResult()
+                for itry in range(3) :
+                    try:
+                        rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
+                        break
+                    except:
+                        time.sleep(5.0)
+                        print "trying again"
+                        pass
+
                 time.sleep(10.0)
                 print "publishing state"
                 result = tssub.synchCommand(60,"publishState");
@@ -335,15 +342,19 @@ if (True):
             else :
                 nplc = 0.25
 
-            nreads = (exptime+6.0)*60/nplc
-            if (nreads > 3000):
-                nreads = 3000
-                nplc = (exptime+6.0)*60/nreads
+            MAX_READS = 3000
+            if 'DARK' in acqname :
+                MAX_READS = 1000
+
+            nreads = (exptime+2.0)*60/nplc
+            if (nreads > MAX_READS):
+                nreads = MAX_READS
+                nplc = (exptime+2.0)*60/nreads
                 print "Nreads limited to 3000. nplc set to %f to cover full exposure period " % nplc
 
 
 # adjust timeout because we will be waiting for the data to become ready
-            mywait = nplc/60.*nreads*3.00 ;
+            mywait = nplc/60.*nreads*1.50 ;
             print "Setting timeout to %f s" % mywait
 #temp            pdsub.synchCommand(1000,"setTimeout",mywait);
 
@@ -411,7 +422,7 @@ if (True):
 # make sure the sample of the photo diode is complete
                         time.sleep(2.)
 
-                        print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)
+                        print "executing readBuffer at %d, cdir=%s , pdfilename = %s" % (time.time(),cdir,pdfilename)
 
 #                result = pdsub.synchCommand(1000,"readBuffer","/tmp/%s" % pdfilename);
                         result = pdsub.synchCommand(1000,"readBuffer","/%s/%s" % (cdir,pdfilename),"ts8prod@ts8-raft1");
