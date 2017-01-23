@@ -195,7 +195,7 @@ if (True):
 # ==================================================
             print "setting location of fits directory"
 
-            ts8sub.synchCommand(10,"setDefaultImageDirectory","%s/${sensorLoc}" % (cdir));
+            ts8sub.synchCommand(10,"setDefaultImageDirectory","%s/S${sensorLoc}" % (cdir));
 
             ts8sub.synchCommand(10,"setRaftName",str(raft))
             ts8sub.synchCommand(10,"setRunNumber",runnum)
