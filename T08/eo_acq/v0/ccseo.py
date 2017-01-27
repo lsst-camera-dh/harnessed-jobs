@@ -188,7 +188,7 @@ if (True):
                     nshifts  = float(tokens[3])
                 elif 'FE55' in acqname :
                     doXED = True
-            print "found instructions for exptime = %f and image count = %d" % (exptime,imcount)
+            print "\nfound instruction (%s) with image count = %d" % (line,imcount)
 
 # ==================================================
 # setup meta data for these exposures
@@ -212,7 +212,7 @@ if (True):
                 ts8sub.synchCommand(10,"setImageType","biasclear")
                 ts8sub.synchCommand(10,"setSeqInfo",seq)
                 try:
-                    rply = ts8sub.synchCommand(200,"exposeAcquireAndSave",0,False,False).getResult()
+                    rply = ts8sub.synchCommand(500,"exposeAcquireAndSave",0,False,False).getResult()
                     print "clearing acquisition completed"
                 except Exception, ex:
                     print "Proceeding despite error: %s" % str(ex)
@@ -233,7 +233,7 @@ if (True):
                     ts8sub.synchCommand(10,"setTestType",acqname.lower())
                     ts8sub.synchCommand(10,"setImageType","bias")
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
-                    rply = ts8sub.synchCommand(50,"exposeAcquireAndSave",0,False,False).getResult()
+                    rply = ts8sub.synchCommand(150,"exposeAcquireAndSave",0,False,False).getResult()
                     print "completed bias exposure"
                     i += 1
                     num_tries = 0
@@ -305,8 +305,9 @@ if (True):
                 for flncal in testfitsfiles:
                     flncalpath = glob.glob("%s/*/%s" % (tsCWD,flncal))[0]
                     print "full flux file path = %s" % flncalpath
-                    result = ts8sub.synchCommand(10,"getFluxStats","%s" % flncalpath);
-                    fluxsum += float(result.getResult());
+                    fluxfl = float(ts8sub.synchCommand(10,"getFluxStats","%s" % flncalpath).getResult());
+                    print "flux = ",fluxfl
+                    fluxsum += fluxfl;
                     nflux=nflux+1;
 
                 flux = fluxsum / nflux;
@@ -319,7 +320,7 @@ if (True):
                 if (flux < 2.0) :
                 # must be a test
                     flux = 300.0
-                print "SETTING A DEFAULT TEST FLUX OF 300 DUE TO APPARENT NO SENSOR TEST IN PROGRESS"
+                    print "SETTING A DEFAULT TEST FLUX OF 300 DUE TO APPARENT NO SENSOR TEST IN PROGRESS"
 
 ####################### End of flux calib section ###########################################
 
@@ -342,8 +343,8 @@ if (True):
             else :
                 nplc = 0.25
 
-            MAX_READS = 3000
-            if 'DARK' in acqname :
+            MAX_READS = 2048
+            if 'DARK' in acqname or 'FE55' in acqname :
                 MAX_READS = 1000
 
             nreads = (exptime+2.0)*60/nplc
@@ -387,7 +388,7 @@ if (True):
                     timestamp = time.time()
 
 # make sure to get some readings before the state of the shutter changes       
-                    time.sleep(1.0);
+                    time.sleep(0.2);
 
                     print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
                 
@@ -420,7 +421,7 @@ if (True):
                         tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
-                        time.sleep(2.)
+                        time.sleep(10.)
 
                         print "executing readBuffer at %d, cdir=%s , pdfilename = %s" % (time.time(),cdir,pdfilename)
 
@@ -447,8 +448,9 @@ if (True):
                         raise Exception('TOO MANY RETRIES! %s' % str(ex))
                     else :
                         print "something went wrong during the exposure ... RETRYING: %s" % str(ex)
-                        rply = pdsub.synchCommand(10,"softReset").getResult()
-                        time.sleep(10.0)
+                        time.sleep(20.0)
+                        rply = pdsub.synchCommand(30,"reset").getResult()
+                        time.sleep(20.0)
                 print "checking ... imdone = %d" % imdone
             print "incrementing sequence number"
             seq += 1

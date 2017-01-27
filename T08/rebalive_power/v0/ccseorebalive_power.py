@@ -188,8 +188,8 @@ if (True):
                 ts8sub.synchCommand(10,"loadCategories Rafts:itl")
                 ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
                 try:
-#                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
-#                    print stat
+                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
+                    print stat
                 
                     print "------ %s Complete ------\n" % rebname
                 except RuntimeException, e:

@@ -5,6 +5,7 @@ import org.lsst.ccs.subsystem.rafts.DacControl;
 import org.lsst.ccs.subsystem.rafts.AspicControl;
 import org.lsst.ccs.subsystem.rafts.CabacControl;
 import org.lsst.ccs.subsystem.rafts.BiasControl;
+import org.lsst.ccs.subsystem.rafts.TempControl;
 import org.lsst.ccs.subsystem.monitor.Channel;
 import org.lsst.ccs.utilities.ccd.*;
 import org.lsst.ccs.utilities.image.*;
@@ -24,8 +25,8 @@ reb0 = Reb.createReb(type);
 raftGeometry.addChildGeometry(reb0, 0, 0);
 reb1 = Reb.createReb(type);
 raftGeometry.addChildGeometry(reb1, 1, 0);
-//reb2 = Reb.createReb(type);
-//raftGeometry.addChildGeometry(reb2, 2, 0);
+reb2 = Reb.createReb(type);
+raftGeometry.addChildGeometry(reb2, 2, 0);
 
 def runMode = System.getProperty("org.lsst.ccs.run.mode","normal");
 System.out.println("Building TS8 subsystem in run mode: "+runMode);
@@ -38,6 +39,10 @@ CCSBuilder builder = ["ts8"]
 builder.
     "main" (TS8Subsystem, tickMillis:10000, geometry:raftGeometry, clientFactory:mainClientFactory) { 
     
+	TempCtrl   (TempControl, gain: 0.1, timeConst: 120.0, smoothTime: 20.0,
+                maxOutput: 5.6, awGain: 4.0, basePower: 0.0, tolerance: 0.05,
+                updateTime: 30000, rebs: ["R00.Reb0", "R00.Reb2"], tempChans: ["R00.Reb0.CCDTemp1", "R00.Reb1.CCDTemp1", "R00.Reb2.CCDTemp1"])
+
         for (Reb rebGeometry : raftGeometry.getChildrenList() ) {
             def rebCount = rebGeometry.getParallelPosition();
             def reb = rebGeometry.getUniqueId();
@@ -65,12 +70,14 @@ builder.
 
         "Page$rebCount" (Page, id: rebCount, label: "${reb}")
 
+
         String title = "${reb} temperatures\\"
         for (int j = 1; j <= 10; j++) {
             "${reb}.Temp$j" (Channel, description: "${title}Board temperature $j", units: "\u00b0C",
                              devcName: "${reb}", hwChan: j - 1, type: "TEMP", pageId: rebCount)
             title = ""
         }
+
 
         "${reb}.Atemp0U" (Channel, description: "ASPIC 0 upper temp", units: "\u00b0C",
                           devcName: "${reb}", hwChan: 0, type: "ATEMP", pageId: rebCount)
@@ -98,6 +105,12 @@ builder.
         "${reb}.RTDTemp" (Channel, description: "RTD temperature", units: "\u00b0C",
                           devcName: "${reb}", hwChan: 3, type: "RTD", pageId: rebCount)
 //*/
+        "${reb}.HtrV"    (Channel, description: "$reb heater\\Heater voltage", units: "Volts",
+                      devcName: "${reb}", hwChan: REBDevice.CHAN_HTR_VOLTS, type: "HEATER", pageId: rebCount)
+
+        "${reb}.HtrW"    (Channel, description: "Heater power", units: "Watts",
+                      devcName: "${reb}", hwChan: REBDevice.CHAN_HTR_POWER, type: "HEATER", pageId: rebCount)
+
         "${reb}.DigV"    (Channel, description: "${reb} board power\\Digital PS voltage", units: "Volts",
                           devcName: "${reb}", hwChan: 0, type: "POWER", pageId: rebCount)
 
