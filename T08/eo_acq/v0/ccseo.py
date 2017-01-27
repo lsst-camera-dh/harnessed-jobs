@@ -128,14 +128,18 @@ if (True):
 # exposure time
     exptime = -1
 # default file pattern
-    def_pat = "${CCDSerialLSST}_${TestType}_${ImageType}_${SequenceInfo}_${RunNumber}_${timestamp}.fits"
+    def_pat = "${CCDSerialLSST}_${testType}_${imageType}_${SequenceInfo}_${RunNumber}_${timestamp}.fits"
     ts8sub.synchCommand(10,"setFitsFileNamePattern",def_pat)
 # flat file pattern
 # E2V-CCD250-179_flat_0065.07_flat2_20161130064552.fits
-    flat_pat = '${CCDSerialLSST}_${TestType}_%07.2fs_${ImageType}%d_${RunNumber}_${timestamp}.fits'
+    flat_pat = '${CCDSerialLSST}_${testType}_%07.2fs_${imageType}%d_${RunNumber}_${timestamp}.fits'
 # qe file pattern
 # E2V-CCD250-179_lambda_flat_1100_076_20161130124533.fits
-    qe_pat = '${CCDSerialLSST}_${TestType}_${ImageType}_%4.4d_${RunNumber}_${timestamp}.fits'
+    qe_pat = '${CCDSerialLSST}_${testType}_${imageType}_%4.4d_${RunNumber}_${timestamp}.fits'
+# sflat file pattern
+# E2V-CCD250-179_lambda_flat_1100_076_20161130124533.fits
+    sflat_pat = '${CCDSerialLSST}_${testType}_%3.3d_${imageType}_%s%3.3d_${timestamp}.fits'
+
 
 
     print "Working on RAFT %s" % raft
@@ -168,11 +172,16 @@ if (True):
             doLight = False
 
             if 'FLAT' in acqname :
-# exptime will be set later using the flux calib
-                target = float(tokens[1])
 # .. indicate that the exposure time must be recalculated
                 exptime = -1
                 doLight = True
+                if 'SFLAT' in acqname :
+                    wl = int(tokens[1])
+                    target = int(tokens[2])
+                    imcount = int(tokens[3])
+                else :
+# exptime will be set later using the flux calib
+                    target = float(tokens[1])
 # imcount was already set
             elif 'LAMBDA' in acqname :
                 wl = int(tokens[1])
@@ -208,17 +217,18 @@ if (True):
             for i in range(1):
                 timestamp = time.time()
                 print "Ready to take clearing bias image. time = %f" % time.time()
-                ts8sub.synchCommand(10,"setTestType",acqname.lower())
+                ts8sub.synchCommand(10,"setTestType",acqname.upper())
                 ts8sub.synchCommand(10,"setImageType","biasclear")
                 ts8sub.synchCommand(10,"setSeqInfo",seq)
                 try:
-                    rply = ts8sub.synchCommand(500,"exposeAcquireAndSave",0,False,False).getResult()
+                    rply = ts8sub.synchCommand(500,"exposeAcquireAndSave",0,False,False,"").getResult()
                     print "clearing acquisition completed"
                 except Exception, ex:
                     print "Proceeding despite error: %s" % str(ex)
                     pass
                 print "after click click at %f" % time.time()
 
+            ts8sub.synchCommand(10,"setFitsFileNamePattern",def_pat)
             time.sleep(3.0)
 # now do the useful bias acquisitions
             num_tries = 0
@@ -230,7 +240,7 @@ if (True):
                     print "Ready to take bias image. time = %f" % time.time()
 
 
-                    ts8sub.synchCommand(10,"setTestType",acqname.lower())
+                    ts8sub.synchCommand(10,"setTestType",acqname.upper())
                     ts8sub.synchCommand(10,"setImageType","bias")
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
                     rply = ts8sub.synchCommand(150,"exposeAcquireAndSave",0,False,False).getResult()
@@ -268,11 +278,11 @@ if (True):
 
 
 # dispose of first image
-                ts8sub.synchCommand(10,"setTestType",acqname.lower())
+                ts8sub.synchCommand(10,"setTestType",acqname.upper())
                 ts8sub.synchCommand(10,"setImageType","prefluxcalib")
                 ts8sub.synchCommand(10,"setSeqInfo",seq)
                 try:
-                    testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False).getResult();
+                    testfitsfiles = ts8sub.synchCommand(500,"exposeAcquireAndSave",2000,True,False,"").getResult();
                 except:
                     pass
                 time.sleep(2.0)
@@ -283,7 +293,7 @@ if (True):
                 max_tries = 3
                 while not success:
                     try:
-                        ts8sub.synchCommand(10,"setTestType",acqname.lower())
+                        ts8sub.synchCommand(10,"setTestType",acqname.upper())
                         ts8sub.synchCommand(10,"setImageType","fluxcalib")
                         ts8sub.synchCommand(10,"setSeqInfo",seq)
 
@@ -392,13 +402,20 @@ if (True):
 
                     print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
                 
-                    ts8sub.synchCommand(10,"setTestType",acqname.lower())
-                    ts8sub.synchCommand(10,"setImageType",acqname.lower())
+                    ts8sub.synchCommand(10,"setTestType",acqname.upper().replace("PPUMP","TRAP"))
+                    ts8sub.synchCommand(10,"setImageType",acqname.upper().replace("SFLAT","FLAT"))
+
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
 #                        ts8sub.synchCommand(10,"setSeqInfo","%s_%07.2f" % (str(seq),exptime))
 
                     if 'FLAT' in acqname :
-                        ts8sub.synchCommand(10,"setFitsFileNamePattern",flat_pat % (exptime,imdone+1))
+                        if 'SFLAT' in acqname :
+                            lohiflux = "L"
+                            if (target>10000) :
+                                lohiflux = "H"
+                            ts8sub.synchCommand(10,"setFitsFileNamePattern",sflat_pat % (int(wl),lohiflux,imdone+1))
+                        else :
+                            ts8sub.synchCommand(10,"setFitsFileNamePattern",flat_pat % (exptime,imdone+1))
                     if 'LAMBDA' in acqname :
                         ts8sub.synchCommand(10,"setFitsFileNamePattern",qe_pat % int(wl))
 
