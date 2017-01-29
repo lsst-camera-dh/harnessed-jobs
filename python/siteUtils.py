@@ -258,6 +258,8 @@ def dependency_glob(pattern, jobname=None, paths=None, description=None,
 
 def packageVersions(versions_filename='installed_versions.txt'):
     versions_file = os.path.join(os.environ['INST_DIR'], versions_filename)
+    if not os.path.isfile(versions_file):
+        return []
     parser = ConfigParser.ConfigParser()
     parser.optionxform = str
     parser.read(versions_file)
@@ -270,10 +272,10 @@ def packageVersions(versions_filename='installed_versions.txt'):
     return results
 
 def jobInfo():
-    results = [packageVersions(),
-               lcatr.schema.valid(lcatr.schema.get('job_info'),
-                                  job_name=os.environ['LCATR_JOB'],
-                                  job_id=os.environ['LCATR_JOB_ID'])]
+    results = packageVersions()
+    results.append(lcatr.schema.valid(lcatr.schema.get('job_info'),
+                                      job_name=os.environ['LCATR_JOB'],
+                                      job_id=os.environ['LCATR_JOB_ID']))
     return results
 
 class Parfile(dict):
