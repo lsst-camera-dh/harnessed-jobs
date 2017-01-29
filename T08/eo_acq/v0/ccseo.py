@@ -108,9 +108,8 @@ if (True):
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, '%s_LOLIM' % acqname, default='0.025'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, '%s_HILIM' % acqname, default='600.0'))
-    bcount = int(eolib.getCfgVal(acqcfgfile, '%s_BCOUNT' % acqname, default='1'))
 
-    imcount = 0
+# image count
     if 'FLAT' in acqname :
         imcount = int(eolib.getCfgVal(acqcfgfile, '%s_IMCOUNT' % acqname, default='2'))
     else :
@@ -118,7 +117,7 @@ if (True):
     wl     = float(eolib.getCfgVal(acqcfgfile, '%s_WL' % acqname, default = "550.0"))
 
 # bias image count
-    bcount = 1
+    bcount = int(eolib.getCfgVal(acqcfgfile, '%s_BCOUNT' % acqname, default='1'))
 # sequence number
     seq = 0
 # old wave length setting
@@ -138,7 +137,7 @@ if (True):
     qe_pat = '${CCDSerialLSST}_${testType}_${imageType}_%4.4d_${RunNumber}_${timestamp}.fits'
 # sflat file pattern
 # E2V-CCD250-179_lambda_flat_1100_076_20161130124533.fits
-    sflat_pat = '${CCDSerialLSST}_${testType}_%3.3d_${imageType}_%s%3.3d_${timestamp}.fits'
+    sflat_pat = '${CCDSerialLSST}_${testType}_${imageType}_%s%3.3d_${timestamp}.fits'
 
 
 
@@ -213,26 +212,28 @@ if (True):
 # take bias images
 # ==================================================
 
-# probably not needed any more ... reduce count to 1
-            for i in range(1):
+# probably not needed any more 
+            for i in range(7):
                 timestamp = time.time()
                 print "Ready to take clearing bias image. time = %f" % time.time()
                 ts8sub.synchCommand(10,"setTestType",acqname.upper())
                 ts8sub.synchCommand(10,"setImageType","biasclear")
                 ts8sub.synchCommand(10,"setSeqInfo",seq)
                 try:
-                    rply = ts8sub.synchCommand(500,"exposeAcquireAndSave",0,False,False,"").getResult()
+                    rply = ts8sub.synchCommand(500,"exposeAcquireAndSave",50,False,False,"").getResult()
                     print "clearing acquisition completed"
                 except Exception, ex:
                     print "Proceeding despite error: %s" % str(ex)
                     pass
                 print "after click click at %f" % time.time()
+                time.sleep(1.0)
 
             ts8sub.synchCommand(10,"setFitsFileNamePattern",def_pat)
             time.sleep(3.0)
 # now do the useful bias acquisitions
             num_tries = 0
             max_tries = 3
+            i = 0
             while i<bcount:
                 try:
                     timestamp = time.time()
@@ -240,8 +241,8 @@ if (True):
                     print "Ready to take bias image. time = %f" % time.time()
 
 
-                    ts8sub.synchCommand(10,"setTestType",acqname.upper())
-                    ts8sub.synchCommand(10,"setImageType","bias")
+                    ts8sub.synchCommand(10,"setTestType",acqname.upper().replace("PPUMP","TRAP").replace("SFLAT","SFLAT_%3.3d"%int(wl)))
+                    ts8sub.synchCommand(10,"setImageType","BIAS")
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
                     rply = ts8sub.synchCommand(150,"exposeAcquireAndSave",0,False,False).getResult()
                     print "completed bias exposure"
@@ -375,13 +376,32 @@ if (True):
             num_tries = 0
             max_tries = 3
             imdone=0
-            print "starting exposure sequence %d for %d images" % (seq,imcount)
+            print "\n\n\n ######################################################################## "
+            print "\n       starting exposure sequence %d of %d for %d images" % (seq,number_instr,imcount)
+            print "\n ######################################################################## "
             while imdone<imcount :
                 try:
-                    print "images completed number = %d" % imdone
-
+                    print "\n ######################################################################## "
+                    print "\n            image number %d in 0->%d in sequence %d in 0->%d  -- try#%d   " % (imdone,imcount-1,seq,number_instr-1,num_tries)
+                    print "\n ######################################################################## "
+                    print " starting clearing "
+                    for i in range(3):
+                        timestamp = time.time()
+                        print "Ready to take clearing bias image. time = %f" % time.time()
+                        ts8sub.synchCommand(10,"setTestType",acqname.upper())
+                        ts8sub.synchCommand(10,"setImageType","biasclear")
+                        ts8sub.synchCommand(10,"setSeqInfo",seq)
+                        try:
+                            rply = ts8sub.synchCommand(500,"exposeAcquireAndSave",0,False,False,"").getResult()
+                            print "image done"
+                        except Exception, ex:
+                            print "Proceeding despite error: %s" % str(ex)
+                            pass
+                        print "after click click at %f" % time.time()
+                        time.sleep(1)
+                    print "done clearing"
                     if (doPD) :
-                        print "call accumBuffer to start PD recording at %f" % time.time()
+                        print "calling accumBuffer to start IS photodiode recording at %f" % time.time()
                         pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
 
                         while(True) :
@@ -402,8 +422,8 @@ if (True):
 
                     print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
                 
-                    ts8sub.synchCommand(10,"setTestType",acqname.upper().replace("PPUMP","TRAP"))
-                    ts8sub.synchCommand(10,"setImageType",acqname.upper().replace("SFLAT","FLAT"))
+                    ts8sub.synchCommand(10,"setTestType",acqname.upper().replace("PPUMP","TRAP").replace("SFLAT","SFLAT_%3.3d"%int(wl)))
+                    ts8sub.synchCommand(10,"setImageType",acqname.upper().replace("SFLAT","FLAT").replace("LAMBDA","FLAT"))
 
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
 #                        ts8sub.synchCommand(10,"setSeqInfo","%s_%07.2f" % (str(seq),exptime))
@@ -413,7 +433,7 @@ if (True):
                             lohiflux = "L"
                             if (target>10000) :
                                 lohiflux = "H"
-                            ts8sub.synchCommand(10,"setFitsFileNamePattern",sflat_pat % (int(wl),lohiflux,imdone+1))
+                            ts8sub.synchCommand(10,"setFitsFileNamePattern",sflat_pat % (lohiflux,imdone+1))
                         else :
                             ts8sub.synchCommand(10,"setFitsFileNamePattern",flat_pat % (exptime,imdone+1))
                     if 'LAMBDA' in acqname :
@@ -422,8 +442,7 @@ if (True):
                     fitsfiles = ts8sub.synchCommand(700,"exposeAcquireAndSave",int(exptime*1000),doLight,doXED).getResult();
                     ts8sub.synchCommand(10,"setFitsFileNamePattern",def_pat)
 
-                    print "after click click at %f" % time.time()
-                    print "done with exposure # %d" % imdone
+                    print "image %d done at %f" % (imdone,time.time())
 
 # =======================================
 #  retrieve the photodiode readings
