@@ -214,7 +214,7 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     files = files+glob.glob('*/*.fits')
     files = files+glob.glob('*/*.fits.gz')
     files = files+glob.glob('*log*')
-    files = files+glob.glob('*summary*')
+#    files = files+glob.glob('*summary*')
     files = files+glob.glob('*.png')
     files = files+glob.glob('*.dat')
     files = files+glob.glob('*.txt')

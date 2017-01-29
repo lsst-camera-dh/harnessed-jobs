@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import pickle
 import subprocess
 import socket
@@ -19,8 +20,18 @@ def getCCDNames() :
     if not topdir:
         raise RuntimeError, 'cannot determine top-level data directory'
     
-# Connect to eTraveler (prod) server with intent to use Dev database
-    conn = Connection('homer', 'Prod', prodServer=False)
+    folder = ""
+    try:
+        folder = os.environ['LCATR_LIMS_URL']
+    except :
+        pass
+    if ('/Prod/' in folder) :
+        print "Connecting to eTraveler Prod"
+        conn = Connection('homer', 'Prod', prodServer=False)
+    else :
+        print "Connecting to eTraveler Dev"
+        conn = Connection('homer', 'Dev', prodServer=False)
+
     if not conn:
         raise RuntimeError, 'unable to authenticate'
     
@@ -145,10 +156,14 @@ def getProcessName(jobName=None):
         myJobName = getJobName()
     else:
         myJobName = jobName
-    if os.environ.has_key('ET_PROCESS_NAME_PREFIX'):
-        return '_'.join((os.environ['ET_PROCESS_NAME_PREFIX'], myJobName))
-    else:
-        return myJobName
+
+    if os.environ.has_key('LCATR_PROCESS_NAME_PREFIX'):
+        myJobName = '_'.join((os.environ['LCATR_PROCESS_NAME_PREFIX'],
+                              myJobName))
+    if os.environ.has_key('LCATR_PROCESS_NAME_SUFFIX'):
+        myJobName = '_'.join((myJobName,
+                              os.environ['LCATR_PROCESS_NAME_SUFFIX']))
+    return myJobName
 
 def getJobDir(jobName=None):
     """
@@ -297,6 +312,7 @@ def get_prerequisite_job_id(pattern, jobname=None, paths=None,
     # The job id is supposed to be the name of the lowest-level folder
     # containing the requested files.
     #
+    print files[0]
     job_id = os.path.split(os.path.split(files[0])[0])[1]
     return job_id
 
@@ -337,3 +353,14 @@ def aggregate_job_ids():
     pickle.dump(my_dependencies, open(pickle_file, 'w'))
     return my_dependencies
 
+def make_fileref(current_path, folder=None, metadata=None,
+                 datatype='LSSTSENSORTEST'):
+    if folder is not None:
+        filename = os.path.basename(current_path)
+        if not os.path.isdir(folder):
+            os.mkdir(folder)
+        new_path = os.path.join(folder, filename)
+        shutil.copy(current_path, new_path)
+        current_path = new_path
+    return lcatr.schema.fileref.make(current_path, datatype=datatype,
+                                     metadata=metadata)

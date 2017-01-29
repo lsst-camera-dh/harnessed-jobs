@@ -41,7 +41,7 @@ try:
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
-    bcount = float(eolib.getCfgVal(acqcfgfile, 'DARK_BCOUNT', default = "3"))
+    bcount = int(eolib.getCfgVal(acqcfgfile, 'DARK_BCOUNT', default = "3"))
 
 # wait until its dark .... very dark
     time.sleep(30.)

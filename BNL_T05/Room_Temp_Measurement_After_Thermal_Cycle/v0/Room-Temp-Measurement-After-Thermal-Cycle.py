@@ -54,7 +54,7 @@ if (True):
         time.sleep(5.)
 ###################################################################
 
-    pdusub.synchCommand(120,"setOutletState",cryo_outlet,False).getResult()
+#    pdusub.synchCommand(120,"setOutletState",cryo_outlet,False).getResult()
 
     cryosub.synchCommand(40000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
 

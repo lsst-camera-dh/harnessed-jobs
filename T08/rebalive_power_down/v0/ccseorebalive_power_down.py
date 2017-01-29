@@ -84,7 +84,7 @@ if (True):
 
             print "TURNING OFF REB CLOCK AND RAIL VOLTAGES"
             try:
-                stat = ts8sub.synchCommand(120,"powerOff %d" % rebid).getResult()
+                stat = ts8sub.synchCommand(300,"powerOff %d" % rebid).getResult()
                 print stat
 
                 print "------ %s Complete ------\n" % rebname 

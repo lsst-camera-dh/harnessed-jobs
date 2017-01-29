@@ -194,7 +194,10 @@ def hdrsummary(filename,outfile):
         outfl.write("Monochromator wavelength = %f\n" % phdr['MONOWL'])
     except:
         outfl.write("Monochromator wavelength = N/A\n")
-    outfl.write("CCD temperature     = %f\n" % phdr['CCDTEMP'])
+    try:
+        outfl.write("CCD temperature     = %f\n" % phdr['CCDTEMP'])
+    except:
+        outfl.write("CCD temperature     = N/A\n")
     outfl.write("Photodiode reading  = %f\n" % phdr['MONDIODE'])
     outfl.write("Filter position     = %d\n" % phdr['FILTPOS'])
     try:
@@ -319,5 +322,5 @@ def updateFitsHeaders(acqfilelist, summaryFile="summary.txt"):
 #            raise RuntimeError("Problem running fitsAverage for %s" % fitsfile)
         try:
             hdrsummary(fitsfile, summaryFile)
-        except:
-            raise RuntimeError("Problem running hdrsummary for %s" % fitsfile)
+        except Exception, ex:
+            raise RuntimeError("Problem running hdrsummary for %s : Error = %s" % (fitsfile,str(ex)))

@@ -35,18 +35,26 @@ schemaFile.write("    \'schema_name\' : \'%s_runtime\',\n"%jobName)
 schemaFile.write("    \'schema_version\' : 0,\n")
 
 statusFile = open("rebalive_results.txt")
+lnum = 0
 for line in statusFile:
     print "line = %s" % line
-    values = line.split("|")
-    val = values[1].strip("[|]").strip(",")
-    aa = values[0]
-    if not "device" in aa and not "wire" in aa :
-        schemaFile.write("    \'%s\' : float,\n"%values[0])
-        if "fail" in val :
-            val = -9999999.
-    else :
-        schemaFile.write("    \'%s\' : str,\n"%values[0])
-    statusAssignments[values[0]] = val
+
+#    line = line.replace('OK','<font color="green">OK</font>').replace('FAILED','<font color="red">FAILED</font>')
+
+    key = "line%03d" % lnum
+    statusAssignments[key] = "%s" % line
+    schemaFile.write("    \'%s\' : str,\n" % key)
+
+    lnum = lnum + 1
+
+while (lnum<240):
+    key = "line%03d" % lnum
+    statusAssignments[key] = "blank"
+    schemaFile.write("    \'%s\' : str,\n"%key)
+
+    lnum = lnum + 1
+
+
 schemaFile.write("}\n")
 schemaFile.close()
 

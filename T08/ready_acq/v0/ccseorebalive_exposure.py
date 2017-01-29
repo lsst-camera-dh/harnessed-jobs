@@ -49,7 +49,7 @@ if (True):
         status_value = "failed"
     fp.write("%s| %s\n" % (test_name,status_value));
 
-    for i in range(5) :
+    for i in range(2) :
 #        fp.write("\n\nREB ID = %s\n" % rebid)
 #        fp.write("==============================\n")
 
@@ -66,7 +66,7 @@ if (True):
 #        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-model-geo2.seq");
  #        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-modelv2.seq");
 # ITL seq file
-        result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v4.seq");
+        result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v6-pntr-explicit.seq");
  
 #14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.
 
@@ -81,15 +81,19 @@ if (True):
         ts8sub.synchCommand(10,"setTestType","FE55")
 
         raft = CCDID
-        ts8sub.synchCommand(10,"setRaftLoc",str(raft))
+#        ts8sub.synchCommand(10,"setRaftLoc",str(raft))
 
-        
+        exptime=0.0
+
         tm_start = time.time()
         print "Ready to take image with exptime = %f at time = %f" % (0,tm_start)
-        
-#        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",100,False,False,fitsfilename);
-        result = ts8sub.synchCommand(500,"exposeAcquireAndSave",15000,False,False,fitsfilename);
-        something = result.getResult();
+
+        ts8sub.synchCommand(10,"setTestType CONN")
+        ts8sub.synchCommand(10,"setImageType BIAS")
+
+# <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
+        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",0,False,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
         
@@ -97,6 +101,24 @@ if (True):
         rebid = "raft"
         fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_start" % (istep,rebid),tm_start));
         fp.write("%s| %s \n" % ("Step%d_%s_bias_exposure_t_end" % (istep,rebid),tm_end));
+
+
+        ts8sub.synchCommand(10,"setTestType CONN")
+        ts8sub.synchCommand(10,"setImageType FLAT")
+
+        exptime=0.100
+
+        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_100ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+
+        exptime=4.000
+
+        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_4000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+
+        exptime=20.000
+
+        rply = ts8sub.synchCommand(180,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_20000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+
+
 
 
     fp.close();

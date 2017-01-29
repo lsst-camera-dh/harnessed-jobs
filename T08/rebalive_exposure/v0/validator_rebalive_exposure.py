@@ -12,7 +12,7 @@ shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
-#os.system("./rebalive_plots.sh")
+os.system("./rebalive_plots.sh")
 
 jobName = "rebalive_exposure"
 
@@ -36,11 +36,26 @@ schemaFile.write("    \'schema_name\' : \'%s_runtime\',\n"%jobName)
 schemaFile.write("    \'schema_version\' : 0,\n")
 
 statusFile = open("rebalive_results.txt")
+lnum = 0
 for line in statusFile:
     print "line = %s" % line
-    values = line.split("|")
-    statusAssignments[values[0]] = values[1].strip("[|]").strip(",")
-    schemaFile.write("    \'%s\' : str,\n"%values[0])
+
+#    line = line.replace('OK','<font color="green">OK</font>').replace('FAILED','<font color="red">FAILED</font>')
+
+    key = "line%03d" % lnum
+    statusAssignments[key] = "%s" % line
+    schemaFile.write("    \'%s\' : str,\n" % key)
+
+    lnum = lnum + 1
+
+while (lnum<240):
+    key = "line%03d" % lnum
+    statusAssignments[key] = "blank"
+    schemaFile.write("    \'%s\' : str,\n"%key)
+
+    lnum = lnum + 1
+
+
 schemaFile.write("}\n")
 schemaFile.close()
 
@@ -59,11 +74,6 @@ results.append(siteUtils.packageVersions())
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
-
-fitsfiles = glob.glob("*fits")
-
-#for fl in fitsfiles:
-#    os.system("screen -d -m ds9 -scale datasec yes -scale histequ -mosaicimage iraf %s &" % fl)
 
 
 #ccsValidator('rebalive_exposure')
