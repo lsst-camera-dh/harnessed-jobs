@@ -157,4 +157,8 @@ def addHeaderData(fitsfile, **kwds):
     fits_obj.writeto(fitsfile, clobber=clobber)
 
 def png_data_product(pngfile, sensor_id):
-    return pngfile[len(sensor_id)+1:-len('.png')]
+    """
+    This function is provided for backwards compatibility, but it is
+    deprecated in favor of the equivalent implementation in siteUtils.
+    """
+    return siteUtils.png_data_product(pngfile, sensor_id)

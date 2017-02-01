@@ -1,16 +1,15 @@
 import os
 import sys
+import glob
 import shutil
 import pickle
-import subprocess
-import socket
 import fnmatch
 import ConfigParser
+import matplotlib.pyplot as plt
 import lcatr.schema
 import lcatr.harness.helpers
-import harnessedJobs as hj
-from eTraveler.clientAPI.connection import Connection
 from lcatr.harness.et_wrapper import getHardwareHierarchy
+from eTraveler.clientAPI.connection import Connection
 
 
 def getCCDNames() :
@@ -366,3 +365,31 @@ def make_fileref(current_path, folder=None, metadata=None,
         current_path = new_path
     return lcatr.schema.fileref.make(current_path, datatype=datatype,
                                      metadata=metadata)
+
+def make_png_file(callback, png_file, *args, **kwds):
+    try:
+        result = callback(*args, **kwds)
+        plt.savefig(png_file)
+        plt.clf()
+        return result
+    except Exception as eobj:
+        print("Exception raised while creating %s:" % png_file)
+        print(eobj)
+        plt.clf()
+
+def png_data_product(pngfile, lsst_num):
+    return pngfile[len(lsst_num)+1:-len('.png')]
+
+def persist_png_files(file_pattern, ccd_manu, lsst_num, testtype,
+                      test_category, folder=None):
+    md = DataCatalogMetadata(CCD_MANU=ccd_manu,
+                             LSST_NUM=lsst_num,
+                             TESTTYPE=testtype,
+                             TEST_CATEGORY=test_category)
+    png_files = glob.glob(file_pattern)
+    png_filerefs = []
+    for png_file in png_files:
+        dp = png_data_product(png_file, lsst_num)
+        png_filerefs.append(make_fileref(png_file, folder=folder,
+                                         metadata=md(DATA_PRODUCT=dp)))
+    return png_filerefs
