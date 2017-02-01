@@ -12,7 +12,7 @@ from java.lang import RuntimeException
 import sys
 import time
 import subprocess
-
+import siteUtils
 
 
 CCS.setThrowExceptions(True);
@@ -91,6 +91,15 @@ if (True):
         if ":" in arg :
             idmap.append(arg)
 
+# check for one by one connectivity jobs
+    if "connectivity0" in siteUtils.getJobName() :
+        idmap.append("0:0")
+    if "connectivity1" in siteUtils.getJobName() :
+        idmap.append("1:1")
+    if "connectivity2" in siteUtils.getJobName() :
+        idmap.append("2:2")
+
+# if nothing specified ... do it all
     if (len(idmap)==0) :
         for rebid in rebids :
             print "rebid = %s" % rebid
