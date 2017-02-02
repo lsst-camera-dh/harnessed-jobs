@@ -267,6 +267,7 @@ if (True):
                 for itry in range(3) :
                     try:
                         rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
+                        result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
                         break
                     except:
                         time.sleep(5.0)

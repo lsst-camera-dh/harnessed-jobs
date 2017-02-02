@@ -12,7 +12,7 @@ from java.lang import RuntimeException
 import sys
 import time
 import subprocess
-import siteUtils
+#import siteUtils
 
 
 CCS.setThrowExceptions(True);
@@ -54,6 +54,8 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
 ########################          MAIN         #######################################
 ######################################################################################
 
+dorun = True
+
 # The following will cause an exception if not run as part of a harnessed job because
 # tsCWD and CCDID will not be defined in that case
 try:
@@ -67,7 +69,9 @@ except:
 
 print "start tstamp: %f" % time.time()
 
-if (True):
+if not dorun :
+    print "setup for repair ... not running"
+else :
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("ts8");
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
@@ -92,11 +96,11 @@ if (True):
             idmap.append(arg)
 
 # check for one by one connectivity jobs
-    if "connectivity0" in siteUtils.getJobName() :
+    if "connectivity0" in jobname :
         idmap.append("0:0")
-    if "connectivity1" in siteUtils.getJobName() :
+    if "connectivity1" in jobname :
         idmap.append("1:1")
-    if "connectivity2" in siteUtils.getJobName() :
+    if "connectivity2" in jobname :
         idmap.append("2:2")
 
 # if nothing specified ... do it all
@@ -138,7 +142,7 @@ if (True):
                 print "%s: FAILED TO TURN POWER OFF! %s" % (rebname,e)
                 raise Exception
 
-            time.sleep(5.0)
+            time.sleep(3.0)
 
             pwron = ""
 # attempt to apply the REB power -- line by line

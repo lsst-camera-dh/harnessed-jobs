@@ -12,7 +12,7 @@ shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
-os.system("./rebalive_plots.sh")
+os.system("./rebalive_plots.sh > logpl &")
 
 jobName = "rebalive_temperatures"
 
@@ -28,7 +28,7 @@ results.extend(data_products)
 
 statusAssignments = {}
 
-schemaFile = open("%s/%s_runtime.schema"%(jobDir,jobName),"w")
+schemaFile = open("%s/%s_runtime.schema.new"%(jobDir,jobName),"w")
 schemaFile.write("# -*- python -*-\n")
 schemaFile.write("{\n")
 schemaFile.write("    \'schema_name\' : \'%s_runtime\',\n"%jobName)

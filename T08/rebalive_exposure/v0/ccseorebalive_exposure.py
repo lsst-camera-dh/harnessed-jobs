@@ -23,6 +23,14 @@ if (True):
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
     pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
 
+    print "Attaching teststand subsystems"
+    tssub  = CCS.attachSubsystem("%s" % ts);
+#    print "attaching Bias subsystem"
+#    biassub   = CCS.attachSubsystem("%s/Bias" % ts);
+#    print "attaching PD subsystem"
+#    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
+    print "attaching Mono subsystem"
+    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
 
     cdir = tsCWD
 
@@ -35,6 +43,14 @@ if (True):
 
     status_value = None
 
+    wl = 500.
+    for itry in range(3) :
+        try:
+            rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
+            result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
+            break
+        except:
+            time.sleep(5.0)
 
 #  Verify data link integrity.
     rebs = ""
@@ -74,9 +90,9 @@ if (True):
 
 # <LSST CCD SN>_<test type>_<image type>_<seq. info>_<time stamp>.fits
 
-        fitsfilename = "s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits"
+#        fitsfilename = "s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits"
 
-        print "fitsfilename = %s" % fitsfilename
+#        print "fitsfilename = %s" % fitsfilename
 
         ts8sub.synchCommand(10,"setTestType","FE55")
 
@@ -92,7 +108,7 @@ if (True):
         ts8sub.synchCommand(10,"setImageType BIAS")
 
 # <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",0,False,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",0,False,False,"${sensorLoc}_${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
@@ -108,15 +124,15 @@ if (True):
 
         exptime=0.100
 
-        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_100ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorLoc}_${sensorId}_${test_type}_100ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
         exptime=4.000
 
-        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_4000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorLoc}_${sensorId}_${test_type}_4000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
         exptime=20.000
 
-        rply = ts8sub.synchCommand(180,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_20000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(180,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorLoc}_${sensorId}_${test_type}_20000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
 
 
