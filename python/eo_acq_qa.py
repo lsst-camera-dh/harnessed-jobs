@@ -12,11 +12,6 @@ import pylab
 import matplotlib
 from matplotlib.dates import DateFormatter
 
-# Default color cycle for displaying multiple trending histories in a
-# single plot.
-matplotlib.rcParams['axes.color_cycle'] \
-    = [pylab.cm.rainbow(int(x)) for x in np.linspace(0, 255, 16)]
-
 def obs_time(infile, method='filename_timestamp'):
     if method == 'mjd_obs':
         return astropy.time.Time(fitsio.open(infile)[0].header['MJD-OBS'],
