@@ -380,16 +380,15 @@ def make_png_file(callback, png_file, *args, **kwds):
 def png_data_product(pngfile, lsst_num):
     return pngfile[len(lsst_num)+1:-len('.png')]
 
-def persist_png_files(file_pattern, ccd_manu, lsst_num, testtype,
-                      test_category, folder=None):
-    md = DataCatalogMetadata(CCD_MANU=ccd_manu,
-                             LSST_NUM=lsst_num,
-                             TESTTYPE=testtype,
-                             TEST_CATEGORY=test_category)
+def persist_png_files(file_pattern, lsst_id, folder=None, metadata=None):
+    if metadata is None:
+        metadata = dict()
+    md = DataCatalogMetadata(**metadata)
     png_files = glob.glob(file_pattern)
     png_filerefs = []
     for png_file in png_files:
-        dp = png_data_product(png_file, lsst_num)
+        dp = png_data_product(png_file, lsst_id)
         png_filerefs.append(make_fileref(png_file, folder=folder,
-                                         metadata=md(DATA_PRODUCT=dp)))
+                                         metadata=md(DATA_PRODUCT=dp,
+                                                     LsstId=lsst_id)))
     return png_filerefs
