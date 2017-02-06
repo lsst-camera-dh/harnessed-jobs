@@ -2,6 +2,7 @@ import os
 import shutil
 import socket
 import datetime
+import json
 import numpy as np
 import ConfigParser
 import astropy.io.fits as pyfits
@@ -229,7 +230,8 @@ class JsonRepackager(object):
             if result.has_key('amp'):
                 amp = result['amp']
                 for key, value in result.items():
-                    if key.find('schema') == 0 or key == 'amp':
+                    if (key.find('schema') == 0 or
+                        key not in self._key_map.keys()):
                         continue
                     self.eotest_results.add_seg_result(amp, self._key_map[key],
                                                        value)
