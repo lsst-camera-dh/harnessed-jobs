@@ -38,14 +38,14 @@ R00.Reb0.ASPIC0//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC0//gain = 1
+R00.Reb0.ASPIC0//gain = 0
 
 #********  R00.Reb0.ASPIC0//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC0//rc = 15
+R00.Reb0.ASPIC0//rc = 0
 
 #********  R00.Reb0.ASPIC0//tm
 #** 
@@ -73,14 +73,14 @@ R00.Reb0.ASPIC1//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC1//gain = 1
+R00.Reb0.ASPIC1//gain = 0
 
 #********  R00.Reb0.ASPIC1//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC1//rc = 15
+R00.Reb0.ASPIC1//rc = 0
 
 #********  R00.Reb0.ASPIC1//tm
 #** 
@@ -108,14 +108,14 @@ R00.Reb0.ASPIC2//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC2//gain = 1
+R00.Reb0.ASPIC2//gain = 0
 
 #********  R00.Reb0.ASPIC2//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC2//rc = 15
+R00.Reb0.ASPIC2//rc = 0
 
 #********  R00.Reb0.ASPIC2//tm
 #** 
@@ -143,14 +143,14 @@ R00.Reb0.ASPIC3//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC3//gain = 1
+R00.Reb0.ASPIC3//gain = 0
 
 #********  R00.Reb0.ASPIC3//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC3//rc = 15
+R00.Reb0.ASPIC3//rc = 0
 
 #********  R00.Reb0.ASPIC3//tm
 #** 
@@ -178,14 +178,14 @@ R00.Reb0.ASPIC4//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC4//gain = 1
+R00.Reb0.ASPIC4//gain = 0
 
 #********  R00.Reb0.ASPIC4//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC4//rc = 15
+R00.Reb0.ASPIC4//rc = 0
 
 #********  R00.Reb0.ASPIC4//tm
 #** 
@@ -213,14 +213,14 @@ R00.Reb0.ASPIC5//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC5//gain = 1
+R00.Reb0.ASPIC5//gain = 0
 
 #********  R00.Reb0.ASPIC5//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb0.ASPIC5//rc = 15
+R00.Reb0.ASPIC5//rc = 0
 
 #********  R00.Reb0.ASPIC5//tm
 #** 
@@ -241,7 +241,7 @@ R00.Reb0.Bias0//csGate = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias0//csGateP = 5.0
+R00.Reb0.Bias0//csGateP = 0.0
 
 #********  R00.Reb0.Bias0//gd
 #** 
@@ -269,7 +269,7 @@ R00.Reb0.Bias0//od = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias0//odP = 25.0
+R00.Reb0.Bias0//odP = 26.0
 
 #********  R00.Reb0.Bias0//og
 #** 
@@ -283,7 +283,7 @@ R00.Reb0.Bias0//og = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias0//ogP = -2.0
+R00.Reb0.Bias0//ogP = 1.0
 
 #********  R00.Reb0.Bias0//ogSh
 #** 
@@ -304,7 +304,7 @@ R00.Reb0.Bias0//rd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias0//rdP = 13.0
+R00.Reb0.Bias0//rdP = 14.0
 
 #********  R00.Reb0.Bias1//csGate
 #** 
@@ -318,7 +318,7 @@ R00.Reb0.Bias1//csGate = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias1//csGateP = 5.0
+R00.Reb0.Bias1//csGateP = 0.0
 
 #********  R00.Reb0.Bias1//gd
 #** 
@@ -346,7 +346,7 @@ R00.Reb0.Bias1//od = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias1//odP = 25.0
+R00.Reb0.Bias1//odP = 26.0
 
 #********  R00.Reb0.Bias1//og
 #** 
@@ -360,7 +360,7 @@ R00.Reb0.Bias1//og = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias1//ogP = -2.0
+R00.Reb0.Bias1//ogP = 1.0
 
 #********  R00.Reb0.Bias1//ogSh
 #** 
@@ -381,7 +381,7 @@ R00.Reb0.Bias1//rd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias1//rdP = 13.0
+R00.Reb0.Bias1//rdP = 14.0
 
 #********  R00.Reb0.Bias2//csGate
 #** 
@@ -395,7 +395,7 @@ R00.Reb0.Bias2//csGate = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias2//csGateP = 5.0
+R00.Reb0.Bias2//csGateP = 0.0
 
 #********  R00.Reb0.Bias2//gd
 #** 
@@ -423,7 +423,7 @@ R00.Reb0.Bias2//od = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias2//odP = 25.0
+R00.Reb0.Bias2//odP = 26.0
 
 #********  R00.Reb0.Bias2//og
 #** 
@@ -437,7 +437,7 @@ R00.Reb0.Bias2//og = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias2//ogP = -2.0
+R00.Reb0.Bias2//ogP = 1.0
 
 #********  R00.Reb0.Bias2//ogSh
 #** 
@@ -458,7 +458,7 @@ R00.Reb0.Bias2//rd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.Bias2//rdP = 13.0
+R00.Reb0.Bias2//rdP = 14.0
 
 #********  R00.Reb0.DAC//csGate
 #** 
@@ -584,7 +584,7 @@ R00.Reb0.DAC//sclkLow = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb0.DAC//sclkLowP = -5.0
+R00.Reb0.DAC//sclkLowP = -5.1
 
 #********  R00.Reb0.DAC//sclkLowSh
 #** 
@@ -633,14 +633,14 @@ R00.Reb1.ASPIC0//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC0//gain = 1
+R00.Reb1.ASPIC0//gain = 0
 
 #********  R00.Reb1.ASPIC0//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC0//rc = 15
+R00.Reb1.ASPIC0//rc = 0
 
 #********  R00.Reb1.ASPIC0//tm
 #** 
@@ -668,14 +668,14 @@ R00.Reb1.ASPIC1//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC1//gain = 1
+R00.Reb1.ASPIC1//gain = 0
 
 #********  R00.Reb1.ASPIC1//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC1//rc = 15
+R00.Reb1.ASPIC1//rc = 0
 
 #********  R00.Reb1.ASPIC1//tm
 #** 
@@ -703,14 +703,14 @@ R00.Reb1.ASPIC2//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC2//gain = 1
+R00.Reb1.ASPIC2//gain = 0
 
 #********  R00.Reb1.ASPIC2//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC2//rc = 15
+R00.Reb1.ASPIC2//rc = 0
 
 #********  R00.Reb1.ASPIC2//tm
 #** 
@@ -738,14 +738,14 @@ R00.Reb1.ASPIC3//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC3//gain = 1
+R00.Reb1.ASPIC3//gain = 0
 
 #********  R00.Reb1.ASPIC3//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC3//rc = 15
+R00.Reb1.ASPIC3//rc = 0
 
 #********  R00.Reb1.ASPIC3//tm
 #** 
@@ -773,14 +773,14 @@ R00.Reb1.ASPIC4//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC4//gain = 1
+R00.Reb1.ASPIC4//gain = 0
 
 #********  R00.Reb1.ASPIC4//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC4//rc = 15
+R00.Reb1.ASPIC4//rc = 0
 
 #********  R00.Reb1.ASPIC4//tm
 #** 
@@ -815,7 +815,7 @@ R00.Reb1.ASPIC5//gain = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb1.ASPIC5//rc = 15
+R00.Reb1.ASPIC5//rc = 0
 
 #********  R00.Reb1.ASPIC5//tm
 #** 
@@ -836,7 +836,7 @@ R00.Reb1.Bias0//csGate = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias0//csGateP = 5.0
+R00.Reb1.Bias0//csGateP = 0.0
 
 #********  R00.Reb1.Bias0//gd
 #** 
@@ -864,7 +864,7 @@ R00.Reb1.Bias0//od = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias0//odP = 25.0
+R00.Reb1.Bias0//odP = 26.0
 
 #********  R00.Reb1.Bias0//og
 #** 
@@ -878,7 +878,7 @@ R00.Reb1.Bias0//og = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias0//ogP = -2.0
+R00.Reb1.Bias0//ogP = 1.0
 
 #********  R00.Reb1.Bias0//ogSh
 #** 
@@ -899,7 +899,7 @@ R00.Reb1.Bias0//rd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias0//rdP = 13.0
+R00.Reb1.Bias0//rdP = 14.0
 
 #********  R00.Reb1.Bias1//csGate
 #** 
@@ -913,7 +913,7 @@ R00.Reb1.Bias1//csGate = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias1//csGateP = 5.0
+R00.Reb1.Bias1//csGateP = 0.0
 
 #********  R00.Reb1.Bias1//gd
 #** 
@@ -941,7 +941,7 @@ R00.Reb1.Bias1//od = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias1//odP = 25.0
+R00.Reb1.Bias1//odP = 26.0
 
 #********  R00.Reb1.Bias1//og
 #** 
@@ -955,7 +955,7 @@ R00.Reb1.Bias1//og = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias1//ogP = -2.0
+R00.Reb1.Bias1//ogP = 1.0
 
 #********  R00.Reb1.Bias1//ogSh
 #** 
@@ -976,7 +976,7 @@ R00.Reb1.Bias1//rd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias1//rdP = 13.0
+R00.Reb1.Bias1//rdP = 14.0
 
 #********  R00.Reb1.Bias2//csGate
 #** 
@@ -990,7 +990,7 @@ R00.Reb1.Bias2//csGate = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias2//csGateP = 5.0
+R00.Reb1.Bias2//csGateP = 0.0
 
 #********  R00.Reb1.Bias2//gd
 #** 
@@ -1018,7 +1018,7 @@ R00.Reb1.Bias2//od = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias2//odP = 25.0
+R00.Reb1.Bias2//odP = 26.0
 
 #********  R00.Reb1.Bias2//og
 #** 
@@ -1032,7 +1032,7 @@ R00.Reb1.Bias2//og = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias2//ogP = -2.0
+R00.Reb1.Bias2//ogP = 1.0
 
 #********  R00.Reb1.Bias2//ogSh
 #** 
@@ -1053,7 +1053,7 @@ R00.Reb1.Bias2//rd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb1.Bias2//rdP = 13.0
+R00.Reb1.Bias2//rdP = 14.0
 
 #********  R00.Reb1.DAC//csGate
 #** 
@@ -1228,14 +1228,14 @@ R00.Reb2.ASPIC0//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC0//gain = 1
+R00.Reb2.ASPIC0//gain = 0
 
 #********  R00.Reb2.ASPIC0//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC0//rc = 15
+R00.Reb2.ASPIC0//rc = 0
 
 #********  R00.Reb2.ASPIC0//tm
 #** 
@@ -1263,14 +1263,14 @@ R00.Reb2.ASPIC1//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC1//gain = 1
+R00.Reb2.ASPIC1//gain = 0
 
 #********  R00.Reb2.ASPIC1//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC1//rc = 15
+R00.Reb2.ASPIC1//rc = 0
 
 #********  R00.Reb2.ASPIC1//tm
 #** 
@@ -1298,14 +1298,14 @@ R00.Reb2.ASPIC2//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC2//gain = 1
+R00.Reb2.ASPIC2//gain = 0
 
 #********  R00.Reb2.ASPIC2//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC2//rc = 15
+R00.Reb2.ASPIC2//rc = 0
 
 #********  R00.Reb2.ASPIC2//tm
 #** 
@@ -1333,14 +1333,14 @@ R00.Reb2.ASPIC3//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC3//gain = 1
+R00.Reb2.ASPIC3//gain = 0
 
 #********  R00.Reb2.ASPIC3//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC3//rc = 15
+R00.Reb2.ASPIC3//rc = 0
 
 #********  R00.Reb2.ASPIC3//tm
 #** 
@@ -1368,14 +1368,14 @@ R00.Reb2.ASPIC4//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC4//gain = 1
+R00.Reb2.ASPIC4//gain = 0
 
 #********  R00.Reb2.ASPIC4//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC4//rc = 15
+R00.Reb2.ASPIC4//rc = 0
 
 #********  R00.Reb2.ASPIC4//tm
 #** 
@@ -1403,14 +1403,14 @@ R00.Reb2.ASPIC5//clamp = 0
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC5//gain = 1
+R00.Reb2.ASPIC5//gain = 0
 
 #********  R00.Reb2.ASPIC5//rc
 #** 
 #** type : int
 #** category : Rafts
 #********
-R00.Reb2.ASPIC5//rc = 15
+R00.Reb2.ASPIC5//rc = 0
 
 #********  R00.Reb2.ASPIC5//tm
 #** 
@@ -1431,7 +1431,7 @@ R00.Reb2.Bias0//csGate = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias0//csGateP = 5.0
+R00.Reb2.Bias0//csGateP = 0.0
 
 #********  R00.Reb2.Bias0//gd
 #** 
@@ -1445,7 +1445,7 @@ R00.Reb2.Bias0//gd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias0//gdP = 20.0
+R00.Reb2.Bias0//gdP = 0.0
 
 #********  R00.Reb2.Bias0//od
 #** 
@@ -1459,7 +1459,7 @@ R00.Reb2.Bias0//od = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias0//odP = 25.0
+R00.Reb2.Bias0//odP = 0.0
 
 #********  R00.Reb2.Bias0//og
 #** 
@@ -1473,7 +1473,7 @@ R00.Reb2.Bias0//og = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias0//ogP = 3.0
+R00.Reb2.Bias0//ogP = 0.0
 
 #********  R00.Reb2.Bias0//ogSh
 #** 
@@ -1494,7 +1494,7 @@ R00.Reb2.Bias0//rd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias0//rdP = 13.0
+R00.Reb2.Bias0//rdP = 0.0
 
 #********  R00.Reb2.Bias1//csGate
 #** 
@@ -1508,7 +1508,7 @@ R00.Reb2.Bias1//csGate = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias1//csGateP = 5.0
+R00.Reb2.Bias1//csGateP = 0.0
 
 #********  R00.Reb2.Bias1//gd
 #** 
@@ -1536,7 +1536,7 @@ R00.Reb2.Bias1//od = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias1//odP = 25.0
+R00.Reb2.Bias1//odP = 26.0
 
 #********  R00.Reb2.Bias1//og
 #** 
@@ -1550,7 +1550,7 @@ R00.Reb2.Bias1//og = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias1//ogP = 3.0
+R00.Reb2.Bias1//ogP = 1.0
 
 #********  R00.Reb2.Bias1//ogSh
 #** 
@@ -1571,7 +1571,7 @@ R00.Reb2.Bias1//rd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias1//rdP = 13.0
+R00.Reb2.Bias1//rdP = 14.0
 
 #********  R00.Reb2.Bias2//csGate
 #** 
@@ -1585,7 +1585,7 @@ R00.Reb2.Bias2//csGate = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias2//csGateP = 5.0
+R00.Reb2.Bias2//csGateP = 0.0
 
 #********  R00.Reb2.Bias2//gd
 #** 
@@ -1613,7 +1613,7 @@ R00.Reb2.Bias2//od = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias2//odP = 25.0
+R00.Reb2.Bias2//odP = 26.0
 
 #********  R00.Reb2.Bias2//og
 #** 
@@ -1627,7 +1627,7 @@ R00.Reb2.Bias2//og = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias2//ogP = 3.0
+R00.Reb2.Bias2//ogP = 1.0
 
 #********  R00.Reb2.Bias2//ogSh
 #** 
@@ -1648,7 +1648,7 @@ R00.Reb2.Bias2//rd = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.Bias2//rdP = 13.0
+R00.Reb2.Bias2//rdP = 14.0
 
 #********  R00.Reb2.DAC//csGate
 #** 
@@ -1774,7 +1774,7 @@ R00.Reb2.DAC//sclkLow = 0
 #** type : double
 #** category : Rafts
 #********
-R00.Reb2.DAC//sclkLowP = -8.0
+R00.Reb2.DAC//sclkLowP = -5.0
 
 #********  R00.Reb2.DAC//sclkLowSh
 #** 

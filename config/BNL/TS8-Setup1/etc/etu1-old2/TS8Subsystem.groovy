@@ -123,23 +123,11 @@ builder.
         "${reb}.AnaI"    (Channel, description: "Analog PS current", format: ".1f", units: "mA",
                           devcName: "${reb}", hwChan: 3, type: "POWER", scale: 1000, pageId: rebCount)
 
-//        "${reb}.ClkV"    (Channel, description: "Clock PS voltage", units: "Volts",
-//                          devcName: "${reb}", hwChan: 4, type: "POWER", pageId: rebCount)
-
-//        "${reb}.ClkI"    (Channel, description: "Clock PS current", format: ".1f", units: "mA",
-//                          devcName: "${reb}", hwChan: 5, type: "POWER", scale: 1000, pageId: rebCount)
-
-        "${reb}.ClkHV"   (Channel, description: "Clock High PS voltage", units: "Volts",
+        "${reb}.ClkV"    (Channel, description: "Clock PS voltage", units: "Volts",
                           devcName: "${reb}", hwChan: 4, type: "POWER", pageId: rebCount)
 
-        "${reb}.ClkHI"   (Channel, description: "Clock High PS current", format: ".1f", units: "mA",
+        "${reb}.ClkI"    (Channel, description: "Clock PS current", format: ".1f", units: "mA",
                           devcName: "${reb}", hwChan: 5, type: "POWER", scale: 1000, pageId: rebCount)
-
-        "${reb}.ClkLV"   (Channel, description: "Clock Low PS voltage", units: "Volts",
-                          devcName: "${reb}", hwChan: 8, type: "POWER", pageId: rebCount)
-
-        "${reb}.ClkLI"   (Channel, description: "Clock Low PS current", format: ".1f", units: "mA",
-                          devcName: "${reb}", hwChan: 9, type: "POWER", scale: 1000, pageId: rebCount)
 
         "${reb}.ODV"     (Channel, description: "OD PS voltage", units: "Volts",
                           devcName: "${reb}", hwChan: 6, type: "POWER", pageId: rebCount)

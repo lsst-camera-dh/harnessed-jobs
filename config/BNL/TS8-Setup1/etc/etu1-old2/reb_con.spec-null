@@ -1,0 +1,4 @@
+# Specification file for reb_cond header. 
+#
+EXTNAME     String  "REB_COND"                 Name of the extension
+#DigV Float ${ts8/R00.Reb0.DigV}
