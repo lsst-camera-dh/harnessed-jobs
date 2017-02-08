@@ -12,6 +12,10 @@ shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
+answer = raw_input("Enter y and return to RETEST, just return to proceed with plotting, archiving and ingesting the results ")
+if "y" in answer.lower() :
+     raise Exception("PURPOSELY crashing to allow a retest via retrying the e-Traveler step")
+
 os.system("./rebalive_plots.sh > logplt &")
 
 jobName = "rebalive_power"

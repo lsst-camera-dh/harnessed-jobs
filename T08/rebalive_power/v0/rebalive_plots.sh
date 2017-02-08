@@ -17,7 +17,8 @@ echo id for $i is $id
 
 #set selection = 'set @tstart=UNIX_TIMESTAMP(NOW())*1000 - 120000;select tstampmills/1000.,doubleData from rawdata where tstampmills>@tstart and descr_id='$id' order by -tstampmills;'
 
-set tstart = `grep "start tstamp" rebalive_results.txt | cut -d ":" -f 2`
+set tstres = `grep "start tstamp" rebalive_results.txt | cut -d ":" -f 2`
+set tstart = `expr $tstres - 60`
 set tstop = `grep "stop tstamp" rebalive_results.txt | cut -d ":" -f 2`
 
 #set selection = 'set @tstart='$now'*1000 - 30000;select tstampmills/1000.,doubleData from rawdata where tstampmills>@tstart and descr_id='$id' order by -tstampmills;'

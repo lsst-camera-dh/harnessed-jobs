@@ -12,7 +12,7 @@ shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
-os.system("screen -d -m ./rebalive_plots.sh > logpl &")
+os.system("./rebalive_plots.sh > logpl &")
 
 jobName = "rebalive_exposure"
 
