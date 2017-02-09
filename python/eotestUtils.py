@@ -215,7 +215,7 @@ class JsonRepackager(object):
         """
         self.eotest_results = sensorTest.EOTestResults(outfile)
 
-    def process_file(self, infile):
+    def process_file(self, infile, sensor_id=None):
         """
         Harvest the EO test results from a summary.lims file.
 
@@ -227,7 +227,8 @@ class JsonRepackager(object):
         """
         foo = json.loads(open(infile).read())
         for result in foo:
-            if result.has_key('amp'):
+            if (result.has_key('amp') and
+                (sensor_id is None or result['sensor_id'] == sensor_id)):
                 amp = result['amp']
                 for key, value in result.items():
                     if (key.find('schema') == 0 or
@@ -251,7 +252,7 @@ class JsonRepackager(object):
         """
         self.eotest_results.write(outfile=outfile, clobber=clobber)
 
-    def process_files(self, summary_files):
+    def process_files(self, summary_files, sensor_id=None):
         """
         Process a list of summary.lims files.
 
@@ -262,4 +263,4 @@ class JsonRepackager(object):
         """
         for item in summary_files:
             print "processing", item
-            self.process_file(item)
+            self.process_file(item, sensor_id=sensor_id)
