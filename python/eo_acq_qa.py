@@ -1,19 +1,23 @@
+"""
+Module to produce QA plots for online EO data acquistion.
+"""
 import os
 import glob
 from collections import OrderedDict
-import numpy as np
 import datetime
+import numpy as np
 import astropy.io.fits as fitsio
 import astropy.time
 import pylab
-from matplotlib.dates import DateFormatter, MinuteLocator
+import matplotlib
+from matplotlib.dates import DateFormatter
 
 def obs_time(infile, method='filename_timestamp'):
     if method == 'mjd_obs':
         return astropy.time.Time(fitsio.open(infile)[0].header['MJD-OBS'],
                                  format='mjd', scale='utc')
     elif method == 'posix_timestamp':
-        return datetime.datetime.fromtimestamp(os.path.getctime(self.infile))
+        return datetime.datetime.fromtimestamp(os.path.getctime(infile))
     elif method == 'filename_timestamp':
         ts = infile[-len('YYYYMMDDHHMMSS.fits'):-len('.fits')]
         return datetime.datetime(int(ts[:4]), int(ts[4:6]), int(ts[6:8]),
@@ -23,7 +27,7 @@ def obs_time(infile, method='filename_timestamp'):
 
 def obs_time_cmp(file1, file2):
     t1 = obs_time(file1)
-    t2 = obs_time(file2)    
+    t2 = obs_time(file2)
     if t1 < t2:
         return -1
     elif t2 > t1:
@@ -32,7 +36,7 @@ def obs_time_cmp(file1, file2):
 
 def annotate_acq(start_time, test_type, yposfrac=0.8, xoffset=0,
                  color='k', size=10):
-    xmin, xmax, ymin, ymax = pylab.axis()
+    ymin, ymax = pylab.axis()[2:]
     try:
         xpos = start_time + xoffset
     except TypeError:
@@ -87,25 +91,24 @@ class FrameTrending(Trending):
         pylab.plot_date(np.array(self.times), np.array(self.values), marker)
 
 class AmpTrending(Trending):
-    def __init__(self, ylabel):
+    def __init__(self, ylabel, namps=16):
         super(AmpTrending, self).__init__(ylabel)
-        self.amp_times = dict([(amp, []) for amp in range(1, 17)])
-        self.values = dict([(amp, []) for amp in range(1, 17)])
+        self.amp_times = dict([(amp, []) for amp in range(1, namps+1)])
+        self.values = dict([(amp, []) for amp in range(1, namps+1)])
     def add_value(self, amp, mjd_obs, value):
         self.amp_times[amp].append(mjd_obs)
         self.values[amp].append(value)
     def plot_dates(self, **kwds):
-        # Set the color_cycle to use 16 different colors
-        try:
-            my_cmap = kwds['cmap']
-        except:
-            my_cmap = pylab.cm.rainbow
-        color_cycle = [my_cmap(int(x)) for x in np.linspace(0, 255, 16)]
-        pylab.rc('axes', color_cycle=color_cycle)
+        if kwds.has_key('cmap'):
+            # Set the color_cycle to 16 different colors using the
+            # specifiec color map.
+            color_cycle = [kwds['cmap'](int(x)) for x
+                           in np.linspace(0, 255, 16)]
+            pylab.rc('axes', color_cycle=color_cycle)
         zero_offsets = dict([(amp, 0) for amp in self.values.keys()])
         try:
-            if kwds['subtract_t0'] == True:
-                zero_offsets = dict([(amp, self.values[amp][0]) for amp in 
+            if kwds['subtract_t0']:
+                zero_offsets = dict([(amp, self.values[amp][0]) for amp in
                                      self.values.keys()])
         except KeyError:
             pass
@@ -117,7 +120,7 @@ class AmpTrending(Trending):
             # do so.  See
             # http://stackoverflow.com/questions/17250392/setting-colors-using-color-cycle-on-date-plots-using-plot-date
             y_vals = np.array(self.values[amp]) - zero_offsets[amp]
-            pylab.plot_date(my_times, y_vals , fmt='.')
+            pylab.plot_date(my_times, y_vals, fmt='.')
 
 class TrendingObjects(object):
     def __init__(self):
@@ -144,7 +147,7 @@ class TrendingObjects(object):
     def __setitem__(self, key, value):
         self._dict[key] = value
     def add_test_type(self, time, test_type):
-        for key, value in self._dict.items():
+        for value in self._dict.values():
             value.add_test_type(time, test_type)
     def processDirectory(self, dirname, test_type, verbose=True):
         files = sorted(glob.glob(os.path.join(dirname, '*.fits')), obs_time_cmp)
@@ -168,7 +171,7 @@ class TrendingObjects(object):
                                             np.std(frame.overscan[amp]))
                 # Perform bias subtraction of overscan mean
                 self['imaging mean'].add_value(amp, obs_time,
-                                               np.mean(frame.imaging[amp] 
+                                               np.mean(frame.imaging[amp]
                                                        - oscan_mean))
                 self['imaging std'].add_value(amp, obs_time,
                                               np.std(frame.imaging[amp]))
@@ -176,9 +179,9 @@ class TrendingObjects(object):
     def plot(self, sensor_id, ext=None, frame_id=0):
         my_frame_id = frame_id
         title = "%s: %s to %s" % (sensor_id,
-                                  self.times[0].strftime('%m-%d-%y %H:%M:%S'), 
+                                  self.times[0].strftime('%m-%d-%y %H:%M:%S'),
                                   self.times[-1].strftime('%m-%d-%y %H:%M:%S'))
-        figure = pylab.figure(num=my_frame_id, figsize=(8.5, 11))
+        pylab.figure(num=my_frame_id, figsize=(8.5, 11))
         my_frame_id += 1
         pylab.subplot(6, 1, 1)
         self['File Count'].plot()
@@ -198,8 +201,8 @@ class TrendingObjects(object):
         else:
             outfile = '%s_QA_monitoring_%s.png' % (sensor_id, ext)
         pylab.savefig(outfile)
-    
-        figure = pylab.figure(num=my_frame_id, figsize=(8.5, 11))
+
+        pylab.figure(num=my_frame_id, figsize=(8.5, 11))
         my_frame_id += 1
         pylab.subplot(4, 1, 1)
         self['oscan mean'].plot(ylog=True)
@@ -216,6 +219,41 @@ class TrendingObjects(object):
             outfile = '%s_QA_imstats_%s.png' % (sensor_id, ext)
         pylab.savefig(outfile)
         return my_frame_id
+
+class RaftTrendingObjects(TrendingObjects):
+    def __init__(self, sensor_ids):
+        super(RaftTrendingObjects, self).__init__()
+        self.sensor_nums = dict([(sensor_id, i+1) for i, sensor_id in
+                                 enumerate(sensor_ids)])
+    def processDirectory(self, dirname, test_type, verbose=True):
+        files = sorted(glob.glob(os.path.join(dirname, '*.fits')), obs_time_cmp)
+        t0 = None
+        for item in files:
+            frame = EoAcqFrame(item)
+            sensor_num = self.sensor_nums[frame.header_value('LSST_NUM')]
+            obs_time = frame.obs_time
+            if t0 is None:
+                t0 = obs_time
+            if verbose:
+                print os.path.basename(item), obs_time
+            self['File Count'].add_value(obs_time)
+            keywords = 'CCDTEMP EXPTIME MONDIODE MONOWL FILTPOS'
+            for keyword, scale in zip(keywords.split(), (1, 1, 1e3, 1, 1)):
+                self[keyword].add_value(obs_time,
+                                        frame.header_value(keyword)*scale)
+            for amp in frame.overscan:
+                oscan_mean = np.mean(frame.overscan[amp])
+                self['oscan mean'].add_value(sensor_num, obs_time, oscan_mean)
+                self['oscan std'].add_value(sensor_num, obs_time,
+                                            np.std(frame.overscan[amp]))
+                # Perform bias subtraction of overscan mean
+                self['imaging mean'].add_value(sensor_num, obs_time,
+                                               np.mean(frame.imaging[amp]
+                                                       - oscan_mean))
+                self['imaging std'].add_value(sensor_num, obs_time,
+                                              np.std(frame.imaging[amp]))
+        self.add_test_type(t0, test_type)
+
 
 class EoAcqFrame(object):
     def __init__(self, infile, namps=16):
@@ -249,7 +287,6 @@ class EoAcqFrame(object):
         self.overscan = {}
         for amp in range(1, namps+1):
             naxis1 = self.header_value('NAXIS1', amp)
-            naxis2 = self.header_value('NAXIS2', amp)
             datasec = self._datasec_values(amp)
             segdata = self.fits_obj[amp].data
             self.imaging[amp] = segdata[datasec['ymin']-1:datasec['ymax']-1,
