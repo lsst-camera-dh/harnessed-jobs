@@ -6,6 +6,10 @@
     'teststand_version' : str,
     'teststand_revision' : str,
     'archon_version' : str,
-    'archon_revision' : str
+    'archon_revision' : str,
+    'ts8_version' : str,
+    'ts8_revision' : str,
+    'power_version' : str,
+    'power_revision' : str,
 }
 

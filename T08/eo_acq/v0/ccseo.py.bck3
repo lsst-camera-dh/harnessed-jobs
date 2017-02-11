@@ -39,7 +39,6 @@ if (True):
     print "Attaching ts8 subsystem"
 
     ts8sub  = CCS.attachSubsystem("ts8");
-    rebpssub  = CCS.attachSubsystem("ccs-rebps");
 
 
     acqname = jobname.split("_")[0].upper()
@@ -95,7 +94,7 @@ if (True):
 
 # prepare TS8: make sure temperature and vacuum are OK and load the sequencer
     rafttype = "ITL"
-    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
+    eolib.EOTS8Setup(tssub,ts8sub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
 
     result = monosub.synchCommand(20,"openShutter");
 
@@ -105,7 +104,6 @@ if (True):
 #    for rebid in rebs :
 #        result = ts8sub.synchCommand(10,"writeRegister "+rebid+" 0x100000 0x10000");
 
-    acqcfgfile = rtmacqcfgfile
 
 
     lo_lim = float(eolib.getCfgVal(acqcfgfile, '%s_LOLIM' % acqname, default='0.025'))
@@ -118,11 +116,6 @@ if (True):
         imcount = int(eolib.getCfgVal(acqcfgfile, '%s_IMCOUNT' % acqname, default='1'))
     wl     = float(eolib.getCfgVal(acqcfgfile, '%s_WL' % acqname, default = "550.0"))
 
-# move to default wl
-    print "Setting monochromator wl to default value"
-    rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
-    print "Monochromator reports wl = ",rwl
-    result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
 # bias image count
     bcount = int(eolib.getCfgVal(acqcfgfile, '%s_BCOUNT' % acqname, default='1'))
 # sequence number
@@ -274,9 +267,7 @@ if (True):
                 for itry in range(3) :
                     try:
                         rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
-                        print "Monochromator reports wl = ",rwl
-#                        result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength %f true" % rwl)
-                        result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
+                        result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
                         break
                     except:
                         time.sleep(5.0)
@@ -390,17 +381,6 @@ if (True):
             print "\n       starting exposure sequence %d of %d for %d images" % (seq,number_instr,imcount)
             print "\n ######################################################################## "
             while imdone<imcount :
-
-                try:
-                    fpause = open("/tmp/ccs.pause" % (cdir),"r");
-                    print "Detected pause request (/tmp/ccs.pause) exists. Remove this file to proceed"
-                    fpause.close()
-                    time.sleep(5.0)
-                    continue
-                except:
-                    pass
-
-
                 try:
                     print "\n ######################################################################## "
                     print "\n            image number %d in 0->%d in sequence %d in 0->%d  -- try#%d   " % (imdone,imcount-1,seq,number_instr-1,num_tries)

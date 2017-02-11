@@ -171,7 +171,7 @@ def ccsTrendingPlots(quantities, outfile_suffix, credentials_file,
         pylab.ylabel(quantity)
         pylab.savefig('%s_%s.png'%(quantity.replace('/', '_'), outfile_suffix))
 
-def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','teststand_version','teststand_revision','archon_version','archon_revision')):
+def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','teststand_version','teststand_revision','archon_version','archon_revision','ts8_version','ts8_revision','power_version','power_revision')):
     try:
         hdrtools.updateFitsHeaders(acqfilelist)
     except IOError:

@@ -1,0 +1,11 @@
+# -*- python -*-
+{
+    'schema_name' : 'rebalive_power_runtime',
+    'schema_version' : 0,
+    'Step2_digi_pwr_to_line digital power 0' : str,
+    'Step2_digi_pwr_to_line analog power 0' : str,
+    'Step2_digi_pwr_to_line digital power 1' : str,
+    'Step2_digi_pwr_to_line analog power 1' : str,
+    'Step2_digi_pwr_to_line digital power 2' : str,
+    'Step2_digi_pwr_to_line analog power 2' : str,
+}

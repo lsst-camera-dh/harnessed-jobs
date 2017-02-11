@@ -121,6 +121,11 @@ def EOgetCCSVersions(tssub,cdir):
     archon_version = ""
     ts_revision = ""
     archon_revision = ""
+
+    ts8_version = ""
+    power_version = ""
+    ts8_revision = ""
+    power_revision = ""
     for line in str(ccsversions).split("\t"):
         tokens = line.split()
         if ("Project   " in line) :
@@ -129,17 +134,29 @@ def EOgetCCSVersions(tssub,cdir):
                 ssys = "ts"
             if ("archon" in tokens[2]) :
                 ssys = "archon"
+            if ("ts8" in tokens[2]) :
+                ssys = "ts8"
+            if ("power" in tokens[2]) :
+                ssys = "power"
         if ("Version:" in line) :
             if (ssys == "ts") :
                 ts_version = tokens[2]
             if (ssys == "archon") :
                 archon_version = tokens[2]
+            if (ssys == "ts8") :
+                ts8_version = tokens[2]
+            if (ssys == "power") :
+                power_version = tokens[2]
         if ("Rev:" in line) :
             print "%s - revision = %s" % (ssys,tokens[3])
             if (ssys == "ts") :
                 ts_revision = tokens[3]
             if (ssys == "archon") :
                 archon_revision = tokens[3]
+            if (ssys == "ts8") :
+                ts8_revision = tokens[3]
+            if (ssys == "power") :
+                power_revision = tokens[3]
     return(ts_version,archon_version,ts_revision,archon_revision)
 
 ###############################################################################
@@ -171,16 +188,17 @@ def EOgetTS8CCSVersions(tssub,cdir):
             if (ssys == "ts8") :
                 ts8_version = tokens[2]
         if ("Rev:" in line) :
-            print "%s - revision = %s" % (ssys,tokens[3])
-            if (ssys == "ts") :
-                ts_revision = tokens[3]
-            if (ssys == "ts8") :
-                ts8_revision = tokens[3]
+            if len(tokens)>3 :
+                print "%s - revision = %s" % (ssys,tokens[3])
+                if (ssys == "ts") :
+                    ts_revision = tokens[3]
+                if (ssys == "ts8") :
+                    ts8_revision = tokens[3]
     return(ts_version,ts8_version,ts_revision,ts8_revision)
 
 ###############################################################################
 # EOTS8Setup: perform setup needed for running standard EO TS8 jobs
-def EOTS8Setup(tssub,ts8sub,raftid,ccdtype,ccdnames,ccdmanunames,cdir,seqfile,vac_outlet,state1="setTSReady",state2="setTSTEST"):
+def EOTS8Setup(tssub,ts8sub,rebpssub,raftid,ccdtype,ccdnames,ccdmanunames,cdir,seqfile,vac_outlet,state1="setTSReady",state2="setTSTEST"):
 
 
     print "Forcing CcdType to be ITL"
@@ -193,10 +211,21 @@ def EOTS8Setup(tssub,ts8sub,raftid,ccdtype,ccdnames,ccdmanunames,cdir,seqfile,va
             linelen = len(line)
             slot = line[linelen-2] + line[linelen-1];
             sn = ccdnames[slot]
-            ts8sub.synchCommand(2,"setLsstSerialNumber %s %s" % (line.split(' ')[1],sn))
+            ccdid = line.split(' ')[1]
+            ts8sub.synchCommand(2,"setLsstSerialNumber %s %s" % (ccdid,sn))
             manu_sn = ccdmanunames[slot]
+            rebid = int(line[linelen-2])
+            ccdnum = int(line[linelen-1])
             if (len(manu_sn)>0) :
-                ts8sub.synchCommand(2,"setManufacturerSerialNumber %s %s" % (line.split(' ')[1],manu_sn))
+                ts8sub.synchCommand(2,"setManufacturerSerialNumber %s %s" % (ccdid,manu_sn))
+            ccdtemp  = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.CCDTemp%d"%(rebid,ccdnum)).getResult()
+            print ccdid,": CCDTemp = ",ccdtemp
+#            ts8sub.synchCommand(10,"setCCDHeader %s MeasuredTemperature %f true"%(ccdid,ccdtemp))
+            ts8sub.synchCommand(10,"setMeasuredCCDTemperature %s %f"%(ccdid,float(ccdtemp)))
+            hv = rebpssub.synchCommand(10,"getChannelValue REB%d.hvbias.VbefSwch"%(rebid)).getResult()
+            print ccdid,": HVbias = ",hv
+#            ts8sub.synchCommand(10,"setCCDHeader %s CCDBSS %f true"%(ccdid,float(hv)))
+            ts8sub.synchCommand(10,"setMeasuredCCDBSS %s %f"%(ccdid,float(hv)))
 
 # Pre TS Initialization
 #    tssub.synchCommand(11000,"eoSetupPreCfg",state1).getResult();
@@ -205,8 +234,8 @@ def EOTS8Setup(tssub,ts8sub,raftid,ccdtype,ccdnames,ccdmanunames,cdir,seqfile,va
 
 
 # full path causes length problem: /home/ts8prod/lsst/redhat6-x86_64-64bit-gcc44/test/jh_inst/0.3.23/harnessed-jobs-0.3.23/config/BNL/sequencer-ts8-ITL-v4.seq                                                             
-
-    seqfile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v7-pntr-explicit.seq"
+    seqfile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v7-etu2-pntr-explicit.seq"
+#    seqfile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v7-pntr-explicit.seq"
     print "sequencer file = %s " % seqfile
     result = ts8sub.synchCommand(90,"loadSequencer",seqfile);
 
