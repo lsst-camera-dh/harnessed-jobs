@@ -81,13 +81,19 @@ class CcsSetup(OrderedDict):
         self['sequence_file'] = _quote("NA")
         self['acffile'] = self['itl_acffile']
         self['CCSCCDTYPE'] = _quote("ITL")
+
         if ("RTM" in CCDTYPE) :
             if ("e2v" in CCDTYPE) :
                 self['CCSCCDTYPE'] = _quote("E2V")
                 self['acffile'] = self['e2v_acffile']
+                self['sequence_file'] = self['e2v_seqfile']
+                os.system("cp -vp %s ." % e2v_seqfile)
             else :
                 self['CCSCCDTYPE'] = _quote("ITL")
                 self['acffile'] = self['itl_acffile']
+                self['sequence_file'] = self['itl_seqfile']
+                os.system("cp -vp %s ." % itl_seqfile)
+
         else :
             if ("ITL" in CCDTYPE) :
                 self['CCSCCDTYPE'] = _quote("ITL")
