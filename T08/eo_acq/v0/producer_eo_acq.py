@@ -95,6 +95,13 @@ except Exception,msg:
 #print dictArray
 
 ccsProducer('eo_acq', 'ccseo.py')
+
+try:
+    os.system("cp -p %s ." % sequence_file)
+except:
+    pass
+
+
 #examining array element 15
 #For key child_hardwareTypeName value is ITL-CCD
 #For key parent_experimentSN value is LCA-10753_RSA-002_CTE_ETU

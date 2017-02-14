@@ -1,3 +1,5 @@
+
+
 import os
 import glob
 import subprocess
@@ -81,19 +83,17 @@ class CcsSetup(OrderedDict):
         self['sequence_file'] = _quote("NA")
         self['acffile'] = self['itl_acffile']
         self['CCSCCDTYPE'] = _quote("ITL")
-
-        if ("RTM" in CCDTYPE) :
+        if ("RTM" in CCDTYPE.upper() or "ETU" in CCDTYPE.upper() ) :
             if ("e2v" in CCDTYPE) :
                 self['CCSCCDTYPE'] = _quote("E2V")
                 self['acffile'] = self['e2v_acffile']
                 self['sequence_file'] = self['e2v_seqfile']
-                os.system("cp -vp %s ." % e2v_seqfile)
             else :
                 self['CCSCCDTYPE'] = _quote("ITL")
                 self['acffile'] = self['itl_acffile']
                 self['sequence_file'] = self['itl_seqfile']
-                os.system("cp -vp %s ." % itl_seqfile)
-
+            os.system("cp -vp %s %s" % (self['sequence_file'],self['tsCWD']))
+            print "The sequence file to be used is %s" % self['sequence_file']
         else :
             if ("ITL" in CCDTYPE) :
                 self['CCSCCDTYPE'] = _quote("ITL")
@@ -101,7 +101,7 @@ class CcsSetup(OrderedDict):
             if ("e2v" in CCDTYPE) :
                 self['CCSCCDTYPE'] = _quote("E2V")
                 self['acffile'] = self['e2v_acffile']
-        print "The acffile to be used is %s" % self['acffile']
+            print "The acffile to be used is %s" % self['acffile']
 
     def _read(self, configFile):
         if configFile is None:
@@ -223,7 +223,8 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
 #    files = files+glob.glob('*summary*')
     files = files+glob.glob('*.png')
     files = files+glob.glob('*.dat')
-    files = files+glob.glob('*.txt')
+    files = files+glob.glob('*.seq')
+    files = files+glob.glob('*.xml')
     files = files+glob.glob('*.csv')
     files = files+glob.glob('*.pickles')
 

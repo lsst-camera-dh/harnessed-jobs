@@ -392,7 +392,7 @@ if (True):
             while imdone<imcount :
 
                 try:
-                    fpause = open("/tmp/ccs.pause" % (cdir),"r");
+                    fpause = open("/tmp/ccs.pause","r");
                     print "Detected pause request (/tmp/ccs.pause) exists. Remove this file to proceed"
                     fpause.close()
                     time.sleep(5.0)
