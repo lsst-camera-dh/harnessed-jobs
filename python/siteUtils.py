@@ -256,26 +256,41 @@ def dependency_glob(pattern, jobname=None, paths=None, description=None,
     print_file_list(description, file_list)
     return file_list
 
-def packageVersions(versions_filename='installed_versions.txt'):
-    versions_file = os.path.join(os.environ['INST_DIR'], versions_filename)
-    if not os.path.isfile(versions_file):
-        return []
-    parser = ConfigParser.ConfigParser()
-    parser.optionxform = str
-    parser.read(versions_file)
-    results = []
-    for section in parser.sections():
-        for package, version in parser.items(section):
-            results.append(lcatr.schema.valid(lcatr.schema.get('package_versions'),
-                                              package=package,
-                                              version=version))
-    return results
+def packageVersions():
+    # Not all harnessed jobs will use eotest and/or the LSST Stack, so
+    # set 'none' as the default for each.
+    try:
+        import lsst.eotest
+        eotest_version = lsst.eotest.getVersion()
+    except ImportError:
+        eotest_version = 'none'
+
+    try:
+        import lsst.afw
+        LSST_stack_version = lsst.afw.__version__
+    except ImportError:
+        LSST_stack_version = 'none'
+
+    import lcatr.harness.version
+    lcatr_harness_version = lcatr.harness.version.__version__
+
+    import lcatr.schema.version
+    lcatr_schema_version = lcatr.schema.version.__version__
+
+    result = lcatr.schema.valid(lcatr.schema.get('package_versions'),
+                                eotest_version=eotest_version,
+                                LSST_stack_version=LSST_stack_version,
+                                lcatr_harness_version=lcatr_harness_version,
+                                lcatr_schema_version=lcatr_schema_version,
+                                harnessedJobs_version=hj.getVersion(),
+                                hostname=socket.getfqdn())
+    return result
 
 def jobInfo():
-    results = packageVersions()
-    results.append(lcatr.schema.valid(lcatr.schema.get('job_info'),
-                                      job_name=os.environ['LCATR_JOB'],
-                                      job_id=os.environ['LCATR_JOB_ID']))
+    results = [packageVersions(),
+               lcatr.schema.valid(lcatr.schema.get('job_info'),
+                                  job_name=os.environ['LCATR_JOB'],
+                                  job_id=os.environ['LCATR_JOB_ID'])]
     return results
 
 class Parfile(dict):
