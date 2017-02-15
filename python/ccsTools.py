@@ -93,6 +93,9 @@ class CcsSetup(OrderedDict):
                 self['acffile'] = self['itl_acffile']
                 self['sequence_file'] = self['itl_seqfile']
             os.system("cp -vp %s %s" % (self['sequence_file'],self['tsCWD']))
+            # now use the local copy
+            bb = self['sequence_file'],split("/")
+            self['sequence_file'] = "%s/%s" % (self['tsCWD'],bb[len(bb)-1])
             print "The sequence file to be used is %s" % self['sequence_file']
         else :
             if ("ITL" in CCDTYPE) :
