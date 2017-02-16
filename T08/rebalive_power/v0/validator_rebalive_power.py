@@ -5,6 +5,7 @@ import siteUtils
 import shutil
 import lcatr.schema
 import glob
+import sys
 
 jobDir = siteUtils.getJobDir()
 
@@ -12,7 +13,10 @@ shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
-answer = raw_input("Enter y and return to RETEST, just return to proceed with plotting, archiving and ingesting the results ")
+for i in range(20) :
+     print "RETEST (N/y)?"
+sys.stdout.flush()
+answer = raw_input("RETEST (N/y)?")
 if "y" in answer.lower() :
      raise Exception("PURPOSELY crashing to allow a retest via retrying the e-Traveler step")
 

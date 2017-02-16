@@ -12,7 +12,7 @@ from java.lang import RuntimeException
 import sys
 import time
 import subprocess
-
+#import siteUtils
 
 
 CCS.setThrowExceptions(True);
@@ -22,17 +22,18 @@ CCS.setThrowExceptions(True);
 #################################################################
 def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
 
-#    print "Retrieving REB PS current %s " % pwr_chan
+    print "Retrieving REB PS current %s " % pwr_chan
     cur_ps = pwrsub.synchCommand(10,"getChannelValue REB%d.%s.IaftLDO" % (rebid,pwr_chan)).getResult()
-#    print "Retrieving REB current %s " % reb_chan
+    print "Retrieving REB current %s " % reb_chan
     cur_reb = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.%s" % (rebid,reb_chan)).getResult()
 
-#    print "verifying that the current is with limits"
+    print "verifying that the current is with limits"
     if (chkreb) :
         stat = "%s: - checking %10.10s : OK - PS value is %8.3f mAmps, REB value is %8.3f mAmps" % (rebname,pwr_chan,cur_ps,cur_reb)
     else :
         stat = "%s: - checking %10.10s : OK - PS value is %8.3f mAmps, REB not yet ON" % (rebname,pwr_chan,cur_ps)
 
+        print " ... stat = ",stat
     if (cur_ps < low_lim or cur_ps> high_lim) :
         pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (rebid,pwr))
         stat = "%s: Current %s with value %f mA NOT in range %f mA to %f mA. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (rebname, pwr_chan,cur_ps,low_lim,high_lim)
@@ -49,17 +50,36 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
     return
 
 
+class Logger(object):
+    def __init__(self):
+        self.terminal = sys.stdout
+        self.log = open("%s/rebalive_results.txt" % tsCWD, "a")
+
+    def write(self, message):
+        self.terminal.write(message+"\n")
+        self.log.write(message)  
+
+    def flush(self):
+        #this flush method is needed for python 3 compatibility.
+        #this handles the flush command by doing nothing.
+        #you might want to specify some extra behavior here.
+        pass    
+
+
 ######################################################################################
 ########################      MAIN             #######################################
 ########################          MAIN         #######################################
 ######################################################################################
+
+dorun = True
 
 # The following will cause an exception if not run as part of a harnessed job because
 # tsCWD and CCDID will not be defined in that case
 try:
     cdir = tsCWD
     unit = CCDID
-    sys.stdout = open("%s/rebalive_results.txt" % cdir, "w")
+ #   sys.stdout = open("%s/rebalive_results.txt" % cdir, "w")
+    sys.stdout = Logger()
     print "Running as a job harness. Results are being recorded in rebalive_results.txt"
 except:
     print "Running standalone. Statements will be sent to standard output."
@@ -67,7 +87,9 @@ except:
 
 print "start tstamp: %f" % time.time()
 
-if (True):
+if not dorun :
+    print "setup for repair ... not running"
+else :
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("ts8");
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
@@ -91,6 +113,15 @@ if (True):
         if ":" in arg :
             idmap.append(arg)
 
+# check for one by one connectivity jobs
+    if "connectivity0" in jobname :
+        idmap.append("0:0")
+    if "connectivity1" in jobname :
+        idmap.append("1:1")
+    if "connectivity2" in jobname :
+        idmap.append("2:2")
+
+# if nothing specified ... do it all
     if (len(idmap)==0) :
         for rebid in rebids :
             print "rebid = %s" % rebid
@@ -129,7 +160,7 @@ if (True):
                 print "%s: FAILED TO TURN POWER OFF! %s" % (rebname,e)
                 raise Exception
 
-            time.sleep(5.0)
+            time.sleep(3.0)
 
             pwron = ""
 # attempt to apply the REB power -- line by line
@@ -140,6 +171,8 @@ if (True):
                 pwron = pwron + pwr + " "
                 if 'clockhi' in pwr:
                     chkreb = True
+                    print "Rebooting the RCE after a 5s wait"
+                    time.sleep(5.0)
                     sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
                     print sout
                     time.sleep(2.0)
@@ -158,7 +191,7 @@ if (True):
                     if 'digital' in pwron :
                         check_currents(i,"digital","DigI",6.,800.,chkreb)
                     if 'analog' in pwron :
-                        check_currents(i,"analog","AnaI",6.,600.,chkreb)
+                        check_currents(i,"analog","AnaI",6.,610.,chkreb)
                     if 'od' in pwron :
                         check_currents(i,"OD","ODI",6.,190.,chkreb)
                     if 'clockhi' in pwron :
@@ -185,8 +218,8 @@ if (True):
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
 #    load default configuration
-                ts8sub.synchCommand(10,"loadConfiguration Rafts:itl")
-                ts8sub.synchCommand(10,"loadConfiguration RaftsLimits:itl")
+                ts8sub.synchCommand(10,"loadCategories Rafts:itl")
+                ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
                 try:
                     stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
                     print stat

@@ -122,10 +122,6 @@ def EOgetCCSVersions(tssub,cdir):
     ts_revision = ""
     archon_revision = ""
 
-    ts8_version = ""
-    power_version = ""
-    ts8_revision = ""
-    power_revision = ""
     for line in str(ccsversions).split("\t"):
         tokens = line.split()
         if ("Project   " in line) :
@@ -134,29 +130,17 @@ def EOgetCCSVersions(tssub,cdir):
                 ssys = "ts"
             if ("archon" in tokens[2]) :
                 ssys = "archon"
-            if ("ts8" in tokens[2]) :
-                ssys = "ts8"
-            if ("power" in tokens[2]) :
-                ssys = "power"
         if ("Version:" in line) :
             if (ssys == "ts") :
                 ts_version = tokens[2]
             if (ssys == "archon") :
                 archon_version = tokens[2]
-            if (ssys == "ts8") :
-                ts8_version = tokens[2]
-            if (ssys == "power") :
-                power_version = tokens[2]
         if ("Rev:" in line) :
             print "%s - revision = %s" % (ssys,tokens[3])
             if (ssys == "ts") :
                 ts_revision = tokens[3]
             if (ssys == "archon") :
                 archon_revision = tokens[3]
-            if (ssys == "ts8") :
-                ts8_revision = tokens[3]
-            if (ssys == "power") :
-                power_revision = tokens[3]
     return(ts_version,archon_version,ts_revision,archon_revision)
 
 ###############################################################################
@@ -172,8 +156,12 @@ def EOgetTS8CCSVersions(tssub,cdir):
 
     ts_version = ""
     ts8_version = ""
+    power_version = ""
+
     ts_revision = ""
     ts8_revision = ""
+    power_revision = ""
+
     for line in str(ccsversions).split("\t"):
         tokens = line.split()
         if ("Project   " in line) :
@@ -182,11 +170,15 @@ def EOgetTS8CCSVersions(tssub,cdir):
                 ssys = "ts"
             if ("ts8" in tokens[2]) :
                 ssys = "ts8"
+            if ("power" in tokens[2]) :
+                ssys = "power"
         if ("Version:" in line) :
             if (ssys == "ts") :
                 ts_version = tokens[2]
             if (ssys == "ts8") :
                 ts8_version = tokens[2]
+            if (ssys == "power") :
+                power_version = tokens[2]
         if ("Rev:" in line) :
             if len(tokens)>3 :
                 print "%s - revision = %s" % (ssys,tokens[3])
@@ -194,7 +186,9 @@ def EOgetTS8CCSVersions(tssub,cdir):
                     ts_revision = tokens[3]
                 if (ssys == "ts8") :
                     ts8_revision = tokens[3]
-    return(ts_version,ts8_version,ts_revision,ts8_revision)
+                if (ssys == "power") :
+                    power_revision = tokens[3]
+    return(ts_version,ts8_version,power_version,ts_revision,ts8_revision,power_revision)
 
 ###############################################################################
 # EOTS8Setup: perform setup needed for running standard EO TS8 jobs

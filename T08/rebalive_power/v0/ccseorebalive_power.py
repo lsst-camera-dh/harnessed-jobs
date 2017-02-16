@@ -56,7 +56,7 @@ class Logger(object):
         self.log = open("%s/rebalive_results.txt" % tsCWD, "a")
 
     def write(self, message):
-        self.terminal.write(message)
+        self.terminal.write(message+"\n")
         self.log.write(message)  
 
     def flush(self):

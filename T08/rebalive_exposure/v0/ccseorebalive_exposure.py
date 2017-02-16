@@ -48,6 +48,7 @@ if (True):
         try:
             rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
             result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
+            rply = monosub.synchCommand(900,"openShutter").getResult();
             break
         except:
             time.sleep(5.0)
@@ -67,7 +68,8 @@ if (True):
 
 # ITL seq file
 #    result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v7-etu2-pntr-explicit.seq");
-    result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v7-etu1-pntr-explicit.seq");
+#    result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v7-etu1-pntr-explicit.seq");
+    result = ts8sub.synchCommand(90,"loadSequencer",sequence_file);
     
 #14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.
 
@@ -123,15 +125,15 @@ if (True):
         ts8sub.synchCommand(10,"setTestType CONN")
         ts8sub.synchCommand(10,"setImageType FLAT")
 
-        exptime=0.100
-        print "Doing 100ms exposure"
+        exptime=1.000
+        print "Doing 1000ms flat exposure"
 
-        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorLoc}_${sensorId}_${test_type}_100ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,False,"${sensorLoc}_${sensorId}_${test_type}_flat_1000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
         exptime=4.000
-        print "Doing 4s exposure"
+        print "Doing 4s Fe55 exposure"
 
-        rply = ts8sub.synchCommand(280,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorLoc}_${sensorId}_${test_type}_4000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(280,"exposeAcquireAndSave",int(exptime*1000),False,True,"${sensorLoc}_${sensorId}_${test_type}_fe55_4000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
 #        exptime=20.000
 #

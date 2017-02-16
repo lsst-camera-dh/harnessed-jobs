@@ -24,6 +24,7 @@ print "attaching PDU subsystem"
 pdusub = CCS.attachSubsystem("%s/PDU" % ts );
 print "Attaching teststand 8 subsystem"
 ts8sub  = CCS.attachSubsystem("ts8");
+rebpssub  = CCS.attachSubsystem("ccs-rebps");
 
 ccdnames = {}
 ccdmanunames = {}
@@ -64,19 +65,22 @@ raft = UNITID
 
 ts_version = ""
 ts8_version = ""
+power_version = ""
+
 ts_revision = ""
 ts8_revision = ""
+power_revision = ""
 
 
 # get the software versions to include in the data products to be persisted in the DB                                                        
-ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetTS8CCSVersions(tssub,cdir)
+ts_version,ts8_version,power_version,ts_revision,ts8_revision,power_revision = eolib.EOgetTS8CCSVersions(tssub,cdir)
 
 # prepare TS8: make sure temperature and vacuum are OK and load the sequencer                                                                
 rafttype = "ITL"
 
 usets8 = False
 try:
-    eolib.EOTS8Setup(tssub,ts8sub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
+    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
     usets8 = True
     print "REBs appear to be attached and ready for exposure. Shutter control will be done via REBs"
 except Exception, ex:
@@ -99,9 +103,9 @@ ccd = CCDID
 flat_pat = '${CCDSerialLSST}_${TestType}_%07.2fs_${ImageType}%d_${RunNumber}_${timestamp}.fits'
 
 if usets8 :
-    rwl = monosub.synchCommand(900,"openShutter").getResult();
+    rply = monosub.synchCommand(900,"openShutter").getResult();
 else :
-    rwl = monosub.synchCommand(900,"closeShutter").getResult();
+    rply = monosub.synchCommand(900,"closeShutter").getResult();
 
 print "Working on CCD %s" % ccd
 
@@ -189,9 +193,9 @@ try:
                     print fitsfiles
                 else :
 
-                    rwl = monosub.synchCommand(900,"openShutter").getResult();
+                    rply = monosub.synchCommand(900,"openShutter").getResult();
                     time.sleep(exptime)
-                    rwl = monosub.synchCommand(900,"closeShutter").getResult();
+                    rply = monosub.synchCommand(900,"closeShutter").getResult();
 
 
                 print "Done exposing at %f" % time.time()
@@ -224,6 +228,7 @@ try:
     fpfiles.close();
     fp.close();
 
+    rply = monosub.synchCommand(900,"openShutter").getResult();
     fp = open("%s/status.out" % (cdir),"w");
 
     istate=0;
@@ -232,13 +237,17 @@ try:
     fp.write(`istate`+"\n");
     fp.write("%s\n" % ts_version);
     fp.write("%s\n" % ts_revision);
+    fp.write("%s\n" % "NA");
+    fp.write("%s\n" % "NA");
     fp.write("%s\n" % ts8_version);
     fp.write("%s\n" % ts8_revision);
+    fp.write("%s\n" % power_version);
+    fp.write("%s\n" % power_revision);
     fp.close();
 
 
 # make sure to leave the monochromator shutter open
-    rwl = monosub.synchCommand(900,"openShutter").getResult();
+    rply = monosub.synchCommand(900,"openShutter").getResult();
 # get the glowing vacuum gauge back on
 #    print "turning the vacuum gauge back on"
 #    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
@@ -258,7 +267,8 @@ except Exception, ex:
 # get the glowing vacuum gauge back on
 #    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
 #    rply = result.getResult();
-    result = pdsub.synchCommand(10,"softReset");
+    rply = monosub.synchCommand(900,"openShutter").getResult();
+    result = pdsub.synchCommand(30,"softReset");
     raise Exception("There was an exception in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 
 except ScriptingTimeoutException, ex:
@@ -269,6 +279,7 @@ except ScriptingTimeoutException, ex:
 # get the glowing vacuum gauge back on
 #    result = pdusub.synchCommand(120,"setOutletState",vac_outlet,True);
 #    rply = result.getResult();
+    rply = monosub.synchCommand(900,"openShutter").getResult();
     result = pdsub.synchCommand(10,"softReset");
     raise Exception("There was a ScriptingTimeoutException in the acquisition producer script. The message is\n (%s)\nPlease retry the step or contact an expert," % ex)
 

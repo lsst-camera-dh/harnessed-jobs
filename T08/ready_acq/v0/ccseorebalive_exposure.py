@@ -23,6 +23,14 @@ if (True):
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
     pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
 
+    print "Attaching teststand subsystems"
+    tssub  = CCS.attachSubsystem("%s" % ts);
+#    print "attaching Bias subsystem"
+#    biassub   = CCS.attachSubsystem("%s/Bias" % ts);
+#    print "attaching PD subsystem"
+#    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
+    print "attaching Mono subsystem"
+    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
 
     cdir = tsCWD
 
@@ -35,6 +43,15 @@ if (True):
 
     status_value = None
 
+    wl = 500.
+    for itry in range(3) :
+        try:
+            rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
+            result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
+            rply = monosub.synchCommand(900,"openShutter").getResult();
+            break
+        except:
+            time.sleep(5.0)
 
 #  Verify data link integrity.
     rebs = ""
@@ -49,34 +66,36 @@ if (True):
         status_value = "failed"
     fp.write("%s| %s\n" % (test_name,status_value));
 
-    for i in range(2) :
-#        fp.write("\n\nREB ID = %s\n" % rebid)
-#        fp.write("==============================\n")
-
-#13. Configure the ASPICs to standard gain and RC time constant, and leave the inputs in clamped state.
-
-#        for i in range(6) :
-#            ts8asp[i].synchCommand(10,"change clamp 1");
-
-
-# Apply the CCD bias voltages and set the CCD clock rails (to E2V levels).                                               
-#        result = ts8sub.synchCommand(90,"loadSequencer","seq_1M.xml");
-
-# E2V seq file
-#        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-model-geo2.seq");
- #        result = ts8sub.synchCommand(90,"loadSequencer","/home/ts8prod/workdir/sequencer-reb3-modelv2.seq");
 # ITL seq file
-        result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v6-pntr-explicit.seq");
- 
+#    result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v7-etu2-pntr-explicit.seq");
+#    result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v7-etu1-pntr-explicit.seq");
+    result = ts8sub.synchCommand(90,"loadSequencer",sequence_file);
+    
 #14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.
 
-        ts8sub.synchCommand(10,"setDefaultImageDirectory","%s" % (cdir));
+    ts8sub.synchCommand(10,"setDefaultImageDirectory","%s" % (cdir));
+
+    if (True) :
+
+
+        seqcmnd = "setSequencerStart Clear"
+        print ts8sub.synchCommand(10,seqcmnd).getResult();
+        for iclear in range(10):
+            seqcmnd = "startSequencer"
+            print "seqcmnd = (%s)" % seqcmnd
+            print ts8sub.synchCommand(10,seqcmnd).getResult();
+
+        expcmnd1 = 'exposeAcquireAndSave 100 True False ""'
+
+        print "PRE-exposure command: expcmnd1 = ",expcmnd1
+        print ts8sub.synchCommand(1500,expcmnd1).getResult() 
+
 
 # <LSST CCD SN>_<test type>_<image type>_<seq. info>_<time stamp>.fits
 
-        fitsfilename = "s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits"
+#        fitsfilename = "s${sensorLoc}_r${raftLoc}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits"
 
-        print "fitsfilename = %s" % fitsfilename
+#        print "fitsfilename = %s" % fitsfilename
 
         ts8sub.synchCommand(10,"setTestType","FE55")
 
@@ -92,7 +111,7 @@ if (True):
         ts8sub.synchCommand(10,"setImageType BIAS")
 
 # <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",0,False,False,"${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",100,False,False,"${sensorLoc}_${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (0,tm_end)
@@ -106,19 +125,19 @@ if (True):
         ts8sub.synchCommand(10,"setTestType CONN")
         ts8sub.synchCommand(10,"setImageType FLAT")
 
-        exptime=0.100
+        exptime=1.000
+        print "Doing 1000ms flat exposure"
 
-        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_100ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,False,"${sensorLoc}_${sensorId}_${test_type}_flat_1000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
         exptime=4.000
+        print "Doing 4s Fe55 exposure"
 
-        rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_4000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(280,"exposeAcquireAndSave",int(exptime*1000),False,True,"${sensorLoc}_${sensorId}_${test_type}_fe55_4000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
-        exptime=20.000
-
-        rply = ts8sub.synchCommand(180,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorId}_${test_type}_20000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
-
-
+#        exptime=20.000
+#
+#        rply = ts8sub.synchCommand(280,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorLoc}_${sensorId}_${test_type}_20000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
 
     fp.close();

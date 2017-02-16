@@ -16,6 +16,15 @@ import glob
 
 CCS.setThrowExceptions(True);
 
+
+def expoprep() :
+    seqcmnd = "setSequencerStart Clear"
+    ts8sub.synchCommand(10,seqcmnd).getResult();
+    for iclear in range(9):
+        print ts8sub.synchCommand(10,"startSequencer").getResult();
+    print ts8sub.synchCommand(1500,'exposeAcquireAndSave 100 False False ""').getResult() 
+
+
 doPD = True
 runnum = "no-eTrav"
 try:
@@ -55,12 +64,15 @@ if (True):
 
     ts_version = ""
     ts8_version = ""
+    power_version = ""
+
     ts_revision = ""
     ts8_revision = ""
+    power_revision = ""
 
 
 # get the software versions to include in the data products to be persisted in the DB
-    ts_version,ts8_version,ts_revision,ts8_revision = eolib.EOgetTS8CCSVersions(tssub,cdir)
+    ts_version,ts8_version,power_version,ts_revision,ts8_revision,power_revision = eolib.EOgetTS8CCSVersions(tssub,cdir)
 
 
     ccdnames = {}
@@ -528,8 +540,12 @@ if (True):
     fp.write(`istate`+"\n");
     fp.write("%s\n" % ts_version);
     fp.write("%s\n" % ts_revision);
+    fp.write("%s\n" % "NA");
+    fp.write("%s\n" % "NA");
     fp.write("%s\n" % ts8_version);
     fp.write("%s\n" % ts8_revision);
+    fp.write("%s\n" % power_version);
+    fp.write("%s\n" % power_revision);
     fp.close();
 
 # move TS to idle state

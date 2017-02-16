@@ -94,8 +94,8 @@ class CcsSetup(OrderedDict):
                 self['sequence_file'] = self['itl_seqfile']
             os.system("cp -vp %s %s" % (self['sequence_file'],self['tsCWD']))
             # now use the local copy
-            bb = self['sequence_file'],split("/")
-            self['sequence_file'] = "%s/%s" % (self['tsCWD'],bb[len(bb)-1])
+#            bb = self['sequence_file'].split("/")
+#            self['sequence_file'] = _quote("%s/%s" % (os.getcwd(),bb[len(bb)-1].split("'")[0]))
             print "The sequence file to be used is %s" % self['sequence_file']
         else :
             if ("ITL" in CCDTYPE) :
@@ -232,10 +232,13 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     files = files+glob.glob('*.pickles')
 
     print "The files that will be registered in lims from %s are:" % os.getcwd()
+    print "files = ",files
     for line in files :
         print "%s" % line
     data_products = [lcatr.schema.fileref.make(item) for item in files]
     results.extend(data_products)
+
+    print "results=",results
 
     lcatr.schema.write_file(results)
     lcatr.schema.validate_file()
