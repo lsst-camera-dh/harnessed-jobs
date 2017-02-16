@@ -240,6 +240,8 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
 
     print "results=",results
 
+    results.extend(siteUtils.jobInfo())
+
     lcatr.schema.write_file(results)
     lcatr.schema.validate_file()
 # now lets crash if that status file wasn't present
