@@ -212,7 +212,7 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     results.append(lcatr.schema.valid(lcatr.schema.get(jobName), 
                                       **statusAssignments))
 
-    results.append(siteUtils.packageVersions())
+#    results.append(siteUtils.packageVersions())
 
     # @todo Fix this. Copying these files should not be necessary.
 #    jobdir = siteUtils.getJobDir()
