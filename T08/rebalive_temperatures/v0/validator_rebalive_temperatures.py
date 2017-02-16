@@ -69,7 +69,7 @@ print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
 results.append(lcatr.schema.valid(lcatr.schema.get("%s_runtime"%jobName),
                                       **statusAssignments))
 
-results.append(siteUtils.packageVersions())
+#results.append(siteUtils.packageVersions())
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()

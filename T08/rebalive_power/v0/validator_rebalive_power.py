@@ -20,7 +20,7 @@ answer = raw_input("RETEST (N/y)?")
 if "y" in answer.lower() :
      raise Exception("PURPOSELY crashing to allow a retest via retrying the e-Traveler step")
 
-os.system("./rebalive_plots.sh > logplt &")
+#os.system("./rebalive_plots.sh > logplt &")
 
 jobName = "rebalive_power"
 
@@ -77,7 +77,7 @@ print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
 results.append(lcatr.schema.valid(lcatr.schema.get("%s_runtime"%jobName),
                                       **statusAssignments))
 
-results.append(siteUtils.packageVersions())
+#results.append(siteUtils.packageVersions())
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
