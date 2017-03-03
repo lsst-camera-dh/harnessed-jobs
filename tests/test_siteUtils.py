@@ -28,5 +28,26 @@ class ParfileTestCase(unittest.TestCase):
             for key, value in self.values[section].items():
                 self.assertEquals(pars[key], value)
 
+class PackageVersionSummaryTestCase(unittest.TestCase):
+    """
+    Test case class for parsing the summary.lims file for the package
+    version info.
+    """
+    def setUp(self):
+        pass
+    def tearDown(self):
+        pass
+    def test_parse_package_versions_summary(self):
+        "Test that the expected package versions are returned."
+        summary_lims_file = os.path.join(os.environ['HARNESSEDJOBSDIR'],
+                                         'tests', 'summary_lims_test_file')
+        versions = siteUtils.parse_package_versions_summary(summary_lims_file)
+        self.assertEqual(versions['harnessed-jobs'], '0.4.28')
+        self.assertEqual(versions['lcatr-harness'], '0.13.0')
+        self.assertEqual(versions['eTraveler-clientAPI'], '1.2.2')
+        self.assertEqual(versions['datacat_config'],
+                         "/nfs/farm/g/lsst/u1/software/datacat/config.cfg")
+        self.assertEqual(len(versions), 11)
+
 if __name__ == '__main__':
     unittest.main()

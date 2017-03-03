@@ -4,6 +4,8 @@ import glob
 import shutil
 import pickle
 import fnmatch
+from collections import OrderedDict
+import json
 import ConfigParser
 import matplotlib.pyplot as plt
 import lcatr.schema
@@ -269,6 +271,14 @@ def packageVersions(versions_filename='installed_versions.txt'):
                                               package=package,
                                               version=version))
     return results
+
+def parse_package_versions_summary(summary_lims_file):
+    package_versions = OrderedDict()
+    summary = json.loads(open(summary_lims_file).read())
+    for result in summary:
+        if result['schema_name'] == 'package_versions':
+            package_versions[result['package']] = result['version']
+    return package_versions
 
 def jobInfo():
     results = packageVersions()

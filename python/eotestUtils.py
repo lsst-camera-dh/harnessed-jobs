@@ -203,7 +203,7 @@ class JsonRepackager(object):
                      ('ptc_gain', 'PTC_GAIN'),
                      ('ptc_gain_error', 'PTC_GAIN_ERROR'),
                      ))
-    def __init__(self, outfile='eotest_results.fits'):
+    def __init__(self, outfile='eotest_results.fits', namps=16):
         """
         Constructor
 
@@ -213,7 +213,7 @@ class JsonRepackager(object):
             Output filename of FITS file to contain the results as
             written by self.eotest_results.
         """
-        self.eotest_results = sensorTest.EOTestResults(outfile)
+        self.eotest_results = sensorTest.EOTestResults(outfile, namps=namps)
 
     def process_file(self, infile, sensor_id=None):
         """
