@@ -73,37 +73,45 @@ fe55_file = processName_dependencyGlob('%s_psf_results*.fits' % sensor_id,
                                        jobname='fe55_analysis')[0]
 plots.fe55_dists(fe55_file=fe55_file)
 plt.savefig('%s_fe55_dists.png' % sensor_id)
+plt.close('all')
 
 # PSF distributions from Fe55 fits
 plots.psf_dists(fe55_file=fe55_file)
 plt.savefig('%s_psf_dists.png' % sensor_id)
+plt.close('all')
 
 # Photon Transfer Curves
 ptc_file = processName_dependencyGlob('%s_ptc.fits' % sensor_id,
                                       jobname='ptc')[0]
 plots.ptcs(ptc_file=ptc_file)
 plt.savefig('%s_ptcs.png' % sensor_id)
+plt.close('all')
 
 # Linearity plots
 detresp_file = processName_dependencyGlob('%s_det_response.fits' % sensor_id,
                                           jobname='flat_pairs')[0]
 plots.linearity(ptc_file=ptc_file, detresp_file=detresp_file)
 plt.savefig('%s_linearity.png' % sensor_id)
+plt.close('all')
 
 plots.linearity_resids(ptc_file=ptc_file, detresp_file=detresp_file)
 plt.savefig('%s_linearity_resids.png' % sensor_id)
+plt.close('all')
 
 # Full well plots
 plots.full_well(ptc_file=ptc_file, detresp_file=detresp_file)
 plt.savefig('%s_full_well.png' % sensor_id)
+plt.close('all')
 
 # System Gain per segment
 plots.gains()
 plt.savefig('%s_gains.png' % sensor_id)
+plt.close('all')
 
 # Read Noise per segment
 plots.noise()
 plt.savefig('%s_noise.png' % sensor_id)
+plt.close('all')
 
 # Fe55 zoom
 fe55_zoom = processName_dependencyGlob('%s_fe55_zoom.png' % sensor_id,
@@ -143,6 +151,7 @@ bias_files = processName_dependencyGlob('%s_mean_bias_*.fits' % sensor_id,
 if bias_files:
     sensorTest.plot_flat(bias_files[0], title='%s, mean bias frame' % sensor_id)
     plt.savefig('%s_mean_bias.png' % sensor_id)
+    plt.close('all')
 
 # Mosaicked image of medianed dark for bright_defects job.
 dark_bd_file = processName_dependencyGlob('%s_median_dark_bp.fits' % sensor_id,
@@ -150,6 +159,7 @@ dark_bd_file = processName_dependencyGlob('%s_median_dark_bp.fits' % sensor_id,
 sensorTest.plot_flat(dark_bd_file,
                      title='%s, medianed dark for bright defects analysis' % sensor_id)
 plt.savefig('%s_medianed_dark.png' % sensor_id)
+plt.close('all')
 
 # Superflat for dark defects job
 sflat_dd_file = processName_dependencyGlob('%s_median_sflat.fits' % sensor_id,
@@ -157,6 +167,7 @@ sflat_dd_file = processName_dependencyGlob('%s_median_sflat.fits' % sensor_id,
 sensorTest.plot_flat(sflat_dd_file,
                      title='%s, superflat for dark defects analysis' % sensor_id)
 plt.savefig('%s_superflat_dark_defects.png' % sensor_id)
+plt.close('all')
 
 # Superflats for high and low flux levels
 superflat_files = sorted(processName_dependencyGlob('%s_superflat_*.fits' % sensor_id, jobname='cte'))
@@ -170,6 +181,7 @@ for sflat_file in superflat_files:
     outfile = os.path.basename(sflat_file).replace('.fits', '.png')
     print outfile
     plt.savefig(outfile)
+    plt.close('all')
 
     # Profiles of serial CTE in overscan region
     mask_files = eotestUtils.glob_mask_files()
@@ -177,31 +189,37 @@ for sflat_file in superflat_files:
     plots.cte_profiles(flux_level, sflat_file, mask_files, serial=True)
     outfile = '%(sensor_id)s_serial_oscan_%(flux_level)s.png' % locals()
     plt.savefig(outfile)
+    plt.close('all')
 
     # Profiles of parallel CTE in overscan region
     plots.cte_profiles(flux_level, sflat_file, mask_files, serial=False)
     outfile = '%(sensor_id)s_parallel_oscan_%(flux_level)s.png' % locals()
     plt.savefig(outfile)
+    plt.close('all')
 
 # Quantum Efficiency
 plots.qe(qe_file=qe_file)
 plt.savefig('%s_qe.png' % sensor_id)
+plt.close('all')
 
 # Crosstalk matrix
 if xtalk_file is not None:
     plots.crosstalk_matrix(xtalk_file=xtalk_file)
     plt.savefig('%s_crosstalk_matrix.png' % sensor_id)
+    plt.close('all')
 
 # Flat fields at wavelengths nearest the centers of the standard bands
 wl_file_path = os.path.split(wl_files[0])[0]
 plots.flat_fields(wl_file_path)
 plt.savefig('%s_flat_fields.png' % sensor_id)
+plt.close('all')
 
 # Image persistence
 persistence_file = processName_dependencyGlob('%s_persistence.fits' % sensor_id,
                                               jobname='persistence')[0]
 plots.persistence(infile=persistence_file)
 plt.savefig('%s_persistence.png' % sensor_id)
+plt.close('all')
 
 # QA plots
 qa_plot_files = processName_dependencyGlob('%s_*.png' % sensor_id,
@@ -235,4 +253,3 @@ report = sensorTest.EOTestReport(plots, wl_file_path,
                                  teststand_config=teststand_config,
                                  job_ids=job_ids)
 report.make_pdf()
-

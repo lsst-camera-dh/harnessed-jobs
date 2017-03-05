@@ -278,6 +278,8 @@ def parse_package_versions_summary(summary_lims_file):
     for result in summary:
         if result['schema_name'] == 'package_versions':
             package_versions[result['package']] = result['version']
+    if len(package_versions) == 0:
+        return None
     return package_versions
 
 def jobInfo():

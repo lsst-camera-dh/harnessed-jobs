@@ -16,7 +16,7 @@ for wl, stdev, mean in zip(prnu_results['WAVELENGTH'],
     results.append(lcatr.schema.valid(lcatr.schema.get('prnu'),
                                       wavelength=int(np.round(wl)),
                                       pixel_stdev=stdev, pixel_mean=mean))
-results.append(siteUtils.packageVersions())
+results.extend(siteUtils.packageVersions())
 results.extend(siteUtils.jobInfo())
 results.append(eotestUtils.eotestCalibrations())
 
