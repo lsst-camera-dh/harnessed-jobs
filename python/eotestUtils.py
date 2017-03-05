@@ -19,7 +19,7 @@ def getSensorGains(jobname='fe55_analysis', sensor_id=None):
         sensor_id = siteUtils.getUnitId()
     try:
         gain_file = dependency_glob('%s_eotest_results.fits' % sensor_id,
-                                    jobname=jobname)[0]
+                                    jobname=siteUtils.getProcessName(jobname))[0]
     except IndexError:
         raise RuntimeError('eotestUtils.getSensorGains: %s %s'
                            % (sensor_id, jobname))
