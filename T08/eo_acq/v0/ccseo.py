@@ -141,7 +141,7 @@ if (True):
     seq = 0
 # old wave length setting
     owl = -1.0
-# number of PulseLinceCounts between readings
+# number of PulseLineCounts between readings
     nplc = 1.0
 # exposure time
     exptime = -1
@@ -213,7 +213,7 @@ if (True):
                 imcount = float(tokens[2])
                 if 'PPUMP' in acqname :
                     nshifts  = float(tokens[3])
-                elif 'FE55' in acqname :
+                elif 'FE55' in acqname or 'STBL' in acqname :
                     doXED = True
             print "\nfound instruction (%s) with image count = %d" % (line,imcount)
 
@@ -377,7 +377,7 @@ if (True):
                 nplc = 0.25
 
             MAX_READS = 2048
-            if 'DARK' in acqname or 'FE55' in acqname :
+            if 'DARK' in acqname or 'FE55' in acqname or 'STBL' in acqname :
                 MAX_READS = 1000
 
             nreads = (exptime+2.0)*60/nplc
@@ -438,8 +438,11 @@ if (True):
                         pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
 
                         while(True) :
-                            result = pdsub.synchCommand(10,"isAccumInProgress");
-                            rply = result.getResult();
+                            try:
+                                result = pdsub.synchCommand(20,"isAccumInProgress");
+                                rply = result.getResult();
+                            except:
+                                pass
                             print "checking for PD accumulation in progress at %f" % time.time()
                             if rply==True :
                                 print "accumulation running"

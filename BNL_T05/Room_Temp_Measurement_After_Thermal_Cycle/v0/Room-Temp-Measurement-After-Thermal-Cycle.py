@@ -1,7 +1,7 @@
 ###############################################################################
 # Room-Temp-Measurement-After-Thermal-Cycle
 # TS5 KEYENCE METROLOGY SCAN
-#      Date: 11/07
+#      Date: 20161107
 #      Authors: Homer and Rebecca
 ###############################################################################
 
@@ -15,13 +15,17 @@ CCS.setThrowExceptions(True);
 
 
 #attach CCS subsystem Devices for scripting
-print "Attaching METROLOGY subsystems"
 ts5sub  = CCS.attachSubsystem("metrology");
-print "Attaching CRYO subystems"
 cryosub = CCS.attachSubsystem("ts/Cryo" );
 vacsub = CCS.attachSubsystem("ts/VQMonitor");
 pdusub = CCS.attachSubsystem("ts/PDU");
 
+
+runnum = "no-eTrav"
+try:
+    runnum = RUNNUM
+except:
+    pass
 
 
 cdir = tsCWD
@@ -29,7 +33,6 @@ cdir = tsCWD
 target_temp = 20. 
 
 cur_temp = cryosub.synchCommand(20,"getTemp B").getResult()
-#cur_temp = 20.
 
 # number of degrees per minute
 trate = 1.2
@@ -42,28 +45,19 @@ period = abs(target_temp - cur_temp) / (trate/60.0);
 nsteps = abs(target_temp - cur_temp)
 
 ###################################################################
-# Once at a safe pressure, begin cooling the device
 starttim = time.time()
-if (True):
-    while True:
-        result = vacsub.synchCommand(20,"readPressure");
-        pres = result.getResult();
-        print "time = %f , P = %f\n" % (time.time(),pres)
-        if (pres>0.0 and pres<0.001) :
-            break
-        time.sleep(5.)
 ###################################################################
 
 #    pdusub.synchCommand(120,"setOutletState",cryo_outlet,False).getResult()
 
-    cryosub.synchCommand(40000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
+#    cryosub.synchCommand(40000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
 
-    while (True) :
-        now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
-        if (abs(target_temp-now_temp)<2.0) :
-            break
-        time.sleep(5.0)
-        print "waiting for target temp to be reached. current temp = %fC" % now_temp
+while (True) :
+    now_temp = cryosub.synchCommand(20,"getTemp C").getResult()
+    if (abs(target_temp-now_temp)<5.0) :
+        break
+    time.sleep(5.0)
+    print "waiting for target temp to be reached. current temp = %fC" % now_temp
 
 ts5sub.synchCommand(30,"setCfgStateByName RTM")
 
@@ -71,24 +65,20 @@ tstart = time.time()
 
 aa=time.ctime().split(" ")
 tstart_human = (aa[4]+aa[1]+aa[2]+"-"+aa[3]).replace(":","")
-fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,RUNNUM,tstart_human,target_temp)
+fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,runnum,tstart_human,target_temp)
 
 start_temp = {}
 
 for temp in ["A","B","C","D"]:
     start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
-#    start_temp[temp]=20.0
 
-#ts5sub.synchCommand(3000,"noStepScan  %s/Room-Temp-Measurement-After-Thermal-Cycle.dat" % cdir)
-ts5sub.synchCommand(3000,"noStepScan  %s/%s" % (cdir,fln))
+ts5sub.synchCommand(5000,"scanfl %s/%s" % (cdir,fln))
 
 tstop = time.time()
 stop_temp = {}
 for temp in ["A","B","C","D"]:
     stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
-#    stop_temp[temp]=20.0
 
-#fpdat = open("%s/Room-Temp-Measurement-After-Thermal-Cycle.dat" % (cdir),"a");
 fpdat = open("%s/%s" % (cdir,fln),"a");
 fpdat.write("# start time = %f , stop time = %f\n" % (tstart,tstop))
 for temp in ["A","B","C","D"]:
@@ -114,7 +104,7 @@ fp.close();
 
 
 print " =====================================================\n"
-print "            TS5 KEYENCE METROLOGY SCAN DONE\n"
+print "   TS5 ROOM TEMP AFTER THERMAL CYCLE METROLOGY SCAN DONE\n"
 print " =====================================================\n"
 
 

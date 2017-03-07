@@ -192,7 +192,7 @@ try:
             nreads = (exptime+2.0)*60/nplc
             if (nreads > 2048):
                 nreads = 2048
-                nplc = (exptime+2.0)*60/nreads
+                nplc = (exptime+4.0)*60/nreads
                 print "Nreads limited to 2048. nplc set to %f to cover full exposure period " % nplc
 
             result = arcsub.synchCommand(10,"setHeader","TestType","LAMBDA")
@@ -205,16 +205,28 @@ try:
             pdsub.synchCommand(1000,"setTimeout",mywait);
 
             arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+            arcsub.synchCommand(10,"setParameter","WaiTime","200");
+
 #                arcsub.synchCommand(10,"setParameter","ExpTime","300");
 
             result = arcsub.synchCommand(10,"setFitsFilename","");
             print "Ready to take clearing bias image. time = %f" % time.time()
-            result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-            rply = result.getResult()
-            result = arcsub.synchCommand(500,"waitForExpoEnd");
-            rply = result.getResult();
+            rply = arcsub.synchCommand(200,"exposeAcquireAndSave").getResult();
+            rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
 
-            time.sleep(4.0)
+# a single pre-exposure
+
+ #           arcsub.synchCommand(10,"setParameter","ExpTime","0");
+            
+            arcsub.synchCommand(10,"setParameter Nexpo 1");
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+            arcsub.synchCommand(10,"setParameter","WaiTime","200");
+
+            fitsfilename = arcsub.synchCommand(500,"exposeAcquireAndSave").getResult();
+            time.sleep(0.1)
+            rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
+#            time.sleep(2.0)
 
             for i in range(imcount):
                 print "starting acquisition step for lambda = %8.2f" % wl
@@ -240,16 +252,25 @@ try:
                 print "fitsfilename = %s" % fitsfilename
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(1.0);
+#                time.sleep(0.5);
+
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
                 print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
-                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                result = arcsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
+                fitsfilename = arcsub.synchCommand(500,"exposeAcquireAndSave").getResult();
+                rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
                 print "after click click at %f" % time.time()
 
                 print "done with exposure # %d" % i
+
+                arcsub.synchCommand(10,"setParameter","ExpTime","0");
+#4ik
+                arcsub.synchCommand(10,"setParameter Nexpo 100000");
+
+#                arcsub.synchCommand(10,"setFitsFilename","");
+#                rply = arcsub.synchCommand(500,"exposeAcquireAndSave").getResult();
+#                rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
                 print "getting photodiode readings at time = %f" % time.time();
 
                 pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),seq,i+1)
@@ -258,7 +279,7 @@ try:
                 tottime = pdresult.get();
 
 # make sure the sample of the photo diode is complete
-                time.sleep(2.)
+#                time.sleep(2.)
 
                 try:
                     print "executing readBuffer, cdir=%s , pdfilename = %s" % (cdir,pdfilename)

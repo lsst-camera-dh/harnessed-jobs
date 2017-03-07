@@ -41,7 +41,7 @@ try:
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","Fe55","0");
 
-    bcount = int(eolib.getCfgVal(acqcfgfile, 'DARK_BCOUNT', default = "3"))
+    bcount = float(eolib.getCfgVal(acqcfgfile, 'DARK_BCOUNT', default = "3"))
 
 # wait until its dark .... very dark
     time.sleep(30.)
@@ -171,12 +171,16 @@ try:
                 result = arcsub.synchCommand(10,"setHeader","ImageType","DARK")
 #                result = arcsub.synchCommand(10,"setFetch_timeout",int(int(mywait)*1000))
 
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+
                 print "Ready to take image. time = %f" % time.time()
-                result = arcsub.synchCommand(10000,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
+                fitsfilename = arcsub.synchCommand(10000,"exposeAcquireAndSave").getResult();
+
                 print "after click click at %f" % time.time()
-    
                 print "done with exposure # %d" % i
+
+                arcsub.synchCommand(10,"setParameter","ExpTime","0");
+
                 print "getting photodiode readings at time = %f" % time.time();
 
                 pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),seq,i+1)

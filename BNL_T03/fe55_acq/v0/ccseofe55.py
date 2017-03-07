@@ -193,8 +193,8 @@ try:
 #    xedsub.synchCommand(30,"retractFe55");
 
     print "Now collect some parameters from the config file"
-    bcount = int(eolib.getCfgVal(acqcfgfile, 'FE55_BCOUNT', default = "2"))
-    dcount = int(eolib.getCfgVal(acqcfgfile, 'FE55_DCOUNT', default = "2"))
+    bcount = float(eolib.getCfgVal(acqcfgfile, 'FE55_BCOUNT', default = "2"))
+    dcount = float(eolib.getCfgVal(acqcfgfile, 'FE55_DCOUNT', default = "2"))
 
     seq = 0
 
@@ -271,7 +271,7 @@ try:
             icount = 0
             for itype in range(2):
                 if (itype==0) : 
-                    itypename = "dark"
+                    itypename = "bias"
                     icount = dcount
                     arcsub.synchCommand(10,"setParameter","Fe55","0");
                 if (itype==1) :
@@ -281,6 +281,8 @@ try:
 
                 print "Throwing away the first image"
                 arcsub.synchCommand(10,"setFitsFilename","");
+# set exposure time just before taking image
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
                 result = arcsub.synchCommand(200,"exposeAcquireAndSave");
                 reply = result.getResult();
 
@@ -291,6 +293,10 @@ try:
 
                 for i in range(icount):
 
+#4ik
+                    print "setting Nexpo back to single shot"
+                    arcsub.synchCommand(10,"setParameter Nexpo 1");
+                    print "picture taken"
 # prepare to readout diodes                                                                              
 # adjust timeout because we will be waiting for the data to become ready
                     mywait = nplc/60.*nreads*1.10 ;
@@ -318,10 +324,16 @@ try:
 #                xedsub.synchCommand(30,"extendFe55");
     
 
-                    result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                    fitsfilename = result.getResult();
-                    result = arcsub.synchCommand(500,"waitForExpoEnd");
-                    rply = result.getResult();
+# set exposure time just before taking image
+                    arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+
+# take the image
+                    fitsfilename = arcsub.synchCommand(200,"exposeAcquireAndSave").getResult();
+                    rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
+# continuous unrecorded bias taking
+                    arcsub.synchCommand(10,"setParameter","ExpTime","0");
+                    arcsub.synchCommand(10,"setParameter Nexpo 100000");
 
 # retract the Fe55 arm
 #                xedsub.synchCommand(30,"retractFe55");

@@ -54,7 +54,7 @@ try:
     print "Now collect some parameters from the config file"
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_LOLIM', default='0.1'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_HILIM', default='120.0'))
-    bcount = int(eolib.getCfgVal(acqcfgfile, 'FLAT_BCOUNT', default = "2"))
+    bcount = float(eolib.getCfgVal(acqcfgfile, 'FLAT_BCOUNT', default = "2"))
     wl     = float(eolib.getCfgVal(acqcfgfile, 'FLAT_WL', default = "550.0"))
     imcount = 2
 
@@ -76,6 +76,7 @@ try:
     print "set controller for bias exposure"
     arcsub.synchCommand(10,"setParameter","Light","0");
     arcsub.synchCommand(10,"setParameter","ExpTime","0");
+    arcsub.synchCommand(10,"setParameter","WaiTime","200");
     for i in range(5):
         timestamp = time.time()
         result = arcsub.synchCommand(10,"setFitsFilename","");
@@ -150,7 +151,7 @@ try:
 
                 time.sleep(1.0)
 # ===========================================================================
-            time.sleep(2.0)
+#            time.sleep(2.0)
 
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
@@ -211,7 +212,7 @@ try:
             else :
                 nplc = 0.20
 
-            nreads = (exptime+4.0)*60/nplc
+            nreads = (exptime+5.0)*60/nplc
             if (nreads > 3000):
                 nreads = 3000
                 nplc = (exptime+4.0)*60/nreads
@@ -233,17 +234,37 @@ try:
 # wait an amount of time equivalent to the last flux image taken
 #            time.sleep(2.0)
             arcsub.synchCommand(10,"setParameter","Light","1");
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
-            result = arcsub.synchCommand(10,"setFitsFilename","");
-            print "Ready to take disposable image. time = %f" % time.time()
-            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-            fitsfilename = result.getResult();
-            result = arcsub.synchCommand(500,"waitForExpoEnd");
-            rply = result.getResult();
-            print "done waiting for throw away image to be acquired %f" % time.time()
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            result = arcsub.synchCommand(10,"setFitsFilename","");
+#            print "Ready to take disposable image. time = %f" % time.time()
+#            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+#            fitsfilename = result.getResult();
+#            result = arcsub.synchCommand(500,"waitForExpoEnd");
+#            rply = result.getResult();
+#            print "done waiting for throw away image to be acquired %f" % time.time()
+#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 # ##########################################################################################
             for i in range(imcount):
+
+####### just added - 2017/02/20
+                print "doing some unrecorded acquisitions to clear the buffers"
+
+                arcsub.synchCommand(10,"setParameter Nexpo 1");
+                arcsub.synchCommand(10,"setParameter","Light","1");
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+                arcsub.synchCommand(10,"setParameter","WaiTime","200");
+                for ii in range(1):
+                    timestamp = time.time()
+                    result = arcsub.synchCommand(10,"setFitsFilename","");
+                    print "Ready to take clearing bias image. time = %f" % time.time()
+                    rply = arcsub.synchCommand(120,"exposeAcquireAndSave").getResult();
+                    print "waiting for exposure to complete"
+                    time.sleep(0.2)
+                    rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+                    print "done, ready for next one"
+
+
+
                 print "starting image setup and PD reading accumulation at %f" % time.time()
                 print "nreads set to %d and nplc set to %f" % (int(nreads),float(nplc))
                 pdresult = pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
@@ -262,7 +283,7 @@ try:
                 timestamp = time.time()
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(2.0);
+#                time.sleep(1.0);
 
 # start acquisition
                 print "set fits filename"
@@ -271,13 +292,21 @@ try:
                 result = arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
                 print "Ready to take image. time = %f" % time.time()
-                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                result = arcsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
+# set exptime just before exposure
+                fitsfilename = arcsub.synchCommand(500,"exposeAcquireAndSave").getResult();
+                rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
                 print "after click click at %f" % time.time()
 
                 print "done with exposure # %d" % i
+
+# set for continuous unrecord bias image
+                result = arcsub.synchCommand(10,"setFitsFilename","");
+                arcsub.synchCommand(10,"setParameter Nexpo 100000");
+                arcsub.synchCommand(10,"setParameter","ExpTime","0");
+                arcsub.synchCommand(10,"setParameter","WaiTime","200");
+                rply = arcsub.synchCommand(500,"exposeAcquireAndSave").getResult();
+                rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
                 print "getting photodiode readings"
 
                 pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (int(timestamp),seq,i+1)

@@ -94,7 +94,7 @@ try:
     print "Now collect some parameters from the config file"
     lo_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_LOLIM', default='0.1'))
     hi_lim = float(eolib.getCfgVal(acqcfgfile, 'FLAT_HILIM', default='120.0'))
-    bcount = int(eolib.getCfgVal(acqcfgfile, 'FLAT_BCOUNT', default = "2"))
+    bcount = float(eolib.getCfgVal(acqcfgfile, 'FLAT_BCOUNT', default = "2"))
     wl     = float(eolib.getCfgVal(acqcfgfile, 'FLAT_WL', default = "550.0"))
     imcount = 2
 

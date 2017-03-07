@@ -42,6 +42,10 @@ try:
 except:
         print "Exception in initialization"
 
+# make sure it is ready to respond quickly
+        arcsub.synchCommand(10,"setParameter","ExpTime","0");
+        arcsub.synchCommand(10,"setParameter","WaiTime","200");
+
 # make sure all is quiescent before sending commands to the ammeters
 time.sleep(5.0)
 
@@ -53,7 +57,7 @@ seq = 0  # image pair number in sequence
     
 lo_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_LOLIM', default='1.0'))
 hi_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_HILIM', default='120.0'))
-bcount = int(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default = "5"))
+bcount = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default = "5"))
     
 #number of PLCs between readings
 nplc = 1
@@ -72,10 +76,8 @@ for i in range(5):
     timestamp = time.time()
     result = arcsub.synchCommand(10,"setFitsFilename","");
     print "Ready to take clearing bias image. time = %f" % time.time()
-    result = arcsub.synchCommand(60,"exposeAcquireAndSave");
-    rply = result.getResult()
-    result = arcsub.synchCommand(500,"waitForExpoEnd");
-    rply = result.getResult();
+    rply = arcsub.synchCommand(60,"exposeAcquireAndSave").getResult()
+    rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
 
 try:
     
@@ -112,10 +114,8 @@ try:
 
 # dispose of first image
             arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-            fitsfilename = result.getResult();
-            result = arcsub.synchCommand(500,"waitForExpoEnd");
-            rply = result.getResult();
+            fitsfilename = arcsub.synchCommand(500,"exposeAcquireAndSave").getResult();
+            rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
 
             time.sleep(0.5)
 
@@ -126,14 +126,15 @@ try:
                 arcsub.synchCommand(10,"setFitsFilename",fitsfilename);
 
                 print "Ready to take bias image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                result = arcsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
+                fitsfilename = arcsub.synchCommand(200,"exposeAcquireAndSave").getResult();
+                rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
                 print "after click click at %f" % time.time()
                 time.sleep(0.2)
 # =========================================================================    
 # take light exposures
+            arcsub.synchCommand(10,"setParameter","ExpTime","0");
+            arcsub.synchCommand(10,"setParameter","WaiTime","200");
             result = arcsub.synchCommand(10,"setParameter","Light","1");
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
@@ -159,10 +160,8 @@ try:
 
                 arcsub.synchCommand(10,"setFitsFilename","fluxcalimage-${TIMESTAMP}");
 
-                result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-                flncal = result.getResult();
-                result = arcsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
+                flncal = arcsub.synchCommand(500,"exposeAcquireAndSave").getResult();
+                rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
                 result = arcsub.synchCommand(10,"getFluxStats",flncal);
                 flux = float(result.getResult());
 
@@ -172,6 +171,10 @@ try:
 
                 print "The flux is determined to be %f" % flux
 
+                arcsub.synchCommand(10,"setParameter","ExpTime","0");
+                arcsub.synchCommand(10,"setParameter","WaiTime","200");
+                arcsub.synchCommand(10,"setFitsFilename","");
+                rply = arcsub.synchCommand(200,"exposeAcquireAndSave").getResult();
                 owl = wl
 
             exptime = target/flux
@@ -181,7 +184,6 @@ try:
             if (exptime < lo_lim) :
                 exptime = lo_lim
             print "adjusted exposure time = %f" % exptime
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
 
 # prepare to readout diodes                                                                                  
             if (exptime>0.5) :
@@ -200,12 +202,13 @@ try:
             result = arcsub.synchCommand(10,"setHeader","ImageType","FLAT")
 
             print "Throwing away the first image"
-            arcsub.synchCommand(10,"setFitsFilename","");
-            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
-            reply = result.getResult();
-            result = arcsub.synchCommand(500,"waitForExpoEnd");
-            reply = result.getResult();
-#            time.sleep(exptime);
+#            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+#            arcsub.synchCommand(10,"setFitsFilename","");
+#            result = arcsub.synchCommand(500,"exposeAcquireAndSave");
+#            reply = result.getResult();
+#            result = arcsub.synchCommand(500,"waitForExpoEnd");
+#            reply = result.getResult();
+##            time.sleep(exptime);
 
 # adjust timeout because we will be waiting for the data to become ready
             mywait = nplc/60.*nreads*2.00 ;
@@ -216,6 +219,17 @@ try:
                 print "starting acquisition step for lambda = %8.2f" % wl
 
                 print "call accumBuffer to start PD recording at %f" % time.time()
+
+#                arcsub.synchCommand(10,"setParameter","ExpTime","0");
+                arcsub.synchCommand(10,"setParameter Nexpo 1");
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime*1000)));
+                result = arcsub.synchCommand(10,"setParameter","Light","1");
+                arcsub.synchCommand(10,"setParameter","WaiTime","200");
+                arcsub.synchCommand(10,"setFitsFilename","");
+                rply = arcsub.synchCommand(200,"exposeAcquireAndSave").getResult();
+                rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
+
                 pdresult =  pdsub.asynchCommand("accumBuffer",int(nreads),float(nplc),True);
 
                 print "recording should now be in progress and the time is %f" % time.time()
@@ -228,15 +242,22 @@ try:
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(1.5);
     
-    
+
                 print "Ready to take image. time = %f" % time.time()
-                result = arcsub.synchCommand(200,"exposeAcquireAndSave");
-                fitsfilename = result.getResult();
-                result = arcsub.synchCommand(500,"waitForExpoEnd");
-                rply = result.getResult();
+                fitsfilename = arcsub.synchCommand(200,"exposeAcquireAndSave").getResult();
+                rply         = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
                 print "after click click at %f" % time.time()
     
                 print "done with exposure # %d" % i
+
+                arcsub.synchCommand(10,"setParameter Nexpo 100000");
+                arcsub.synchCommand(10,"setParameter","ExpTime","0");
+                arcsub.synchCommand(10,"setParameter","WaiTime","200");
+                arcsub.synchCommand(10,"setFitsFilename","");
+                rply = arcsub.synchCommand(200,"exposeAcquireAndSave").getResult();
+                rply = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
                 print "getting photodiode readings"
     
                 pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (timestamp,seq,i+1)
@@ -263,8 +284,14 @@ try:
 
                 print "Finished getting readings at %f" % time.time()
     
-                result = arcsub.synchCommand(200,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+                print "adding binary table"
+                result = arcsub.synchCommand(500,"addBinaryTable","%s/%s" % (cdir,pdfilename),fitsfilename,"AMP0.MEAS_TIMES","AMP0_MEAS_TIMES","AMP0_A_CURRENT",timestamp)
+
+                print "Finished adding binary table at %f" % time.time()
+
                 fpfiles.write("%s %s/%s %f\n" % (fitsfilename,cdir,pdfilename,timestamp))
+
+                print "Finished processing image and adding tables"
 # ---------------- end of loop imcount -------------------------------
 # reset timeout to something reasonable for a regular command
             pdsub.synchCommand(1000,"setTimeout",10.);

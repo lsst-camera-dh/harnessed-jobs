@@ -51,7 +51,7 @@ try:
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
     wl     = float(eolib.getCfgVal(acqcfgfile, 'PPUMP_WL', default = "550.0"))
-    pcount = int(eolib.getCfgVal(acqcfgfile, 'PPUMP_BCOUNT', default = "25"))
+    pcount = float(eolib.getCfgVal(acqcfgfile, 'PPUMP_BCOUNT', default = "25"))
     imcount = 2
     
     print "setting the monochromator wavelength"
@@ -96,7 +96,7 @@ try:
         if ((len(tokens) > 0) and (tokens[0] == 'ppump')):
     
             exptime = float(tokens[1])
-            imcount = int(tokens[2])
+            imcount = float(tokens[2])
             nshifts  = float(tokens[3])
 
             result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)
@@ -178,12 +178,16 @@ try:
 # make sure to get some readings before the state of the shutter changes       
                 time.sleep(0.2);
     
+                arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime)));
+
                 print "Ready to take image. time = %f" % time.time()
                 result = arcsub.synchCommand(500,"exposeAcquireAndSave");
                 fitsfilename = result.getResult();
                 print "after click click at %f" % time.time()
     
                 print "done with exposure # %d" % i
+
+                arcsub.synchCommand(10,"setParameter","ExpTime","0")
                 print "getting photodiode readings"
     
                 pdfilename = "pd-values_%d-for-seq-%d-exp-%d.txt" % (timestamp,seq,i+1)
