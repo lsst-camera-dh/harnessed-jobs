@@ -7,12 +7,9 @@ from collections import OrderedDict
 #  This is needed so that matplotlib can write to .matplotlib
 os.environ['MPLCONFIGDIR'] = os.curdir
 import matplotlib
-
 # For batch-processing, use the AGG backend to avoid needing an X11
 # connection.
 matplotlib.use('Agg')
-
-import json
 import astropy.io.fits as fits
 import matplotlib.pyplot as plt
 import lsst.eotest.sensor as sensorTest
@@ -24,58 +21,6 @@ def processName_dependencyGlob(*args, **kwds):
     if kwds.has_key('jobname'):
         kwds['jobname'] = siteUtils.getProcessName(kwds['jobname'])
     return dependency_glob(*args, **kwds)
-
-class JsonRepackager(object):
-    _key_map = dict((('gain', 'GAIN'),
-                     ('gain_error', 'GAIN_ERROR'),
-                     ('psf_sigma', 'PSF_SIGMA'),
-                     ('read_noise', 'READ_NOISE'),
-                     ('system_noise', 'SYSTEM_NOISE'),
-                     ('total_noise', 'TOTAL_NOISE'),
-                     ('bright_pixels', 'NUM_BRIGHT_PIXELS'),
-                     ('bright_columns', 'NUM_BRIGHT_COLUMNS'),
-                     ('dark_pixels', 'NUM_DARK_PIXELS'),
-                     ('dark_columns', 'NUM_DARK_COLUMNS'),
-                     ('dark_current_95CL', 'DARK_CURRENT_95'),
-                     ('num_traps', 'NUM_TRAPS'),
-                     ('cti_low_serial', 'CTI_LOW_SERIAL'),
-                     ('cti_low_serial_error', 'CTI_LOW_SERIAL_ERROR'),
-                     ('cti_low_parallel', 'CTI_LOW_PARALLEL'),
-                     ('cti_low_parallel_error', 'CTI_LOW_PARALLEL_ERROR'),
-                     ('cti_high_serial', 'CTI_HIGH_SERIAL'),
-                     ('cti_high_serial_error', 'CTI_HIGH_SERIAL_ERROR'),
-                     ('cti_high_parallel', 'CTI_HIGH_PARALLEL'),
-                     ('cti_high_parallel_error', 'CTI_HIGH_PARALLEL_ERROR'),
-                     ('full_well', 'FULL_WELL'),
-                     ('max_frac_dev', 'MAX_FRAC_DEV'),
-                     ('deferred_charge_median', 'DEFERRED_CHARGE_MEDIAN'),
-                     ('deferred_charge_stdev', 'DEFERRED_CHARGE_STDEV'),
-                     ('ptc_gain', 'PTC_GAIN'),
-                     ('ptc_gain_error', 'PTC_GAIN_ERROR'),
-                     ))
-    def __init__(self, outfile='eotest_results.fits'):
-        """
-        Repackage per amp information in the json-formatted
-        summary.lims files from each analysis task into the
-        EOTestResults-formatted output.
-        """
-        self.eotest_results = sensorTest.EOTestResults(outfile)
-    def process_file(self, infile):
-        foo = json.loads(open(infile).read())
-        for result in foo:
-            if result.has_key('amp'):
-                amp = result['amp']
-                for key, value in result.items():
-                    if key.find('schema') == 0 or key == 'amp':
-                        continue
-                    self.eotest_results.add_seg_result(amp, self._key_map[key],
-                                                       value)
-    def write(self, outfile=None, clobber=True):
-        self.eotest_results.write(outfile=outfile, clobber=clobber)
-    def process_files(self, summary_files):
-        for item in summary_files:
-            print "processing", item
-            self.process_file(item)
 
 def append_prnu(results_file, prnu_file):
     """
@@ -99,7 +44,7 @@ total_num, rolloff_mask = sensorTest.pixel_counts(wl_files[0])
 
 # Aggregate information from summary.lims files into
 # a final EOTestResults output file.
-repackager = JsonRepackager()
+repackager = eotestUtils.JsonRepackager()
 repackager.eotest_results.add_ccd_result('TOTAL_NUM_PIXELS', total_num)
 repackager.eotest_results.add_ccd_result('ROLLOFF_MASK_PIXELS', rolloff_mask)
 summary_files = processName_dependencyGlob('summary.lims')
@@ -128,37 +73,45 @@ fe55_file = processName_dependencyGlob('%s_psf_results*.fits' % sensor_id,
                                        jobname='fe55_analysis')[0]
 plots.fe55_dists(fe55_file=fe55_file)
 plt.savefig('%s_fe55_dists.png' % sensor_id)
+plt.close('all')
 
 # PSF distributions from Fe55 fits
 plots.psf_dists(fe55_file=fe55_file)
 plt.savefig('%s_psf_dists.png' % sensor_id)
+plt.close('all')
 
 # Photon Transfer Curves
 ptc_file = processName_dependencyGlob('%s_ptc.fits' % sensor_id,
                                       jobname='ptc')[0]
 plots.ptcs(ptc_file=ptc_file)
 plt.savefig('%s_ptcs.png' % sensor_id)
+plt.close('all')
 
 # Linearity plots
 detresp_file = processName_dependencyGlob('%s_det_response.fits' % sensor_id,
                                           jobname='flat_pairs')[0]
 plots.linearity(ptc_file=ptc_file, detresp_file=detresp_file)
 plt.savefig('%s_linearity.png' % sensor_id)
+plt.close('all')
 
 plots.linearity_resids(ptc_file=ptc_file, detresp_file=detresp_file)
 plt.savefig('%s_linearity_resids.png' % sensor_id)
+plt.close('all')
 
 # Full well plots
 plots.full_well(ptc_file=ptc_file, detresp_file=detresp_file)
 plt.savefig('%s_full_well.png' % sensor_id)
+plt.close('all')
 
 # System Gain per segment
 plots.gains()
 plt.savefig('%s_gains.png' % sensor_id)
+plt.close('all')
 
 # Read Noise per segment
 plots.noise()
 plt.savefig('%s_noise.png' % sensor_id)
+plt.close('all')
 
 # Fe55 zoom
 fe55_zoom = processName_dependencyGlob('%s_fe55_zoom.png' % sensor_id,
@@ -198,6 +151,7 @@ bias_files = processName_dependencyGlob('%s_mean_bias_*.fits' % sensor_id,
 if bias_files:
     sensorTest.plot_flat(bias_files[0], title='%s, mean bias frame' % sensor_id)
     plt.savefig('%s_mean_bias.png' % sensor_id)
+    plt.close('all')
 
 # Mosaicked image of medianed dark for bright_defects job.
 dark_bd_file = processName_dependencyGlob('%s_median_dark_bp.fits' % sensor_id,
@@ -205,6 +159,7 @@ dark_bd_file = processName_dependencyGlob('%s_median_dark_bp.fits' % sensor_id,
 sensorTest.plot_flat(dark_bd_file,
                      title='%s, medianed dark for bright defects analysis' % sensor_id)
 plt.savefig('%s_medianed_dark.png' % sensor_id)
+plt.close('all')
 
 # Superflat for dark defects job
 sflat_dd_file = processName_dependencyGlob('%s_median_sflat.fits' % sensor_id,
@@ -212,6 +167,7 @@ sflat_dd_file = processName_dependencyGlob('%s_median_sflat.fits' % sensor_id,
 sensorTest.plot_flat(sflat_dd_file,
                      title='%s, superflat for dark defects analysis' % sensor_id)
 plt.savefig('%s_superflat_dark_defects.png' % sensor_id)
+plt.close('all')
 
 # Superflats for high and low flux levels
 superflat_files = sorted(processName_dependencyGlob('%s_superflat_*.fits' % sensor_id, jobname='cte'))
@@ -225,6 +181,7 @@ for sflat_file in superflat_files:
     outfile = os.path.basename(sflat_file).replace('.fits', '.png')
     print outfile
     plt.savefig(outfile)
+    plt.close('all')
 
     # Profiles of serial CTE in overscan region
     mask_files = eotestUtils.glob_mask_files()
@@ -232,48 +189,46 @@ for sflat_file in superflat_files:
     plots.cte_profiles(flux_level, sflat_file, mask_files, serial=True)
     outfile = '%(sensor_id)s_serial_oscan_%(flux_level)s.png' % locals()
     plt.savefig(outfile)
+    plt.close('all')
 
     # Profiles of parallel CTE in overscan region
     plots.cte_profiles(flux_level, sflat_file, mask_files, serial=False)
     outfile = '%(sensor_id)s_parallel_oscan_%(flux_level)s.png' % locals()
     plt.savefig(outfile)
+    plt.close('all')
 
 # Quantum Efficiency
 plots.qe(qe_file=qe_file)
 plt.savefig('%s_qe.png' % sensor_id)
+plt.close('all')
 
 # Crosstalk matrix
 if xtalk_file is not None:
     plots.crosstalk_matrix(xtalk_file=xtalk_file)
     plt.savefig('%s_crosstalk_matrix.png' % sensor_id)
+    plt.close('all')
 
 # Flat fields at wavelengths nearest the centers of the standard bands
 wl_file_path = os.path.split(wl_files[0])[0]
 plots.flat_fields(wl_file_path)
 plt.savefig('%s_flat_fields.png' % sensor_id)
+plt.close('all')
 
 # Image persistence
 persistence_file = processName_dependencyGlob('%s_persistence.fits' % sensor_id,
                                               jobname='persistence')[0]
 plots.persistence(infile=persistence_file)
 plt.savefig('%s_persistence.png' % sensor_id)
+plt.close('all')
 
 # QA plots
 qa_plot_files = processName_dependencyGlob('%s_*.png' % sensor_id,
                                            jobname='qa_plots')
 
 # Software versions
-software_versions = OrderedDict()
 summary_lims_file = processName_dependencyGlob('summary.lims',
                                                jobname='fe55_analysis')[0]
-foo = json.loads(open(summary_lims_file).read())
-for result in foo:
-    if result['schema_name'] == 'package_versions':
-        for key, value in result.items():
-            if key == 'schema_version':
-                continue
-            if key.endswith('_version'):
-                software_versions[key] = value
+software_versions = siteUtils.parse_package_versions_summary(summary_lims_file)
 
 # Test Stand configuration (extracted from one of the pixel data FITS headers)
 teststand_config = OrderedDict()
@@ -298,4 +253,3 @@ report = sensorTest.EOTestReport(plots, wl_file_path,
                                  teststand_config=teststand_config,
                                  job_ids=job_ids)
 report.make_pdf()
-
