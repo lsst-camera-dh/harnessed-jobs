@@ -131,6 +131,24 @@ for temp in ["A","B","C","D"]:
 
 fpdat.close()
 
+aa=time.ctime().split(" ")
+tstart_human = (aa[4]+aa[1]+aa[2]+"-"+aa[3]).replace(":","")
+fpdat = open("/home/ts5prod/scans/multi-scan_%s.csv" % (tstart_human),"a");
+
+for mcfg in ["CCD10","CCD11","CCD12","BASEPLATE","CCD10","CCD11","CCD12"] :
+    aa=time.ctime().split(" ")
+    tstart_human = (aa[4]+aa[1]+aa[2]+"-"+aa[3]).replace(":","")
+    fln = "%s_%s.txt" % (mcfg,tstart_human)
+    ts5sub.synchCommand(30,"setCfgStateByName %s" % mcfg)
+    ts5sub.synchCommand(5000,"scanfl %s/%s" % (cdir,fln))
+    fprdr = open("%s/%s" % (cdir,fln),"r");
+    for line in fprdr :
+        fpdat.write(line)
+    fprdr.close()
+
+fpdat.close()
+
+
 fp = open("%s/status.out" % (cdir),"w");
 
 ts_version = "NA"
