@@ -44,8 +44,11 @@ for line in open(ccs_configs):
         continue
     tokens = line.strip().split('=')
     filename = os.path.join(config_dir, tokens[1].strip())
-    shutil.copy(filename, '.')
-    results.append(lcatr.schema.fileref.make(os.path.basename(filename)))
+    try:
+        shutil.copy(filename, '.')
+        results.append(lcatr.schema.fileref.make(os.path.basename(filename)))
+    except:
+        pass
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
