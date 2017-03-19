@@ -191,12 +191,9 @@ def EOgetTS8CCSVersions(tssub,cdir):
     return(ts_version,ts8_version,power_version,ts_revision,ts8_revision,power_revision)
 
 ###############################################################################
-# EOTS8Setup: perform setup needed for running standard EO TS8 jobs
-def EOTS8Setup(tssub,ts8sub,rebpssub,raftid,ccdtype,ccdnames,ccdmanunames,cdir,seqfile,vac_outlet,state1="setTSReady",state2="setTSTEST"):
+# EOTS8SetupCCDInfo: setup CCD specific info for running standard EO TS8 jobs
+def EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames):
 
-
-    print "Forcing CcdType to be ITL"
-#    ts8sub.synchCommand(10,"setCcdType","itl")
 
 
     geo = ts8sub.synchCommand(2,"printGeometry 3").getResult();
@@ -214,24 +211,40 @@ def EOTS8Setup(tssub,ts8sub,rebpssub,raftid,ccdtype,ccdnames,ccdmanunames,cdir,s
                 ts8sub.synchCommand(2,"setManufacturerSerialNumber %s %s" % (ccdid,manu_sn))
             ccdtemp  = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.CCDTemp%d"%(rebid,ccdnum)).getResult()
             print ccdid,": CCDTemp = ",ccdtemp
-#            ts8sub.synchCommand(10,"setCCDHeader %s MeasuredTemperature %f true"%(ccdid,ccdtemp))
+
             ts8sub.synchCommand(10,"setMeasuredCCDTemperature %s %f"%(ccdid,float(ccdtemp)))
             hv = rebpssub.synchCommand(10,"getChannelValue REB%d.hvbias.VbefSwch"%(rebid)).getResult()
             print ccdid,": HVbias = ",hv
-#            ts8sub.synchCommand(10,"setCCDHeader %s CCDBSS %f true"%(ccdid,float(hv)))
+
             ts8sub.synchCommand(10,"setMeasuredCCDBSS %s %f"%(ccdid,float(hv)))
+
+###############################################################################
+# EOTS8Setup: perform setup needed for running standard EO TS8 jobs
+def EOTS8Setup(tssub,ts8sub,rebpssub,raftid,ccdtype,cdir,seqfile,vac_outlet,state1="setTSReady",state2="setTSTEST"):
 
 # Pre TS Initialization
 #    tssub.synchCommand(11000,"eoSetupPreCfg",state1).getResult();
 
-# DAQ Setup
-
 
 # full path causes length problem: /home/ts8prod/lsst/redhat6-x86_64-64bit-gcc44/test/jh_inst/0.3.23/harnessed-jobs-0.3.23/config/BNL/sequencer-ts8-ITL-v4.seq                                                             
-#    seqfile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v7-etu2-pntr-explicit.seq"
-#    seqfile = "/home/ts8prod/workdir/sequencer-ts8-ITL-v7-pntr-explicit.seq"
     print "sequencer file = %s " % seqfile
     result = ts8sub.synchCommand(90,"loadSequencer",seqfile);
+
+
+
+# not activated until ts subsystem timeout adjusted
+#   if (False) :
+#       try:
+#           press = vqmsub.synchCommand(30,"readPressure").getResult();
+#           if (press>0.0) :
+#               try:
+#                   reply = tssub.synchCommand(30,"disconnectVQM").getResult();
+#               except:
+#                   pass
+#               reply = pdusub.synchCommand(360,"ts/PDU setOutlet %d false" % vac_outlet).getResult();
+#       except:
+#           pass
+
 
 # Post TS Initialization
 #    tssub.synchCommand(11000,"eoSetupPostCfg",vac_outlet,state2).getResult();
