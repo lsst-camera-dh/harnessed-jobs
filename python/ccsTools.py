@@ -223,19 +223,21 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     files = files+glob.glob('*/*.fits')
     files = files+glob.glob('*/*.fits.gz')
     files = files+glob.glob('*log*')
-#    files = files+glob.glob('*summary*')
+    files = files+glob.glob('*.txt')
     files = files+glob.glob('*.png')
     files = files+glob.glob('*.dat')
     files = files+glob.glob('*.seq')
     files = files+glob.glob('*.xml')
     files = files+glob.glob('*.csv')
     files = files+glob.glob('*.pickles')
+    fileset = set(files)
+    uniquefiles = list(fileset)
 
     print "The files that will be registered in lims from %s are:" % os.getcwd()
-    print "files = ",files
-    for line in files :
+    print "files = ",uniquefiles
+    for line in uniquefiles :
         print "%s" % line
-    data_products = [lcatr.schema.fileref.make(item) for item in files]
+    data_products = [lcatr.schema.fileref.make(item) for item in uniquefiles]
     results.extend(data_products)
 
     print "results=",results
