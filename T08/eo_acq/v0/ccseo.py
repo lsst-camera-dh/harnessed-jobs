@@ -107,13 +107,16 @@ if (True):
 
 # prepare TS8: make sure temperature and vacuum are OK and load the sequencer
     rafttype = "ITL"
-    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
+    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,cdir,sequence_file,vac_outlet)
 
+
+# opening monochromator shutter in case a previous test left it closed
     result = monosub.synchCommand(20,"openShutter");
 
 
-# set shutter/XED to a normally closed state
     rebs = ts8sub.synchCommand(10,"getREBDevices").getResult();
+
+# Note about testing LVDS signal control:
 #    for rebid in rebs :
 #        result = ts8sub.synchCommand(10,"writeRegister "+rebid+" 0x100000 0x10000");
 
@@ -238,6 +241,7 @@ if (True):
                 ts8sub.synchCommand(10,"setTestType",acqname.upper())
                 ts8sub.synchCommand(10,"setImageType","biasclear")
                 ts8sub.synchCommand(10,"setSeqInfo",seq)
+                eolib.EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames)
                 try:
                     rply = ts8sub.synchCommand(500,"exposeAcquireAndSave",50,False,False,"").getResult()
                     print "clearing acquisition completed"
@@ -263,6 +267,7 @@ if (True):
                     ts8sub.synchCommand(10,"setTestType",acqname.upper().replace("PPUMP","TRAP").replace("SFLAT","SFLAT_%3.3d"%int(wl)))
                     ts8sub.synchCommand(10,"setImageType","BIAS")
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
+                    eolib.EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames)
                     rply = ts8sub.synchCommand(150,"exposeAcquireAndSave",0,False,False).getResult()
                     print "completed bias exposure"
                     i += 1
@@ -463,6 +468,7 @@ if (True):
 
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
 #                        ts8sub.synchCommand(10,"setSeqInfo","%s_%07.2f" % (str(seq),exptime))
+                    eolib.EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames)
 
                     if 'FLAT' in acqname :
                         if 'SFLAT' in acqname :
