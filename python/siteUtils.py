@@ -21,12 +21,12 @@ def getCCDNames() :
     if not topdir:
         raise RuntimeError, 'cannot determine top-level data directory'
     
-    folder = ""
+    limsurl = ""
     try:
-        folder = os.environ['LCATR_LIMS_URL']
+        limsurl = os.environ['LCATR_LIMS_URL']
     except :
         pass
-    if ('/Prod' in folder) :
+    if ('/Prod' in limsurl) :
         print "Connecting to eTraveler Prod"
         conn = Connection('homer', 'Prod', prodServer=False)
     else :
