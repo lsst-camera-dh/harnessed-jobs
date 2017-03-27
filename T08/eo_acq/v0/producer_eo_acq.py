@@ -19,7 +19,19 @@ if not topdir:
 #manIds = list(os.listdir(topdir))
 
 # Connect to eTraveler (prod) server with intent to use Dev database
-conn = Connection('homer', 'Dev', prodServer=False)
+limsurl = ""
+try:
+    limsurl = os.environ['LCATR_LIMS_URL']
+except :
+    pass
+if ('/Prod' in limsurl) :
+    print "Connecting to eTraveler Prod"
+    conn = Connection('homer', 'Prod', prodServer=False)
+else :
+    print "Connecting to eTraveler Dev"
+    conn = Connection('homer', 'Dev', prodServer=False)
+
+
 if not conn:
     raise RuntimeError, 'unable to authenticate'
 
