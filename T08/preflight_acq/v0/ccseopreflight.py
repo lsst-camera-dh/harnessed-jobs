@@ -80,7 +80,9 @@ rafttype = "ITL"
 
 usets8 = False
 try:
-    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
+#    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
+    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,cdir,sequence_file,vac_outlet)
+
     usets8 = True
     print "REBs appear to be attached and ready for exposure. Shutter control will be done via REBs"
 except Exception, ex:

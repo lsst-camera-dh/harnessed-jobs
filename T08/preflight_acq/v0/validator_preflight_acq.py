@@ -4,8 +4,11 @@ import siteUtils
 import shutil
 import lcatr.schema
 import glob
+import sys
 
-print "RETEST (N/y)?"
+for i in range(20) :
+     print "RETEST (N/y)?"
+sys.stdout.flush()
 answer = raw_input("RETEST (N/y)?")
 if "y" in answer.lower() :
      raise Exception("PURPOSELY crashing to allow a retest via retrying the e-Traveler step")
