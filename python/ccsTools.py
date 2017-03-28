@@ -1,7 +1,6 @@
-
-
 import os
 import glob
+import shutil
 import subprocess
 from collections import OrderedDict
 import datetime
@@ -92,7 +91,8 @@ class CcsSetup(OrderedDict):
                 self['CCSCCDTYPE'] = _quote("ITL")
                 self['acffile'] = self['itl_acffile']
                 self['sequence_file'] = self['itl_seqfile']
-            os.system("cp -vp %s %s" % (self['sequence_file'],self['tsCWD']))
+            print self['sequence_file'], self['tsCWD']
+            shutil.copy2(self['sequence_file'].strip("'"), self['tsCWD'].strip("'"))
             # now use the local copy
 #            bb = self['sequence_file'].split("/")
 #            self['sequence_file'] = _quote("%s/%s" % (os.getcwd(),bb[len(bb)-1].split("'")[0]))
@@ -142,6 +142,9 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=False, verbose=True):
     output = open("%s.log" % jobName, "w")
     output.write(result.getOutput())
     output.close()
+    if result.thread.java_exceptions:
+        raise RuntimeError("java.lang.Exceptions raised:\n%s"
+                           % '\n'.join(result.thread.java_exceptions))
 
 #    print "purge fluxcal fits files"
 #    os.system("rm -v fluxcal*.fits")
@@ -204,7 +207,6 @@ def ccsValidator(jobName, acqfilelist='acqfilelist', statusFlags=('stat','testst
     except IOError:
         for flag in statusFlags:
             statusAssignments[flag] = -1
-    
 
     print "jobName = %s" % jobName
     print "schema = %s" % str(lcatr.schema.get(jobName))

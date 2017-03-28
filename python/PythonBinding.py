@@ -1,10 +1,11 @@
 #!/usr/bin/python
-import socket  
+import socket
 import threading
 import time
 import random
 import exceptions
-
+import re
+import sys
 
 class CcsExecutionResult:
     def __init__(self, thread):
@@ -17,7 +18,7 @@ class CcsExecutionResult:
         while self.thread.running:
             time.sleep(0.1);
         return self.thread.executionOutput;
-            
+
 
 class CcsException(Exception):
     def __init__(self, value):
@@ -43,11 +44,11 @@ class CcsJythonInterpreter:
             print 'Initialized connection to CCS Python interpreter on on host ', CcsJythonInterpreter.host,':',CcsJythonInterpreter.port;
         except :
             raise CcsException("Could not establish a connection with CCS Python Interpreter on host "+CcsJythonInterpreter.host+":"+str(CcsJythonInterpreter.port));
-        
+
         if name != None :
             name = name.replace("\n","");
             self.syncExecution("initializeInterpreter "+name);
-            
+
     @staticmethod
     def __establishSocketConnectionToCcsJythonInterpreter__():
          s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -112,10 +113,11 @@ class _CcsPythonExecutorThread:
         self.s = s;
         self.threadId = threadId;
         self.outputThread = threading.Thread(target=self.listenToSocketOutput);
+        self.java_exceptions = []
 
     def executePythonContent(self,content):
         self.running = True;
-        self.outputThread.start();        
+        self.outputThread.start();
         content = "startContent:"+self.threadId+"\n"+content+"\nendContent:"+self.threadId+"\n";
         try:
             self.s.send(content);
@@ -125,19 +127,21 @@ class _CcsPythonExecutorThread:
         return CcsExecutionResult(self);
 
     def listenToSocketOutput(self):
+        re_obj = re.compile(r'.*java.lang.\w*Exception.*')
         self.executionOutput = "";
         while self.running:
             try:
                 output = self.s.recv(1024)
             except:
                 raise CcsException("Communication Problem with Socket");
+            for item in output.split('\n'):
+                if re_obj.match(item):
+                    self.java_exceptions.append(item)
             if "doneExecution:"+self.threadId not in output:
-                print output.replace("\n","");
+                sys.stdout.write(output)
+                sys.stdout.flush()
 #            self.executionOutput += output
             if "doneExecution:"+self.threadId in output:
                 self.running = False;
                 self.executionOutput = self.executionOutput.replace("doneExecution:"+self.threadId+"\n","");
         self.outputThread._Thread__stop();
-
-
- 
