@@ -107,7 +107,7 @@ if (True):
     rafttype = "ITL"
     raft = UNITID
 
-    eolib.EOTS8Setup(tssub,ts8sub,pwrsub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
+    eolib.EOTS8Setup(tssub,ts8sub,pwrsub,raft,rafttype,cdir,sequence_file,vac_outlet)
 
     
 #14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.

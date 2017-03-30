@@ -20,7 +20,7 @@ answer = raw_input("RETEST (N/y)?")
 if "y" in answer.lower() :
      raise Exception("PURPOSELY crashing to allow a retest via retrying the e-Traveler step")
 
-#os.system("./rebalive_plots.sh > logplt &")
+#os.system("./rebalive_plots.sh 2>&1 logplt &")
 
 jobName = "rebalive_power"
 

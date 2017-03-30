@@ -25,4 +25,4 @@ eval mysql CCSTrending4 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst 
 
 end
 
-eval 'gnuplot < rebalive_plots.gp'
+eval 'gnuplot < rebalive_plots.gp 2>&1 logpl'
