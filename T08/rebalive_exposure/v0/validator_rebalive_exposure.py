@@ -9,7 +9,7 @@ import pyfits
 import sys
 import numpy
 import numpy.random
-import tkinter
+import Tkinter
 
 jobDir = siteUtils.getJobDir()
 
