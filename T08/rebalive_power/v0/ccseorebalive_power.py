@@ -228,7 +228,7 @@ else :
                     print stat
                     print "---------------List of low current channels ------------------"
                     for ln in stat:
-                        if "LOW CURRENT" in stat.upper() :
+                        if "LOW CURRENT" in ln.upper() :
                             print ln
                     print "---------------End of list of low current channels ------------"
                     print "---------------CCD Temperatures as retrieved from getChannelValue are -----"
