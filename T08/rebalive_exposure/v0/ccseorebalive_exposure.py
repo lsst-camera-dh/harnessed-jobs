@@ -40,7 +40,7 @@ if (True):
     ts_revision = "NA"
     ts8_revision = "NA"
 
-    fp = open("%s/rebalive_results.txt" % (cdir),"w");
+    fp = open("%s/rebalive_results_exposures.txt" % (cdir),"w");
 
     status_value = None
 

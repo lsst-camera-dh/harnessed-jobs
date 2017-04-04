@@ -88,7 +88,7 @@ print >> ofile, ("1 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],
 print >> ofile, ("4 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad4], sig4[bad4])
 ofile.close()
 
-os.system('cat /tmp/conntest >> rebalive_results.txt')
+os.system('cat /tmp/conntest >> rebalive_results_exposures.txt')
 
 
 if (not "ready" in jobDir) :
@@ -112,7 +112,7 @@ if (not "ready" in jobDir) :
         
         qefiles = sorted(glob.glob('*flat*.fits'))
         if len(qefiles)>0 :
-             os.system("ds9 -mosaicimage iraf -scale datasec no -scale zscale -lock frame image *flat*fits")
+             os.system("ds9 -mosaicimage iraf -scale datasec no -zscale -lock frame image *flat*fits")
         
 
 
@@ -148,7 +148,7 @@ schemaFile.write("{\n")
 schemaFile.write("    \'schema_name\' : \'%s_runtime\',\n"%jobName)
 schemaFile.write("    \'schema_version\' : 0,\n")
 
-statusFile = open("rebalive_results.txt")
+statusFile = open("rebalive_results_exposures.txt")
 lnum = 0
 for line in statusFile:
     print "line = %s" % line

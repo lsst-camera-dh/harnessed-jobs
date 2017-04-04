@@ -6,7 +6,7 @@ import os
 import sys
 
 for i in range(20):
-     print "This POWER ON test may be skipped if the REB(s) are(is) already fully powered and you have the authorization. Skip the step (N/y)?"
+     print "This POWER ON test may be skipped if the REB(s) is(are) already fully powered and you have the authorization. Skip the step (N/y)?"
 sys.stdout.flush()
 answer = raw_input("\n\nThis test may be skipped if the REB(s) are(is) already fully powered and you have the authorization. Skip the step (N/y)? \n\n")
 if "y" in answer.lower() :
@@ -38,7 +38,7 @@ qefiles = sorted(glob.glob('*flat*.fits'))
 #for qefile in qefiles:
 #os.system("ds9 -scale datasec no -scale histequ %s" % qefile)
 if len(qefiles)>0 :
-     os.system("ds9 -scale datasec no -scale histequ *flat*fits")
+     os.system("ds9 -scale datasec no -lock frame image -lock scale yes -zscale -zoom to fit *flat*fits")
 
 apptxt = "Please check the Fe55 image that is about to be projected in ds9\nfor clearly identifiable X-ray hits that should appear as clusters of pixels.\nClick on this window when ready."
 
@@ -53,7 +53,7 @@ fe55files = sorted(glob.glob('*fe55*.fits'))
 #for fe55file in fe55files:
 #    os.system("ds9 -mosaicimage iraf -lock frame image -zscale -scale datasec yes %s" % fe55file)
 if len(fe55files)>0 :
-     os.system("ds9 -mosaicimage iraf -lock frame image -zscale -scale datasec yes *fe55*")
+     os.system("ds9 -mosaicimage iraf -lock frame image -lock scale yes -zscale -scale datasec yes *fe55*")
 
 apptxt = "The job is finished.\nClick on this button then\nreturn to the eTraveler page to complete the readiness verification form."
 topd = Tkinter.Tk()
