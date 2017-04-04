@@ -11,6 +11,7 @@ from java.lang import Exception
 from java.lang import RuntimeException
 import sys
 import time
+import subprocess
 
 CCS.setThrowExceptions(True);
 
@@ -83,7 +84,7 @@ if (True):
 
             print "TURNING OFF REB CLOCK AND RAIL VOLTAGES"
             try:
-                stat = ts8sub.synchCommand(120,"powerOff %d" % rebid).getResult()
+                stat = ts8sub.synchCommand(300,"powerOff %d" % rebid).getResult()
                 print stat
 
                 print "------ %s Complete ------\n" % rebname 
@@ -100,7 +101,13 @@ if (True):
             powers = ['od', 'heater', 'clocklo', 'clockhi', 'analog', 'digital', 'master']
             chkreb = True
 
+            pwroff = ""
+
             for pwr in powers :
+
+                pwroff = pwroff + pwr + " "
+
+
                 if 'clocklo' in pwr:
                     chkreb = False
                 try:
@@ -113,18 +120,22 @@ if (True):
                 time.sleep(2.0)
     
                 try:
-#                    print "checking currrents"
-                    check_currents(i,"digital","DigI",500.,750.,chkreb)
-                    check_currents(i,"analog","AnaI",400.,600.,chkreb)
-                    check_currents(i,"OD","ODI",60.,120.,chkreb)
-                    check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
-#                   check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
+                    if 'digital' in pwroff :
+                        check_currents(i,"digital","DigI",500.,770.,chkreb)
+                    if 'analog' in pwroff :
+                        check_currents(i,"analog","AnaI",400.,600.,chkreb)
+                    if 'od' in pwroff :
+                        check_currents(i,"OD","ODI",60.,120.,chkreb)
+                    if 'clockhi' in pwroff :
+                        check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
+                    if 'clocklo' in pwroff :
+                        check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
 #                   check_currents(i,"heater","???",0.100,0.300,chkreb)
                 except Exception, e:
                     print "%s: CURRENT CHECK FAILED! %s" % (rebname,e)
 #                    raise Exception
                     exit
-                time.sleep(2)
+                time.sleep(2.0)
 
 
 

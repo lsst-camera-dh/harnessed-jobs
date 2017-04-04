@@ -22,6 +22,7 @@ if (True):
     ts8sub  = CCS.attachSubsystem("ts8");
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
     pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
+    tssub  = CCS.attachSubsystem("%s" % ts);
 
     print "Attaching teststand subsystems"
     tssub  = CCS.attachSubsystem("%s" % ts);
@@ -39,7 +40,7 @@ if (True):
     ts_revision = "NA"
     ts8_revision = "NA"
 
-    fp = open("%s/rebalive_results.txt" % (cdir),"w");
+    fp = open("%s/rebalive_results_exposures.txt" % (cdir),"w");
 
     status_value = None
 
@@ -69,7 +70,45 @@ if (True):
 # ITL seq file
 #    result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v7-etu2-pntr-explicit.seq");
 #    result = ts8sub.synchCommand(90,"loadSequencer","//home/ts8prod/workdir/sequencer-ts8-ITL-v7-etu1-pntr-explicit.seq");
-    result = ts8sub.synchCommand(90,"loadSequencer",sequence_file);
+#    result = ts8sub.synchCommand(90,"loadSequencer",sequence_file);
+
+
+
+    ccdnames = {}
+    ccdmanunames = {}
+    try:
+        ccdnames["00"] = CCDS00
+        ccdmanunames["00"] = CCDMANUS00
+        ccdnames["01"] = CCDS01
+        ccdmanunames["01"] = CCDMANUS01
+        ccdnames["02"] = CCDS02
+        ccdmanunames["02"] = CCDMANUS02
+    except:
+        pass
+    try:
+        ccdnames["10"] = CCDS10
+        ccdmanunames["10"] = CCDMANUS10
+        ccdnames["11"] = CCDS11
+        ccdmanunames["11"] = CCDMANUS11
+        ccdnames["12"] = CCDS12
+        ccdmanunames["12"] = CCDMANUS12
+    except:
+        pass
+    try:
+        ccdnames["20"] = CCDS20
+        ccdmanunames["20"] = CCDMANUS20
+        ccdnames["21"] = CCDS21
+        ccdmanunames["21"] = CCDMANUS21
+        ccdnames["22"] = CCDS22
+        ccdmanunames["22"] = CCDMANUS22
+    except:
+        pass
+
+    rafttype = "ITL"
+    raft = UNITID
+
+    eolib.EOTS8Setup(tssub,ts8sub,pwrsub,raft,rafttype,cdir,sequence_file,vac_outlet)
+
     
 #14. Execute a zero-second exposure and readout sequence. Start a timer when the close shutter command executes.
 
@@ -97,6 +136,7 @@ if (True):
 
 #        print "fitsfilename = %s" % fitsfilename
 
+        ts8sub.synchCommand(10,"setTestStand","TS6")
         ts8sub.synchCommand(10,"setTestType","FE55")
 
         raft = CCDID

@@ -56,7 +56,7 @@ class Logger(object):
         self.log = open("%s/rebalive_results.txt" % tsCWD, "a")
 
     def write(self, message):
-        self.terminal.write(message+"\n")
+        self.terminal.write(message+"\r")
         self.log.write(message)  
 
     def flush(self):
@@ -153,12 +153,15 @@ else :
 
 # verify that all power is OFF
             try:
+                stat = ts8sub.synchCommand(300,"R00.Reb%d setBackBias false" % rebid).getResult()
+                stat = ts8sub.synchCommand(300,"powerOff %d" % rebid).getResult()
+
 #                result = pwrsub.synchCommand(10,"setNamedPowerOn",i,"master",False);
                 result = pwrsub.synchCommand(20,"setNamedPowerOn %d master False" % i);
             except Exception, e:
 
-                print "%s: FAILED TO TURN POWER OFF! %s" % (rebname,e)
-                raise Exception
+                print "%s: FAILED TO TURN POWER OFF! \r\r %s" % (rebname,e)
+                raise e
 
             time.sleep(3.0)
 
@@ -175,13 +178,13 @@ else :
                     time.sleep(5.0)
                     sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
                     print sout
-                    time.sleep(2.0)
+                    time.sleep(3.0)
                 try:
                     print "%s: turning on %s power at %s" % (rebname,pwr,time.ctime().split()[3])
                     pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (i,pwr));
-                except:
+                except Exception, e:
                     print "%s: failed to turn on current %s!" % (rebname,pwr)
-                    throw
+                    raise Exception(e)
 
                 time.sleep(2.0)
     
@@ -222,7 +225,18 @@ else :
                 ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
                 try:
                     stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
-                    print stat
+                    print stat.replace("\n","\r\n")
+                    print "---------------List of low current channels ------------------"
+                    for ln in stat:
+                        if "LOW CURRENT" in ln.upper() :
+                            print ln
+                    print "---------------End of list of low current channels ------------"
+                    print "---------------CCD Temperatures as retrieved from getChannelValue are -----"
+                    for ccdnum in range(3) :
+                        reb_chan = "CCDTemp%d" % ccdnum
+                        ccdtemp = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.%s" % (rebid,reb_chan)).getResult()
+                        print "%s : %s = %8.3f " % (rebname,reb_chan,ccdtemp)
+
                 
                     print "------ %s Complete ------\n" % rebname
                 except RuntimeException, e:
