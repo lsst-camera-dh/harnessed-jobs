@@ -161,7 +161,7 @@ else :
             except Exception, e:
 
                 print "%s: FAILED TO TURN POWER OFF! \r\r %s" % (rebname,e)
-                raise Exception
+                raise e
 
             time.sleep(3.0)
 
@@ -178,13 +178,13 @@ else :
                     time.sleep(5.0)
                     sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
                     print sout
-                    time.sleep(2.0)
+                    time.sleep(3.0)
                 try:
                     print "%s: turning on %s power at %s" % (rebname,pwr,time.ctime().split()[3])
                     pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (i,pwr));
-                except:
+                except Exception, e:
                     print "%s: failed to turn on current %s!" % (rebname,pwr)
-                    throw
+                    raise Exception(e)
 
                 time.sleep(2.0)
     
