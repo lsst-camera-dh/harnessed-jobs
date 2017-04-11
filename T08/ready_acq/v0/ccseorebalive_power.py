@@ -224,7 +224,7 @@ else :
                 ts8sub.synchCommand(10,"loadCategories Rafts:itl")
                 ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
                 try:
-                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
+                    stat = ts8sub.synchCommand(600,"powerOn %d" % rebid).getResult()
                     print stat.replace("\n","\r\n")
                     print "---------------List of low current channels ------------------"
                     for ln in stat:

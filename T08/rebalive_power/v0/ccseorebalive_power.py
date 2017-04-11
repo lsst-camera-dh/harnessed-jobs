@@ -221,8 +221,16 @@ else :
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
 #    load default configuration
-                ts8sub.synchCommand(10,"loadCategories Rafts:itl")
-                ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
+                if 'e2v' in CCSCCDTYPE :
+                    for iwrn in range(20):
+                        print "LOADING CONFIGURATION CATEGORY ***** E2V *****   ABORT IF THIS IS NOT OK!"
+                    ts8sub.synchCommand(10,"loadCategories Rafts:e2v")
+                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:e2v")
+                if 'itl' in CCSCCDTYPE :
+                    for iwrn in range(20):
+                        print "LOADING CONFIGURATION CATEGORY ***** ITL *****   ABORT IF THIS IS NOT OK!"
+                    ts8sub.synchCommand(10,"loadCategories Rafts:itl")
+                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
                 try:
                     stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
                     print stat.replace("\n","\r\n")

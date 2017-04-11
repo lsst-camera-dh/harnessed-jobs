@@ -60,9 +60,13 @@ class CcsSetup(OrderedDict):
         self['CCDID'] = _quote(siteUtils.getUnitId())
         self['UNITID'] = _quote(siteUtils.getUnitId())
         self['LSSTID'] = _quote(siteUtils.getLSSTId())
+
+        unitid = siteUtils.getUnitId()
+        CCDTYPE = _quote(siteUtils.getUnitType())
         ccdnames = {}
         ccdmanunames = {}
         ccdnames,ccdmanunames = siteUtils.getCCDNames()
+
         print "retrieved the following LSST CCD names list"
         print ccdnames
         print "retrieved the following Manufacturers CCD names list"
@@ -70,6 +74,10 @@ class CcsSetup(OrderedDict):
         for slot in ccdnames :
             print "CCD %s is in slot %s" % (ccdnames[slot],slot)
             self['CCD%s'%slot] = _quote(ccdnames[slot])
+            if 'itl' in ccdnames[slot].lower() :
+                CCDTYPE = 'itl'
+            if 'e2v' in ccdnames[slot].lower() :
+                CCDTYPE = 'e2v'
         for slot in ccdmanunames :
             print "CCD %s is in slot %s" % (ccdmanunames[slot],slot)
             self['CCDMANU%s'%slot] = _quote(ccdmanunames[slot])
@@ -77,13 +85,15 @@ class CcsSetup(OrderedDict):
             self['RUNNUM'] = _quote(siteUtils.getRunNumber())
         except:
             self['RUNNUM'] = "no_lcatr_run_number"
+            pass
         self._read(os.path.join(siteUtils.getJobDir(), configFile))
-        CCDTYPE = _quote(siteUtils.getUnitType())
+
         print "CCDTYPE = %s" % CCDTYPE
         self['sequence_file'] = _quote("NA")
         self['acffile'] = self['itl_acffile']
+# set default type
         self['CCSCCDTYPE'] = _quote("ITL")
-        if ("RTM" in CCDTYPE.upper() or "ETU" in CCDTYPE.upper() ) :
+        if ("RTM" in unitid.upper() or "ETU" in unitid.upper() or "RSA" in unitid.upper()) :
             if ("e2v" in CCDTYPE) :
                 self['CCSCCDTYPE'] = _quote("E2V")
                 self['acffile'] = self['e2v_acffile']
