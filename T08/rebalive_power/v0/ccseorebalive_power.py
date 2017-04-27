@@ -220,6 +220,7 @@ else :
                 time.sleep(2)
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
+                print "CCSCCDTYPE=",CCSCCDTYPE
 #    load default configuration
                 if 'e2v' in CCSCCDTYPE.lower() :
                     for iwrn in range(20):
@@ -233,7 +234,7 @@ else :
                     ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
                 else :
                     for iwrn in range(20):
-                        print "UNABLE TO DETERMINING REQUIRED CONFIG CATEGORY ... ABORT!!!"
+                        print "UNABLE TO DETERMINE REQUIRED CONFIG CATEGORY ... ABORT!!!"
                     raise Exception("UNABLE TO DETERMINING REQUIRED CONFIG CATEGORY!")
 
                 try:

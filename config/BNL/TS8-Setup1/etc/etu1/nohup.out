@@ -1,0 +1,3 @@
+Xlib:  extension "RANDR" missing on display "localhost:10.0".
+Xlib:  extension "RANDR" missing on display "localhost:10.0".
+gnome-terminal: Fatal IO error 11 (Resource temporarily unavailable) on X server localhost:10.0.

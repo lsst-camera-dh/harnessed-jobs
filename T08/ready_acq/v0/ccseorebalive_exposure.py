@@ -107,6 +107,8 @@ if (True):
     rafttype = "ITL"
     raft = UNITID
 
+
+
     eolib.EOTS8Setup(tssub,ts8sub,pwrsub,raft,rafttype,cdir,sequence_file,vac_outlet)
 
     
@@ -123,9 +125,12 @@ if (True):
             seqcmnd = "startSequencer"
             print "seqcmnd = (%s)" % seqcmnd
             print ts8sub.synchCommand(10,seqcmnd).getResult();
+            time.sleep(1.0)
+
 
         expcmnd1 = 'exposeAcquireAndSave 100 True False ""'
-
+        time.sleep(1.0)
+            
         print "PRE-exposure command: expcmnd1 = ",expcmnd1
         print ts8sub.synchCommand(1500,expcmnd1).getResult() 
 

@@ -220,11 +220,25 @@ else :
                 time.sleep(2)
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
+                print "CCSCCDTYPE=",CCSCCDTYPE
 #    load default configuration
-                ts8sub.synchCommand(10,"loadCategories Rafts:itl")
-                ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
+                if 'e2v' in CCSCCDTYPE.lower() :
+                    for iwrn in range(20):
+                        print "LOADING CONFIGURATION CATEGORY ***** E2V *****   ABORT IF THIS IS NOT OK!"
+                    ts8sub.synchCommand(10,"loadCategories Rafts:e2v")
+                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:e2v")
+                elif 'itl' in CCSCCDTYPE.lower() :
+                    for iwrn in range(20):
+                        print "LOADING CONFIGURATION CATEGORY ***** ITL *****   ABORT IF THIS IS NOT OK!"
+                    ts8sub.synchCommand(10,"loadCategories Rafts:itl")
+                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
+                else :
+                    for iwrn in range(20):
+                        print "UNABLE TO DETERMINE REQUIRED CONFIG CATEGORY ... ABORT!!!"
+                    raise Exception("UNABLE TO DETERMINING REQUIRED CONFIG CATEGORY!")
+
                 try:
-                    stat = ts8sub.synchCommand(600,"powerOn %d" % rebid).getResult()
+                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
                     print stat.replace("\n","\r\n")
                     print "---------------List of low current channels ------------------"
                     for ln in stat:
