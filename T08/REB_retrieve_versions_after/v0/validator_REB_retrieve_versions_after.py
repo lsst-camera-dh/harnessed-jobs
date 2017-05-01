@@ -43,7 +43,7 @@ for line in fp:
     id = id + 1
 
 
-results.append(lcatr.schema.valid(lcatr.schema.get('REB_retrieve_versions_before.schema'),
+results.append(lcatr.schema.valid(lcatr.schema.get('REB_retrieve_versions_after.schema'),
                                   REB0name=REBname[0], REB0firmware=REBfirmware[0], REB0SN=REBSN[0],
                                   REB1name=REBname[1], REB1firmware=REBfirmware[1], REB1SN=REBSN[1],
                                   REB2name=REBname[2], REB2firmware=REBfirmware[2], REB2SN=REBSN[2]))
