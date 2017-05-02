@@ -1,6 +1,6 @@
 # -*- python -*-
 {
-    'schema_name' : 'REB_retrieve_versions_before',
+    'schema_name' : 'REBVersionsBefore',
     'schema_version' : 0,
     'REB0name' : str,
     'REB0firmware' : str,

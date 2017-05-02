@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from ccsTools import ccsValidator
 import glob
+import siteUtils
 import lcatr.schema
 import os
 
@@ -18,10 +19,10 @@ for item in versionfiles :
 
 
 
-fp = open("REBversions.txt","r");
-REBname = []
-REBfirmware = []
-REBSN = []
+fp = open("REB_versions.txt","r");
+REBname = {}
+REBfirmware = {}
+REBSN = {}
 
 REBname[0] = "none"
 REBfirmware[0] = "none"
@@ -43,19 +44,11 @@ for line in fp:
     id = id + 1
 
 
-results.append(lcatr.schema.valid(lcatr.schema.get('REB_retrieve_versions_after.schema'),
-                                  REB0name=REBname[0], REB0firmware=REBfirmware[0], REB0SN=REBSN[0],
-                                  REB1name=REBname[1], REB1firmware=REBfirmware[1], REB1SN=REBSN[1],
-                                  REB2name=REBname[2], REB2firmware=REBfirmware[2], REB2SN=REBSN[2]))
+results.append(lcatr.schema.valid(lcatr.schema.get('REBVersionsAfter'),REB0name=REBname[0], REB0firmware=REBfirmware[0], REB0SN=REBSN[0],REB1name=REBname[1], REB1firmware=REBfirmware[1], REB1SN=REBSN[1],REB2name=REBname[2], REB2firmware=REBfirmware[2], REB2SN=REBSN[2]))
 
-results.append(siteUtils.packageVersions())
-
-
+#results.append(siteUtils.jobInfo())
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
 
-# see if the status file is there thus indicating successful completion of the ccs script
-#fp = open("status.out","r");
 
-#ccsValidator('REB_retrieve_versions_acq')
