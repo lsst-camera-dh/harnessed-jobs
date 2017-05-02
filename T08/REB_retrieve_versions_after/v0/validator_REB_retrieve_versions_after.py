@@ -39,8 +39,8 @@ REBSN[2] = "none"
 id = 0
 for line in fp:
     REBname[id] = line.split()[0]
-    REBfirmware[id] = line.split()[1]
-    REBSN[id] = line.split()[2]
+    REBfirmware[id] = line.split()[2]
+    REBSN[id] = line.split()[1]
     id = id + 1
 
 
