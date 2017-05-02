@@ -4,13 +4,13 @@ import Tkinter
 import glob
 import os
 
-apptxt = "Warning, this script will turn on the turbo pump.\nClick on this button only if this OK. If this is not OK, type abort in any terminal window or click on the abort button on the GUI."
+apptxt = "Doing pressure check."
 
-print apptxt
-top = Tkinter.Tk()
-A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = "yellow", font = ("Helvetica",24))
-A.pack()
-top.title('Ready for turbo pumping?')
-top.mainloop()
+#print apptxt
+#top = Tkinter.Tk()
+#A = Tkinter.Button(top, text = apptxt, command = top.destroy, bg = "yellow", font = ("Helvetica",24))
+#A.pack()
+#top.title('Performing pressure check')
+#top.mainloop()
 
-ccsProducer('ts8_pump', 'ccseots8_pump.py')
+ccsProducer('pressure_check', 'ccseopressure_check.py')

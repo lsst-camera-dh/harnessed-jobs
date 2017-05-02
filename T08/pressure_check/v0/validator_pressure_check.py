@@ -23,4 +23,4 @@ lcatr.schema.validate_file()
 # see if the status file is there thus indicating successful completion of the ccs script
 fp = open("status.out","r");
 
-#ccsValidator('ts8_pump_acq')
+#ccsValidator('ts8_pressure_check')

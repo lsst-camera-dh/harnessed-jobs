@@ -1,5 +1,5 @@
 ###############################################################################
-# power_check
+# pressure_check
 #
 ###############################################################################
 
@@ -35,20 +35,26 @@ if (True) :
     except:
         pass
     print "press = ",press
-    if (press > 900. or press = 0.0 or press < 0.0) :
-        print "turning VQM ON"
-        reply = pdusub.synchCommand(360,"ts/PDU setOutlet %d true" % vac_outlet).getResult();
-    print "sleeping for 3 mins"
-    time.sleep(180)
-    print "readt to turn VQM off"
-    try:
-        reply = tssub.synchCommand(30,"disconnectVQM").getResult();
-    except:
-        print "failed to disconnect from VQM"
-        pass
-    print "turning VQM off"
-    reply = pdusub.synchCommand(360,"ts/PDU setOutlet %d false" % vac_outlet).getResult();
-    print "done ... ready to resume acquiring data"
+    if (False) :
+        if (press > 900. or press is 0.0 or press < 0.0) :
+            print "turning VQM ON"
+            reply = pdusub.synchCommand(360,"ts/PDU setOutletState %d true" % vac_outlet).getResult();
+        print "sleeping for 3 mins"
+        time.sleep(180)
+        print "ready to turn VQM off"
+        try:
+            reply = tssub.synchCommand(30,"disconnectVQM").getResult();
+        except:
+            print "failed to disconnect from VQM"
+            pass
+        print "turning VQM off"
+        reply = pdusub.synchCommand(360,"ts/PDU setOutletState %d false" % vac_outlet).getResult();
+    print "done"
+
+    ts_version = -1
+    ts_revision = -1
+    ts8_version = -1
+    ts8_revision = -1
 
     fp = open("%s/status.out" % (cdir),"w");
     istate=0;
@@ -57,9 +63,9 @@ if (True) :
     fp.write(`istate`+"\n");
     fp.write("%s\n" % ts_version);
     fp.write("%s\n" % ts_revision);
-    fp.write("%s\n" % archon_version);
-    fp.write("%s\n" % archon_revision);
+    fp.write("%s\n" % ts8_version);
+    fp.write("%s\n" % ts8_revision);
     fp.close();
 
 
-print "power_check: COMPLETED"
+print "pressure_check: COMPLETED"
