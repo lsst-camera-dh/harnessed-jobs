@@ -31,12 +31,10 @@ for id in rebdevs:
     idx = idx + 1
 
 istate = tssub.synchCommand(10,"getstate").getResult()
-istate = istate or (3 << 24)
+istate = istate or (jobname.split("__")[1] << 24)
 tssub.synchCommand(10,"setstate",istate)
 
-
 fp = open("%s/status.out" % (cdir),"w");
-istate=0;
 fp.write(`istate`+"\n");
 fp.close();
 

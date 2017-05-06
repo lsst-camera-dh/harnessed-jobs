@@ -20,7 +20,6 @@ tssub.synchCommand(10,"setstate",istate)
 
 
 fp = open("%s/status.out" % (cdir),"w");
-istate=0;
 fp.write(`istate`+"\n");
 fp.close();
 

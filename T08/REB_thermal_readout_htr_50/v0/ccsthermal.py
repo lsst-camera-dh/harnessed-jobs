@@ -23,6 +23,10 @@ pwrsub  = CCS.attachSubsystem("ccs-rebps");
 pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
 rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
+istate = tssub.synchCommand(10,"getstate").getResult()
+istate = istate or (jobname.split("__")[1] << 24)
+tssub.synchCommand(10,"setstate",istate)
+
 if (True) :
 
     cdir = tsCWD
@@ -115,13 +119,8 @@ if (True) :
 
 
 
-istate = tssub.synchCommand(10,"getstate").getResult()
-istate = istate or (jobname.split("__")[1] << 24)
-tssub.synchCommand(10,"setstate",istate)
-
 
 fp = open("%s/status.out" % (cdir),"w");
-istate=0;
 fp.write(`istate`+"\n");
 fp.close();
 

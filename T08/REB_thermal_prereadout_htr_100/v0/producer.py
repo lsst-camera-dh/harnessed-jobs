@@ -4,4 +4,4 @@ import Tkinter
 import glob
 import os
 
-ccsProducer('RTM_thermal_low_t_minimum_power', 'ccsthermal.py')
+ccsProducer('RTM_thermo', 'ccsthermal.py')
