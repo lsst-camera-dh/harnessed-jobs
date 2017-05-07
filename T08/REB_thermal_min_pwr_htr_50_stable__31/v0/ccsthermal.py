@@ -15,7 +15,9 @@ cdir = tsCWD
 tssub  = CCS.attachSubsystem("ts");
 
 istate = tssub.synchCommand(10,"getstate").getResult()
-istate = istate or (jobname.split("__")[1] << 24)
+print "istate before = ",istate," : "
+istate = (istate & 0xffffff) | (int(jobname.split("__")[1]) << 24)
+print "istate after = ",istate
 tssub.synchCommand(10,"setstate",istate)
 
 

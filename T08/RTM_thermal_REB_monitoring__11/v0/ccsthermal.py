@@ -24,10 +24,11 @@ rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 idx = 0
 for id in rebdevs:
-    rebsub[id]  = CCS.attachSubsystem("ts8/%s" % id);
-    result = pwrsub.synchCommand(20,"setNamedPowerOn %d heater True" % idx).getResult();
-
-    result = rebsub[id].synchCommand(10,"setHeaterPower 0 0.0").getResult();
+    result = pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (idx,'master')).getResult();
+    time.sleep(3.0)
+    result = pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (idx,'analog')).getResult();
+    time.sleep(3.0)
+    result = pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (idx,'digital')).getResult();
 
     idx = idx + 1
 
@@ -36,7 +37,6 @@ print "istate before = ",istate," : "
 istate = (istate & 0xffffff) | (int(jobname.split("__")[1]) << 24)
 print "istate after = ",istate
 tssub.synchCommand(10,"setstate",istate)
-
 
 fp = open("%s/status.out" % (cdir),"w");
 fp.write(`istate`+"\n");
