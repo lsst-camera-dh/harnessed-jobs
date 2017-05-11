@@ -22,6 +22,8 @@ pwrsub  = CCS.attachSubsystem("ccs-rebps");
 pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
 rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
+time.sleep(15.0)
+
 idx = 0
 for id in rebdevs:
     rebsub[id]  = CCS.attachSubsystem("ts8/%s" % id);

@@ -31,6 +31,9 @@ for id in rebdevs:
 
     idx = idx + 1
 
+
+time.sleep(3600.0)
+
 istate = tssub.synchCommand(10,"getstate").getResult()
 print "istate before = ",istate," : "
 istate = (istate & 0xffffff) | (int(jobname.split("__")[1]) << 24)

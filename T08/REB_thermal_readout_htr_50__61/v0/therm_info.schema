@@ -1,7 +1,9 @@
 # -*- python -*-
 {
-    'schema_name' : 'REBVersionsBefore',
+    'schema_name' : 'thermInfo',
     'schema_version' : 0,
+    'status' : str,
+    'time'   : str,
     'REB0name' : str,
     'REB0firmware' : str,
     'REB0SN' : str,

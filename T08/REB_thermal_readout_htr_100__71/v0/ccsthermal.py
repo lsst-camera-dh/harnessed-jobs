@@ -7,6 +7,7 @@ from org.lsst.ccs.scripting import *
 from java.lang import Exception
 import sys
 import time
+import eolib
 
 CCS.setThrowExceptions(True);
 
@@ -100,7 +101,7 @@ if (True) :
 
     ts8sub.synchCommand(10,"setDefaultImageDirectory","%s" % (cdir));
 
-    for ii in range(10) :
+    for ii in range(40) :
 
 
         ts8sub.synchCommand(10,"setTestStand","TS8")

@@ -20,6 +20,7 @@ istate = (istate & 0xffffff) | (int(jobname.split("__")[1]) << 24)
 print "istate after = ",istate
 tssub.synchCommand(10,"setstate",istate)
 
+time.sleep(3600.0)
 
 fp = open("%s/status.out" % (cdir),"w");
 fp.write(`istate`+"\n");

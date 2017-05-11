@@ -16,6 +16,7 @@ cdir = tsCWD
 rebsub = {}
 serial_number = {}
 ts8sub  = CCS.attachSubsystem("ts8");
+tssub  = CCS.attachSubsystem("ts");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 pwrsub  = CCS.attachSubsystem("ccs-rebps");
 pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
@@ -38,19 +39,19 @@ for id in rebdevs:
 
     idx = idx + 1
 
-target_temp = -134.
+target_temp = -130.
 
 cryosub.synchCommand(10,"setSetPoint 2 %f" % target_temp)
 ts8sub.synchCommand(10,"stopTempControl")
 
 while(True) :
-    temp = cryosub.synchCommand(10,"getTemp C")
+    temp = float(cryosub.synchCommand(10,"getTemp C").getResult())
 
     tdev = abs(temp-target_temp)
 
     print "target_temp = %f , current cryo plate temp = %f , tdev = %f " % (target_temp, temp, tdev) 
 
-    if (tdev < 0.2) :
+    if (tdev < 2.0) :
         break
 
 istate = tssub.synchCommand(10,"getstate").getResult()
