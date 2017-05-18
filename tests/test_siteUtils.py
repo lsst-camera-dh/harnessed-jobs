@@ -49,5 +49,26 @@ class PackageVersionSummaryTestCase(unittest.TestCase):
                          "/nfs/farm/g/lsst/u1/software/datacat/config.cfg")
         self.assertEqual(len(versions), 11)
 
+class PngDataProductTestCase(unittest.TestCase):
+    "TestCase class for png data product handling code."
+    def setUp(self):
+        pass
+    def tearDown(self):
+        pass
+    def test_png_data_product(self):
+        data_product = 'median_dark'
+        lsst_num = 'E2V-CCD250-264'
+
+        run_number = '4005D'
+        os.environ['LCATR_RUN_NUMBER'] = run_number
+        pngfile = '%s_%s_%s.png' % (lsst_num, run_number, data_product)
+        self.assertEqual(siteUtils.png_data_product(pngfile, lsst_num),
+                         data_product)
+
+        del os.environ['LCATR_RUN_NUMBER']
+        pngfile = '%s_%s.png' % (lsst_num, data_product)
+        self.assertEqual(siteUtils.png_data_product(pngfile, lsst_num),
+                         data_product)
+
 if __name__ == '__main__':
     unittest.main()
