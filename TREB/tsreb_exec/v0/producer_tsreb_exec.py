@@ -22,7 +22,7 @@ class tsreb_test(object):
 def do_test():
     import lcatr.schema
     reb_id = os.environ["LCATR_UNIT_ID"]
-    if (len(reb_id.split("-")) != 2):
+    if (len(reb_id.split("-")) != 3):
         raise Exception("ERROR: Invalid REB ID format: %s" % (reb_id))
 	return
 
@@ -30,7 +30,7 @@ def do_test():
     if (os.environ.has_key('TSREB_SSH_LOGIN')):
 	remote = os.environ('TSREB_SSH_LOGIN')
 
-    reb_id = reb_id.split("-")[1]
+    reb_id = reb_id.split("-")[2]
     tsp = tsreb_test(reb_id, remote=remote)
 
 if (__name__ == "__main__"):
