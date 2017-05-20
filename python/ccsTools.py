@@ -102,7 +102,14 @@ class CcsSetup(OrderedDict):
                 self['CCSCCDTYPE'] = _quote("ITL")
                 self['acffile'] = self['itl_acffile']
                 self['sequence_file'] = self['itl_seqfile']
+            os.system("export | grep -i seq")
+            seqdir = ""
+            if os.environ.has_key('SEQUENCERFILESDIR') :
+                seqdir = os.getenv('SEQUENCERFILESDIR')
+                print "seqdir=",seqdir
+                self['sequence_file'] = self['sequence_file'].replace('${SEQUENCERFILESDIR}',seqdir)
             os.system("cp -vp %s %s" % (self['sequence_file'],self['tsCWD']))
+
             # now use the local copy
 #            bb = self['sequence_file'].split("/")
 #            self['sequence_file'] = _quote("%s/%s" % (os.getcwd(),bb[len(bb)-1].split("'")[0]))
@@ -122,7 +129,11 @@ class CcsSetup(OrderedDict):
         configDir = siteUtils.configDir()
         for line in open(configFile):
             key, value = line.strip().split("=")
-            self[key.strip()] = _quote(os.path.realpath(os.path.join(configDir, value.strip())))
+            if not '$' in value :
+                self[key.strip()] = _quote(os.path.realpath(os.path.join(configDir, value.strip())))
+            else :
+                self[key.strip()] = _quote(value.strip())
+
     def __call__(self):
         """
         Return the setup commands for the CCS script.
