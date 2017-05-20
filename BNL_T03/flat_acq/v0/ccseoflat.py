@@ -246,6 +246,22 @@ try:
 # ##########################################################################################
             for i in range(imcount):
 
+# take bias image
+                print "set controller for bias exposure"
+                arcsub.synchCommand(10,"setParameter Nexpo 1");
+                arcsub.synchCommand(10,"setParameter","Light","0");
+                arcsub.synchCommand(10,"setParameter","ExpTime","0");
+                arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
+                result = arcsub.synchCommand(10,"setCCDnum",ccd)
+                result = arcsub.synchCommand(10,"setHeader","TestType","FLAT")
+                result = arcsub.synchCommand(10,"setHeader","ImageType","BIAS")
+                for ii in range(1):
+                    arcsub.synchCommand(10,"setFitsFilename","");
+                    print "Ready to take clearing bias image. time = %f" % time.time()
+                    result = arcsub.synchCommand(500,"exposeAcquireAndSave").getResult();
+                    result = arcsub.synchCommand(500,"waitForExpoEnd").getResult();
+
+
 ####### just added - 2017/02/20
                 print "doing some unrecorded acquisitions to clear the buffers"
 
@@ -256,7 +272,7 @@ try:
                 for ii in range(1):
                     timestamp = time.time()
                     result = arcsub.synchCommand(10,"setFitsFilename","");
-                    print "Ready to take clearing bias image. time = %f" % time.time()
+                    print "Ready to take pre-image. time = %f" % time.time()
                     rply = arcsub.synchCommand(120,"exposeAcquireAndSave").getResult();
                     print "waiting for exposure to complete"
                     time.sleep(0.2)
