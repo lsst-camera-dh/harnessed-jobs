@@ -6,22 +6,22 @@ import os
 import sys
 
 for i in range(20):
-     print "This POWER ON test may be skipped if the REB(s) is(are) already fully powered and you have the authorization. Skip the step (N/y)?"
+     print "This POWER ON test may be skipped if the REB(s) is(are) already fully powered and you have the authorization. \n *** THE HV BIAS MUST BE OFF TO PROCEED! *** \n Skip this part of the step (Y (default)/n)?"
 sys.stdout.flush()
-answer = raw_input("\n\nThis test may be skipped if the REB(s) are(is) already fully powered and you have the authorization. Skip the step (N/y)? \n\n")
-if "y" in answer.lower() :
-     print "Operator requested to skip the step. BYE"
+answer = raw_input("\n\nThis POWER ON test may be skipped if the REB(s) is(are) already fully powered and you have the authorization. \n *** THE HV BIAS MUST BE OFF TO PROCEED! *** \n Skip this part of the step (Y (default)/n)? \n\n")
+if "n" not in answer.lower() :
+     print "Operator requested to skip this part (POWER ON) of the  step."
 else :
     ccsProducer('ready_acq', 'ccseorebalive_power.py')
 
 ccsProducer('ready_acq', 'ccseoREB_retrieve_versions.py')
 
 for i in range(20):
-     print "This EXPOSURES test may be skipped if you have the authorization. Skip the step (N/y)?"
+     print "This EXPOSURES test may be skipped if you have the authorization. Skip this part of the step (N (default)/y)?"
 sys.stdout.flush()
-answer = raw_input("\n\nThis test may be skipped if you have the authorization. Skip the step (N/y)? \n\n")
+answer = raw_input("\n\nThis EXPOSURES test may be skipped if you have the authorization. Skip this part of the step (N (default)/y)? \n\n")
 if "y" in answer.lower() :
-     print "Operator requested to skip the step. BYE"
+     print "Operator requested to skip the EXPOSURES part of the step."
 else :
     ccsProducer('ready_acq', 'ccseorebalive_exposure.py')
     sys.stdout.flush()

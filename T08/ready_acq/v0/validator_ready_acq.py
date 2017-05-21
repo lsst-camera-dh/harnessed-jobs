@@ -16,25 +16,25 @@ if "y" in answer.lower() :
 
 results = []
 
-preflfiles = glob.glob("*.txt")
-preflfiles = preflfiles + glob.glob("*summary*")
-preflfiles = preflfiles + glob.glob("*png")
-preflfiles = preflfiles + glob.glob("*fits")
-preflfiles = preflfiles + glob.glob("*/*fits")
-preflfiles = preflfiles + glob.glob("*log*")
+readyfiles = glob.glob("*.txt")
+readyfiles = readyfiles + glob.glob("*summary*")
+readyfiles = readyfiles + glob.glob("*png")
+readyfiles = readyfiles + glob.glob("*fits")
+readyfiles = readyfiles + glob.glob("*/*fits")
+readyfiles = readyfiles + glob.glob("*log*")
 
-data_products = [lcatr.schema.fileref.make(item) for item in preflfiles]
+data_products = [lcatr.schema.fileref.make(item) for item in readyfiles]
 results.extend(data_products)
 
-versionfiles = glob.glob("*.txt")
-versionfiles = versionfiles + glob.glob("*summary*")
+#versionfiles = glob.glob("*.txt")
+#versionfiles = versionfiles + glob.glob("*summary*")
 
-data_products1 = [lcatr.schema.fileref.make(item) for item in versionfiles]
-results.extend(data_products1)
+#data_products1 = [lcatr.schema.fileref.make(item) for item in versionfiles]
+#results.extend(data_products1)
 
 
-for item in versionfiles :
-    print "Archiving versions file - %s" % item
+#for item in versionfiles :
+#    print "Archiving versions file - %s" % item
 
 
 
