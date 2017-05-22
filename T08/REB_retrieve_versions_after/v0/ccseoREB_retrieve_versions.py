@@ -12,14 +12,17 @@ CCS.setThrowExceptions(True);
 
 cdir = tsCWD
 
-
+#Set variables
 rebsub = {}
 firmware_version = {}
 serial_number = {}
 ts8sub  = CCS.attachSubsystem("ts8");
 rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
+#Open "REB_versions.txt"
 fpr = open("%s/REB_versions.txt" % (cdir),"w");
+
+#Get REB5 firmware version and serial number
 for id in rebdevs:
     rebsub[id]  = CCS.attachSubsystem("ts8/%s" % id);
     firmware_version[id] = rebsub[id].synchCommand(10,"getHwVersion").getResult()
@@ -32,7 +35,7 @@ for id in rebdevs:
 
 fpr.close()
 
-
+#Output
 fp = open("%s/status.out" % (cdir),"w");
 istate=0;
 fp.write(`istate`+"\n");
