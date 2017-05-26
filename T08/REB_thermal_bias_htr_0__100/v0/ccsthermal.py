@@ -41,7 +41,8 @@ if (True) :
 
     status_value = None
 
-    ts8sub.synchCommand(10,"change tickMillis 500");
+    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 500");
+    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
 
 
     rebs = ""

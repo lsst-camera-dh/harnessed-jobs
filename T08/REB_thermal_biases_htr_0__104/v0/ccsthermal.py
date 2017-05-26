@@ -106,7 +106,8 @@ if (True) :
 
         time.sleep(2.0)
 
-ts8sub.synchCommand(10,"change tickMillis 10000");
+ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
+ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
 
 
 

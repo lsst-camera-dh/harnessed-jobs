@@ -27,7 +27,7 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
     print "Retrieving REB current %s " % reb_chan
     cur_reb = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.%s" % (rebid,reb_chan)).getResult()
 
-    print "verifying that the current is with limits"
+    print "verifying that the current is within limits"
     if (chkreb) :
         stat = "%s: - checking %10.10s : OK - PS value is %8.3f mAmps, REB value is %8.3f mAmps" % (rebname,pwr_chan,cur_ps,cur_reb)
     else :
@@ -154,7 +154,7 @@ else :
 # verify that all power is OFF
             try:
                 stat = ts8sub.synchCommand(300,"R00.Reb%d setBackBias false" % rebid).getResult()
-                stat = ts8sub.synchCommand(300,"powerOff %d" % rebid).getResult()
+#                stat = ts8sub.synchCommand(300,"powerOff %d" % rebid).getResult()
 
 #                result = pwrsub.synchCommand(10,"setNamedPowerOn",i,"master",False);
                 result = pwrsub.synchCommand(20,"setNamedPowerOn %d master False" % i);
@@ -196,11 +196,13 @@ else :
                     if 'analog' in pwron :
                         check_currents(i,"analog","AnaI",6.,610.,chkreb)
                     if 'od' in pwron :
+                        time.sleep(5.0)
                         check_currents(i,"OD","ODI",6.,190.,chkreb)
                     if 'clockhi' in pwron :
-                        check_currents(i,"clockhi","ClkI",6.0,300.,chkreb)
+                        check_currents(i,"clockhi","ClkHI",6.0,300.,chkreb)
                     if 'clocklo' in pwron :
-                        check_currents(i,"clocklo","ClkI",6.,300.,chkreb)
+                        time.sleep(5.0)
+                        check_currents(i,"clocklo","ClkLI",6.,300.,chkreb)
 #                    if 'digital' in pwron :
 #                        check_currents(i,"digital","DigI",500.,770.,chkreb)
 #                    if 'analog' in pwron :
