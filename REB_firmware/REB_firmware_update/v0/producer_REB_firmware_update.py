@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import Tkinter
 import glob
 import os
 import subprocess
