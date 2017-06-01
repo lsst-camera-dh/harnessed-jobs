@@ -90,11 +90,12 @@ plt.close('all')
 # Linearity plots
 detresp_file = processName_dependencyGlob('%s_det_response.fits' % sensor_id,
                                           jobname='flat_pairs')[0]
-plots.linearity(ptc_file=ptc_file, detresp_file=detresp_file)
+plots.linearity(ptc_file=ptc_file, detresp_file=detresp_file, use_exptime=True)
 plt.savefig('%s_linearity.png' % sensor_id)
 plt.close('all')
 
-plots.linearity_resids(ptc_file=ptc_file, detresp_file=detresp_file)
+plots.linearity_resids(ptc_file=ptc_file, detresp_file=detresp_file,
+                       use_exptime=True)
 plt.savefig('%s_linearity_resids.png' % sensor_id)
 plt.close('all')
 

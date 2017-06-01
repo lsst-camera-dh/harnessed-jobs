@@ -12,4 +12,4 @@ mask_files = eotestUtils.glob_mask_files()
 gains = eotestUtils.getSensorGains()
 
 task = sensorTest.FlatPairTask()
-task.run(sensor_id, flat_files, mask_files, gains)
+task.run(sensor_id, flat_files, mask_files, gains, use_exptime=True)
