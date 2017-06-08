@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+import lsst.eotest.sensor as sensorTest
+import siteUtils
+import eotestUtils
+import glob
+
+sensor_id = siteUtils.getUnitId()
+#flat_files = siteUtils.dependency_glob('*_flat*flat?_*.fits',
+#                                       jobname=siteUtils.getProcessName('flat_acq'),
+#                                       description='Flat files:')
+
+flat_files = glob.glob('/home/ts3prod/jobHarness/jh_stage/e2v-CCD/E2V-CCD250-265/4530/flat_acq/v0/21840/*_flat*flat?_*.fits')
+
+#mask_files = eotestUtils.glob_mask_files()
+mask_files = glob.glob('*_mask.fits')
+
+data = sensorTest.EOTestResults('/home/ts3prod/jobHarness/jh_stage/e2v-CCD/E2V-CCD250-265/4530/fe55_analysis/v0/21838/*_eotest_results.fits')
+amps = data['AMP']
+gains = data['GAIN']
+gains = dict([(amp, gains[amp-1]) for amp in amps])
+
+#gains = eotestUtils.getSensorGains()
+
+task = sensorTest.FlatPairTask()
+
+task.run(sensor_id, flat_files, mask_files, gains, use_exptime=True)
