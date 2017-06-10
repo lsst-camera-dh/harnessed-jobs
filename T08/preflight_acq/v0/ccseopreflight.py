@@ -108,7 +108,7 @@ ccd = CCDID
 
 # flat file pattern
 # E2V-CCD250-179_flat_0065.07_flat2_20161130064552.fits
-flat_pat = '${TestType}_%07.2fs_${ImageType}%d_${RunNumber}.fits'
+flat_pat = '${sensorLoc}_%07.2fs_${ImageType}%d_${RunNumber}_${timestamp}.fits'
 #flat_pat = '${CCDSerialLSST}_${testType}_%07.2fs_${imageType}%d_${RunNumber}_${timestamp}.fits'
 
 if usets8 :

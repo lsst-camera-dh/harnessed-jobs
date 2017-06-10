@@ -20,6 +20,7 @@ preflfiles = glob.glob("*.txt")
 preflfiles = preflfiles + glob.glob("*summary*")
 preflfiles = preflfiles + glob.glob("*png")
 preflfiles = preflfiles + glob.glob("*log*")
+preflfiles = preflfiles + glob.glob("*/*fits")
 
 data_products = [lcatr.schema.fileref.make(item) for item in preflfiles]
 results.extend(data_products)
