@@ -62,6 +62,12 @@ cdir = tsCWD
 
 raft = UNITID
 
+runnum = "no-eTrav"
+try:
+    runnum = RUNNUM
+except:
+    pass
+
 
 ts_version = ""
 ts8_version = ""
@@ -102,7 +108,8 @@ ccd = CCDID
 
 # flat file pattern
 # E2V-CCD250-179_flat_0065.07_flat2_20161130064552.fits
-flat_pat = '${CCDSerialLSST}_${TestType}_%07.2fs_${ImageType}%d_${RunNumber}_${timestamp}.fits'
+flat_pat = '${TestType}_%07.2fs_${ImageType}%d_${RunNumber}.fits'
+#flat_pat = '${CCDSerialLSST}_${testType}_%07.2fs_${imageType}%d_${RunNumber}_${timestamp}.fits'
 
 if usets8 :
     rply = monosub.synchCommand(900,"openShutter").getResult();
@@ -177,7 +184,7 @@ try:
 
 
 # make sure to get some readings before the state of the shutter changes       
-                time.sleep(1.0);
+                time.sleep(2.0);
  
                 timestamp = time.time()
                 if usets8 :
@@ -185,10 +192,17 @@ try:
                     print "Ready to take image with exptime = %f at time = %f" % (exptime,time.time())
 
                     acqname = "preflight"
+                    ts8sub.synchCommand(10,"setDefaultImageDirectory","%s/S${sensorLoc}" % (cdir));
+            
+                    ts8sub.synchCommand(10,"setRaftName",str(raft))
+                    ts8sub.synchCommand(10,"setRunNumber",runnum)
+            
                     ts8sub.synchCommand(10,"setTestType",acqname.lower())
                     ts8sub.synchCommand(10,"setImageType",acqname.lower())
                     ts8sub.synchCommand(10,"setSeqInfo",seq)
                     ts8sub.synchCommand(10,"setFitsFileNamePattern",flat_pat % (exptime,imdone+1))
+#                    eolib.EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames)
+
                     doLight = True
                     doXED = True
                     fitsfiles = ts8sub.synchCommand(100,"exposeAcquireAndSave",int(exptime*1000),doLight,doXED).getResult();
