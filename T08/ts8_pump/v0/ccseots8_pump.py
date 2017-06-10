@@ -25,8 +25,8 @@ try:
     pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "attaching Cryo subsystem"
     cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
-    print "attaching VacuumGauge subsystem"
-    vacsub = CCS.attachSubsystem("%s/VacuumGauge" % ts );
+#    print "attaching VQMonitor subsystem"
+#    vacsub = CCS.attachSubsystem("%s/VQMonitor" % ts );
 #    print "Attaching archon subsystem"
 #    arcsub  = CCS.attachSubsystem("%s" % archon);
 
@@ -47,7 +47,7 @@ try:
     starttim = time.time()
     while True:
         print "checking if pressure is low enough to turn on turbo pump";
-        result = vacsub.synchCommand(20,"readPressure");
+        result = tssub.synchCommand(20,"getPressure");
         pres = result.getResult();
         print "time = %f , P = %f\n" % (time.time(),pres)
         if ((time.time()-starttim)>7200):
@@ -58,13 +58,15 @@ try:
         time.sleep(5.)
 
 # turn on power to the turbo pump
-    result = vacsub.synchCommand(20,"readPressure");
-    pres = result.getResult();
+    pres = tssub.synchCommand(20,"getPressure").getResult();
+
     if (pres>0.0 and pres<0.1) :
         print "TURNING ON POWER TO THE TURBO PUMP!"
-        result = pdusub.synchCommand(120,"setOutletState",pump_outlet,True);
-        rply = result.getResult();
-
+        try:
+            rply = pdusub.synchCommand(200,"setOutletState",pump_outlet,True).getResult();
+        except ScriptingTimeoutException, exx:
+            print "Letting a timeout on the outlet state change pass."
+            print "Verify that the pump does eventually come on and if not, do it manually."
 
     fp = open("%s/status.out" % (cdir),"w");
     istate=0;
