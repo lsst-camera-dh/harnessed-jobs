@@ -135,9 +135,7 @@ else :
 
 
     print "setting tick and monitoring period to 0.5s"
-    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 500");
-    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
-#    ts8sub.synchCommand(10,"change tickMillis 100");
+    ts8sub.synchCommand(10,"change tickMillis 100");
 #    ts8sub.synchCommand(10,"setTickMillis 100")
 
 #    for rebid in rebids :
@@ -205,6 +203,16 @@ else :
                     if 'clocklo' in pwron :
                         time.sleep(5.0)
                         check_currents(i,"clocklo","ClkLI",6.,300.,chkreb)
+#                    if 'digital' in pwron :
+#                        check_currents(i,"digital","DigI",500.,770.,chkreb)
+#                    if 'analog' in pwron :
+#                        check_currents(i,"analog","AnaI",400.,600.,chkreb)
+#                    if 'od' in pwron :
+#                        check_currents(i,"OD","ODI",60.,120.,chkreb)
+#                    if 'clockhi' in pwron :
+#                        check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
+#                    if 'clocklo' in pwron :
+#                        check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
 ##                   check_currents(i,"heater","???",0.100,0.300,chkreb)
                 except Exception, e:
                     print "%s: CURRENT CHECK FAILED! %s" % (rebname,e)
@@ -212,29 +220,6 @@ else :
                     raise Exception
                     break
                 time.sleep(2)
-
-# after everything is up, do a final check while imposing full lower limits
-
-            try:
-                print "Final pass of REB PS current check"
-                
-                if 'digital' in pwron :
-                    check_currents(i,"digital","DigI",500.,800.,chkreb)
-                if 'analog' in pwron :
-                    check_currents(i,"analog","AnaI",400.,610.,chkreb)
-                if 'od' in pwron :
-                    check_currents(i,"OD","ODI",60.,190.,chkreb)
-                if 'clockhi' in pwron :
-                    check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
-                if 'clocklo' in pwron :
-                    check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
-#                 check_currents(i,"heater","???",0.100,0.300,chkreb)
-            except Exception, e:
-                print "%s: CURRENT CHECK FAILED ON FINAL REB PS CHECK! %s" % (rebname,e)
-                status_value = False
-                raise Exception
-                break
-
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
                 print "CCSCCDTYPE=",CCSCCDTYPE
@@ -257,12 +242,8 @@ else :
                 try:
                     stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
                     print stat.replace("\n","\r\n")
-                    if ('FAIL' in stat) :
-                        for iii in range(5) :
-                        print "!!!! FAILED TO FULLY POWER ",rebname
-
                     print "---------------List of low current channels ------------------"
-                    for ln in stat.split("\n"):
+                    for ln in stat:
                         if "LOW CURRENT" in ln.upper() :
                             print ln
                     print "---------------End of list of low current channels ------------"
@@ -274,27 +255,19 @@ else :
 
                 
                     print "------ %s Complete ------\n" % rebname
-                    if ('FAIL' in stat) :
-                        break
                 except RuntimeException, e:
                     print e
                     print "setting tick and monitoring period to 10s"
-                    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
-                    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
-#                    ts8sub.synchCommand(10,"change tickMillis 10000");
+                    ts8sub.synchCommand(10,"change tickMillis 10000");
                     raise e
                 except Exception, e:
                     print e
                     print "setting tick and monitoring period to 10s"
-                    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
-                    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
-#                    ts8sub.synchCommand(10,"change tickMillis 10000");
+                    ts8sub.synchCommand(10,"change tickMillis 10000");
                     raise e
 
     print "setting tick and monitoring period to 10s"
-    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
-    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
-#    ts8sub.synchCommand(10,"change tickMillis 10000");
+    ts8sub.synchCommand(10,"change tickMillis 10000");
 
     if status_value :
         print "DONE with successful powering of"
