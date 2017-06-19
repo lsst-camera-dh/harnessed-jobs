@@ -1,0 +1,24 @@
+# -*- python -*-
+{
+    'schema_name' : 'REB_OD_RD',
+    'schema_version' : 0,
+    'OD0_0' : str,
+    'OD1_0' : str,
+    'OD2_0' : str,
+    'RD0_0' : str,
+    'RD1_0' : str,
+    'RD2_0' : str,
+    'OD0_1' : str,
+    'OD1_1' : str,
+    'OD2_1' : str,
+    'RD0_1' : str,
+    'RD1_1' : str,
+    'RD2_1' : str,
+    'OD0_2' : str,
+    'OD1_2' : str,
+    'OD2_2' : str,
+    'RD0_2' : str,
+    'RD1_2' : str,
+    'RD2_2' : str,
+}
+
