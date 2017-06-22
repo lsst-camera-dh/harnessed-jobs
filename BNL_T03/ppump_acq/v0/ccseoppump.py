@@ -51,7 +51,7 @@ try:
     pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
     wl     = float(eolib.getCfgVal(acqcfgfile, 'PPUMP_WL', default = "550.0"))
-    pcount = float(eolib.getCfgVal(acqcfgfile, 'PPUMP_BCOUNT', default = "25"))
+    pcount = int(eolib.getCfgVal(acqcfgfile, 'PPUMP_BCOUNT', default = "25"))
     imcount = 2
     
     print "setting the monochromator wavelength"

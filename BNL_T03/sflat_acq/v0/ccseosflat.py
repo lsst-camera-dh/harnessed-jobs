@@ -57,7 +57,7 @@ seq = 0  # image pair number in sequence
     
 lo_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_LOLIM', default='1.0'))
 hi_lim = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_HILIM', default='120.0'))
-bcount = float(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default = "5"))
+bcount = int(eolib.getCfgVal(acqcfgfile, 'SFLAT_BCOUNT', default = "5"))
     
 #number of PLCs between readings
 nplc = 1
