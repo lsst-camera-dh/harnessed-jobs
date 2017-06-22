@@ -40,26 +40,20 @@ for ii in range(3) :
 
 for line in fp:
     label = line.split()[0]
-    value = line.split()[1]
-    ireb = label.split('b')[1]
-    iccd = label.split('_')[1]
+    rdval = line.split()[1]
+    odval = line.split()[2]
+    ireb = int(label.split('b')[1][0])
+    iccd = int(label.split('_')[1][0])
     
-    if "OD" in line.split()[0] :
-        if ireb==0 :
-            OD0[iccd] = value
-        elif ireb==1 :
-            OD1[iccd] = value
-        else :
-
-            OD2[iccd] = value
-
-    if "RD" in line.split()[0] :
-        if ireb==0 :
-            RD0[iccd] = value
-        elif ireb==1 :
-            RD1[iccd] = value
-        else :
-            RD2[iccd] = value
+    if ireb==0 :
+        RD0[iccd] = rdval
+        OD0[iccd] = odval
+    elif ireb==1 :
+        RD1[iccd] = rdval
+        OD1[iccd] = odval
+    else :
+        RD2[iccd] = rdval
+        OD2[iccd] = odval
 
 
 
