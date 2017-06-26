@@ -1,0 +1,15 @@
+# -*- python -*-
+{
+    'schema_name' : 'REB_CSGATE',
+    'schema_version' : 0,
+    'CCDI0_0' : str,
+    'CCDI1_0' : str,
+    'CCDI2_0' : str,
+    'CCDI0_1' : str,
+    'CCDI1_1' : str,
+    'CCDI2_1' : str,
+    'CCDI0_2' : str,
+    'CCDI1_2' : str,
+    'CCDI2_2' : str,
+}
+

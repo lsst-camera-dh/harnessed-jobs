@@ -1,0 +1,15 @@
+# -*- python -*-
+{
+    'schema_name' : 'REB_OG',
+    'schema_version' : 0,
+    'OG0_0' : str,
+    'OG1_0' : str,
+    'OG2_0' : str,
+    'OG0_1' : str,
+    'OG1_1' : str,
+    'OG2_1' : str,
+    'OG0_2' : str,
+    'OG1_2' : str,
+    'OG2_2' : str,
+}
+
