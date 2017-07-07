@@ -25,7 +25,10 @@ try:
     print "attaching Cryo subsystem"
     cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
     print "Attaching archon subsystem"
-    arcsub  = CCS.attachSubsystem("%s" % archon);
+    try:
+        arcsub  = CCS.attachSubsystem("%s" % archon);
+    except:
+        pass
 
     time.sleep(3.)
 

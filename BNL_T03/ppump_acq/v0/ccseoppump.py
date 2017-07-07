@@ -96,7 +96,7 @@ try:
         if ((len(tokens) > 0) and (tokens[0] == 'ppump')):
     
             exptime = float(tokens[1])
-            imcount = float(tokens[2])
+            imcount = int(tokens[2])
             nshifts  = float(tokens[3])
 
             result = arcsub.synchCommand(10,"setHeader","SequenceNumber",seq)

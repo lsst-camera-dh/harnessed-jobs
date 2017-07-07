@@ -10,6 +10,8 @@ import lsst.eotest.sensor as sensorTest
 import siteUtils
 
 siteUtils.aggregate_job_ids()
+#sensor_id = []
+#sensor_id.append(siteUtils.getUnitId())
 sensor_id = siteUtils.getUnitId()
 fe55_files = siteUtils.dependency_glob('*_fe55_fe55_*.fits',
                                        jobname=siteUtils.getProcessName('fe55_acq'),

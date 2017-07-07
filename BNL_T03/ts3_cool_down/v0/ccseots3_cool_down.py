@@ -26,7 +26,7 @@ try:
     print "attaching Cryo subsystem"
     cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
     print "attaching VacuumGauge subsystem"
-    vacsub = CCS.attachSubsystem("%s/VacuumGauge" % ts );
+    vacsub = CCS.attachSubsystem("%s/VQMonitor" % ts );
 #    print "Attaching archon subsystem"
 #    arcsub  = CCS.attachSubsystem("%s" % archon);
 
