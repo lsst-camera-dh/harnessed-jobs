@@ -1,5 +1,5 @@
 ###############################################################################
-# Cooling-Measurement-2
+# Cooling-Measurement-1
 # TS5 KEYENCE METROLOGY SCAN
 #      Date: 11/07
 #      Authors: Homer and Rebecca
@@ -26,13 +26,13 @@ pdusub = CCS.attachSubsystem("ts/PDU");
 
 cdir = tsCWD
 
-target_temp = -60. 
+target_temp = -30. 
 
 cur_temp = cryosub.synchCommand(20,"getTemp B").getResult()
 #cur_temp = 20.
 
 # number of degrees per minute
-trate = 0.4
+trate = 0.2
 
 # duration in seconds
 period = abs(target_temp - cur_temp) / (trate/60.0); 
@@ -44,7 +44,7 @@ nsteps = abs(target_temp - cur_temp)
 ###################################################################
 # Once at a safe pressure, begin cooling the device
 starttim = time.time()
-if (False):
+if (True):
     while True:
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
@@ -54,20 +54,18 @@ if (False):
         time.sleep(5.)
 ###################################################################
 
+#    pdusub.synchCommand(120,"setOutletState",cryo_outlet,True).getResult()
+
     cryosub.synchCommand(20000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
 
     while (True) :
-        try:
-            now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
-            if (abs(target_temp-now_temp)<1.0) :
-                break
-        except:
-            print "failed to read temperature"
-            pass
-        time.sleep(10.0)
+        now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
+        if (abs(target_temp-now_temp)<2.0) :
+            break
+        time.sleep(5.0)
         print "waiting for target temp to be reached. current temp = %fC" % now_temp
 
-ts5sub.synchCommand(30,"setCfgStateByName BASEPLATE")
+ts5sub.synchCommand(30,"setCfgStateByName RTM")
 
 tstart = time.time()
 
@@ -81,8 +79,8 @@ for temp in ["A","B","C","D"]:
     start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
 #    start_temp[temp]=20.0
 
-#ts5sub.synchCommand(3000,"scanfl %s/Cooling-Measurement-2.dat" % cdir)
-ts5sub.synchCommand(6000,"scanfl %s/%s" % (cdir,fln))
+#ts5sub.synchCommand(3000,"scanfl %s/Cooling-Measurement-1.dat" % cdir)
+ts5sub.synchCommand(3000,"scanfl %s/%s" % (cdir,fln))
 
 tstop = time.time()
 stop_temp = {}
@@ -90,7 +88,7 @@ for temp in ["A","B","C","D"]:
     stop_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
 #    stop_temp[temp]=20.0
 
-#fpdat = open("%s/Cooling-Measurement-2.dat" % (cdir),"a");
+#fpdat = open("%s/Cooling-Measurement-1.dat" % (cdir),"a");
 fpdat = open("%s/%s" % (cdir,fln),"a");
 fpdat.write("# start time = %f , stop time = %f\n" % (tstart,tstop))
 for temp in ["A","B","C","D"]:
@@ -120,4 +118,4 @@ print "            TS5 KEYENCE METROLOGY SCAN DONE\n"
 print " =====================================================\n"
 
 
-print "Cooling-Measurement-2: COMPLETED"
+print "Cooling-Measurement-1: COMPLETED"

@@ -31,7 +31,7 @@ for temp in ["A","B","C","D"]:
     start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
     time.sleep(1.0)
 
-ts5sub.synchCommand(3000,"noStepScan  %s/RSA-calib.dat" % cdir)
+ts5sub.synchCommand(3000,"scanfl %s/RSA-calib.dat" % cdir)
 
 tstop = time.time()
 stop_temp = {}

@@ -44,7 +44,7 @@ nsteps = abs(target_temp - cur_temp)
 ###################################################################
 # Once at a safe pressure, begin cooling the device
 starttim = time.time()
-if (True):
+if (False):
     while True:
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
@@ -65,7 +65,7 @@ if (True):
         time.sleep(5.0)
         print "waiting for target temp to be reached. current temp = %fC" % now_temp
 
-ts5sub.synchCommand(30,"setCfgStateByName RTM")
+ts5sub.synchCommand(30,"setCfgStateByName BASEPLATE")
 
 tstart = time.time()
 
@@ -79,8 +79,8 @@ for temp in ["A","B","C","D"]:
     start_temp[temp]=cryosub.synchCommand(20,"getTemp %s" % temp).getResult()
 #    start_temp[temp]=20.0
 
-#ts5sub.synchCommand(3000,"noStepScan  %s/Cooling-Measurement-1.dat" % cdir)
-ts5sub.synchCommand(3000,"noStepScan  %s/%s" % (cdir,fln))
+#ts5sub.synchCommand(3000,"scanfl %s/Cooling-Measurement-1.dat" % cdir)
+ts5sub.synchCommand(5000,"scanfl %s/%s" % (cdir,fln))
 
 tstop = time.time()
 stop_temp = {}
