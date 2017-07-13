@@ -265,10 +265,10 @@ def EOSetup(tssub,ccdid,ccdtype,cdir,acffile,vac_outlet,arcsub,state1="setTSRead
     reply = result.getResult();
 # Post Archon TS Initialization
     try:
-        reply = tssub.synchCommand(11000,"disconnectVQM").getResult();
+        reply = tssub.synchCommand(100,"disconnectVQM").getResult();
     except:
         pass
-    result = tssub.synchCommand(11000,"eoSetupPostCfg",vac_outlet,state2);
+    result = tssub.synchCommand(200,"eoSetupPostCfg",vac_outlet,state2);
     reply = result.getResult();
 
     result = arcsub.synchCommand(10,"getKpixRate");
