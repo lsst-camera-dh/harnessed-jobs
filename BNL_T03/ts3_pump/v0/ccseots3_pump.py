@@ -27,6 +27,10 @@ try:
     cryosub = CCS.attachSubsystem("%s/Cryo" % ts );
     print "attaching VacuumGauge subsystem"
     vacsub = CCS.attachSubsystem("%s/VacuumGauge" % ts );
+    pres = vacsub.synchCommand(20,"readPressure").getResult();
+    if (pres == 0.0) :
+        vacsub = CCS.attachSubsystem("%s/VQMonitor" % ts );
+
 #    print "Attaching archon subsystem"
 #    arcsub  = CCS.attachSubsystem("%s" % archon);
 
@@ -49,7 +53,7 @@ try:
         print "checking if pressure is low enough to turn on turbo pump";
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
-        print "time = %f , P = %f\n" % (time.time(),pres)
+        print "time = %f , P = %11.3e\n" % (time.time(),pres)
         if ((time.time()-starttim)>7200):
             print "Something is wrong ... we will never make it to a low enough pressure for turning on the turbo pump"
             exit
