@@ -158,6 +158,8 @@ else :
                 stat = ts8sub.synchCommand(300,"powerOff %d" % rebid).getResult()
             except Exception, e:
                 print "%s: FAILED TO TURN POWER OFF! \r\r %s" % (rebname,e)
+                ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
+                ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
                 raise e
 
             time.sleep(3.0)
@@ -183,7 +185,6 @@ else :
             time.sleep(3.0)
     
             try:
-#                    print "checking currents"
                     
                 if 'digital' in pwron :
                     check_currents(i,"digital","DigI",6.,800.,chkreb)
@@ -197,26 +198,12 @@ else :
                 if 'clocklo' in pwron :
                     time.sleep(5.0)
                     check_currents(i,"clocklo","ClkLI",6.,300.,chkreb)
-                except Exception, e:
-                    print "%s: CURRENT CHECK FAILED! %s" % (rebname,e)
-                    status_value = False
-                    raise Exception
-                    break
-                time.sleep(2)
-                    print "------ %s Complete ------\n" % rebname
-                except RuntimeException, e:
-                    print e
-                    print "setting tick and monitoring period to 10s"
-
-                    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
-                    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
-                    raise e
-                except Exception, e:
-                    print e
-                    print "setting tick and monitoring period to 10s"
-                    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
-                    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
-                    raise e
+            except Exception, e:
+                print "%s: CURRENT CHECK FAILED! %s" % (rebname,e)
+                status_value = False
+                raise Exception
+                break
+            time.sleep(2)
 
     print "setting tick and monitoring period to 10s"
     ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
