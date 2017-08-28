@@ -2,7 +2,7 @@
 # REB-PS safe power on
 #
 #
-# author: homer    10/2016
+# author: homer    8/2017
 #
 ###############################################################################
 
@@ -41,9 +41,6 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
     if (abs(cur_ps)>0.0 and chkreb) :
         if (abs(cur_reb-cur_ps)/cur_ps > 0.10 and abs(cur_reb)>0.5) :
             stat = "%s: Current %s with value %f differs by > 10%% to current from reb channel %s with value %f!" % (rebname,pwr_chan,cur_ps,reb_chan,cur_reb)
-#            pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (rebid,pwr))
-#            stat = "%s: Current %s with value %f differs by > 20%% to current from reb channel %s with value %f. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (rebname,pwr_chan,cur_ps,reb_chan,cur_reb)
-#            raise Exception(stat)
 
     print stat
 
@@ -148,7 +145,7 @@ else :
             print "****************************************************"
 
 
-# verify that all power is OFF
+# Insure the front and back biases are off and increase the monitoring update rate
             ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 500");
             ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
 
@@ -165,7 +162,7 @@ else :
             time.sleep(3.0)
 
             pwron = ""
-# attempt to apply the REB power 
+# Turn on the REB PS power lines but keep off the RSA heaters
 
             try:
                 print "%s: turning on %s power at %s" % (rebname,pwr,time.ctime().split()[3])
@@ -177,6 +174,8 @@ else :
 
             time.sleep(2.0)
 
+
+# Insure the that the RCE is talking to the REBs before starting the checks
             chkreb = True
             print "Rebooting the RCE after a 5s wait"
             time.sleep(5.0)
@@ -184,8 +183,8 @@ else :
             print sout
             time.sleep(3.0)
     
+# perform checks
             try:
-                    
                 if 'digital' in pwron :
                     check_currents(i,"digital","DigI",6.,800.,chkreb)
                 if 'analog' in pwron :
@@ -211,7 +210,7 @@ else :
     
 
     if status_value :
-        print "DONE with successful powering of"
+        print "DONE with successful powering of REB PS lines for "
         print rebids
     else :
         print "FAILED to turn on all requested rebs"
