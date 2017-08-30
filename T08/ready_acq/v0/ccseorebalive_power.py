@@ -135,7 +135,9 @@ else :
 
 
     print "setting tick and monitoring period to 0.5s"
-    ts8sub.synchCommand(10,"change tickMillis 100");
+#    ts8sub.synchCommand(10,"change tickMillis 100");
+#    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 500");
+#    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
 #    ts8sub.synchCommand(10,"setTickMillis 100")
 
 #    for rebid in rebids :
@@ -169,24 +171,37 @@ else :
 # attempt to apply the REB power -- line by line
             powers = ['master', 'digital', 'analog', 'clockhi', 'clocklo', 'heater', 'od']
             chkreb = False
-
-            for pwr in powers :
-                pwron = pwron + pwr + " "
-                if 'clockhi' in pwr:
-                    chkreb = True
-                    print "Rebooting the RCE after a 5s wait"
-                    time.sleep(5.0)
-                    sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
-                    print sout
-                    time.sleep(3.0)
+            
+#            for pwr in powers :
+#                pwron = pwron + pwr + " "
+#                if 'clockhi' in pwr:
+#                    chkreb = True
+#                    print "Rebooting the RCE after a 5s wait"
+#                    time.sleep(5.0)
+#                    sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
+#                    print sout
+#                    time.sleep(3.0)
+#                try:
+#                    print "%s: turning on %s power at %s" % (rebname,pwr,time.ctime().split()[3])
+#                    pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (i,pwr));
+#                except Exception, e:
+#                    print "%s: failed to turn on current %s!" % (rebname,pwr)
+#                    raise Exception(e)
+            if (True) :
                 try:
-                    print "%s: turning on %s power at %s" % (rebname,pwr,time.ctime().split()[3])
-                    pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (i,pwr));
+                    print "%s: turning on REB power at %s" % (rebname,time.ctime().split()[3])
+                    pwrsub.synchCommand(10,"sequencePower %d true" % (i));
                 except Exception, e:
-                    print "%s: failed to turn on current %s!" % (rebname,pwr)
+                    print "%s: failed to turn on REB power!" % (rebname)
                     raise Exception(e)
 
-                time.sleep(2.0)
+
+#                time.sleep(2.0)
+                print "Rebooting the RCE after a 5s wait"
+                time.sleep(5.0)
+                sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
+                print sout
+                time.sleep(3.0)
     
                 try:
 #                    print "checking currents"
@@ -243,7 +258,7 @@ else :
                     stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
                     print stat.replace("\n","\r\n")
                     print "---------------List of low current channels ------------------"
-                    for ln in stat:
+                    for ln in stat.split("\n"):
                         if "LOW CURRENT" in ln.upper() :
                             print ln
                     print "---------------End of list of low current channels ------------"
@@ -251,19 +266,26 @@ else :
                     for ccdnum in range(3) :
                         reb_chan = "CCDTemp%d" % ccdnum
                         ccdtemp = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.%s" % (rebid,reb_chan)).getResult()
-                        print "%s : %s = %8.3f " % (rebname,reb_chan,ccdtemp)
+
+                        f_ccdtemp = -999.
+                        try:
+                            f_ccdtemp = float(ccdtemp)
+                        except:
+                            pass
+ 
+                        print "%s : %s = %8.3f " % (rebname,reb_chan,f_ccdtemp)
 
                 
                     print "------ %s Complete ------\n" % rebname
                 except RuntimeException, e:
                     print e
                     print "setting tick and monitoring period to 10s"
-                    ts8sub.synchCommand(10,"change tickMillis 10000");
+#                    ts8sub.synchCommand(10,"change tickMillis 10000");
                     raise e
                 except Exception, e:
                     print e
                     print "setting tick and monitoring period to 10s"
-                    ts8sub.synchCommand(10,"change tickMillis 10000");
+#                    ts8sub.synchCommand(10,"change tickMillis 10000");
                     raise e
 
     print "setting tick and monitoring period to 10s"

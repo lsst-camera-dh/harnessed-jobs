@@ -24,11 +24,8 @@ rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 idx = 0
 for id in rebdevs:
-    result = pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (idx,'master')).getResult();
+    result = pwrsub.synchCommand(10,"sequencePower %d True" % (idx).getResult();
     time.sleep(3.0)
-    result = pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (idx,'analog')).getResult();
-    time.sleep(3.0)
-    result = pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (idx,'digital')).getResult();
 
     idx = idx + 1
 
