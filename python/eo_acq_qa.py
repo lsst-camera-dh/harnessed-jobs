@@ -162,8 +162,12 @@ class TrendingObjects(object):
             self['File Count'].add_value(obs_time)
             keywords = 'CCDTEMP EXPTIME MONDIODE MONOWL FILTPOS'
             for keyword, scale in zip(keywords.split(), (1, 1, 1e3, 1, 1)):
-                self[keyword].add_value(obs_time,
-                                        frame.header_value(keyword)*scale)
+                try:
+                    self[keyword].add_value(obs_time,
+                                            frame.header_value(keyword)*scale)
+                except KeyError:
+                    print "Missing keyword:", keyword, "\nfrom file", item
+                    self[keyword].add_value(obs_time, 0)
             for amp in frame.overscan:
                 oscan_mean = np.mean(frame.overscan[amp])
                 self['oscan mean'].add_value(amp, obs_time, oscan_mean)
@@ -239,8 +243,12 @@ class RaftTrendingObjects(TrendingObjects):
             self['File Count'].add_value(obs_time)
             keywords = 'CCDTEMP EXPTIME MONDIODE MONOWL FILTPOS'
             for keyword, scale in zip(keywords.split(), (1, 1, 1e3, 1, 1)):
-                self[keyword].add_value(obs_time,
-                                        frame.header_value(keyword)*scale)
+                try:
+                    self[keyword].add_value(obs_time,
+                                            frame.header_value(keyword)*scale)
+                except KeyError:
+                    print "Missing keyword:", keyword, "\nfrom file", item
+                    self[keyword].add_value(obs_time, 0)
             for amp in frame.overscan:
                 oscan_mean = np.mean(frame.overscan[amp])
                 self['oscan mean'].add_value(sensor_num, obs_time, oscan_mean)
