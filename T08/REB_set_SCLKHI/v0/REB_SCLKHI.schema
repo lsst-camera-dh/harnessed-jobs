@@ -1,0 +1,9 @@
+# -*- python -*-
+{
+    'schema_name' : 'REB_SCLKHI',
+    'schema_version' : 0,
+    'SCLKHI0' : str,
+    'SCLKHI1' : str,
+    'SCLKHI2' : str,
+}
+

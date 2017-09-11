@@ -475,6 +475,8 @@ if (True):
                             lohiflux = "L"
                             if (target>10000) :
                                 lohiflux = "H"
+                            elif (target<500) :
+                                lohiflux = "U"
                             ts8sub.synchCommand(10,"setFitsFileNamePattern",sflat_pat % (lohiflux,imdone+1))
                         else :
                             ts8sub.synchCommand(10,"setFitsFileNamePattern",flat_pat % (exptime,imdone+1))

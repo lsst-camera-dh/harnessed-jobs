@@ -1,0 +1,15 @@
+# -*- python -*-
+{
+    'schema_name' : 'REB_GD',
+    'schema_version' : 0,
+    'GD0_0' : str,
+    'GD1_0' : str,
+    'GD2_0' : str,
+    'GD0_1' : str,
+    'GD1_1' : str,
+    'GD2_1' : str,
+    'GD0_2' : str,
+    'GD1_2' : str,
+    'GD2_2' : str,
+}
+

@@ -159,13 +159,15 @@ else :
 #                stat = ts8sub.synchCommand(300,"powerOff %d" % rebid).getResult()
 
 #                result = pwrsub.synchCommand(10,"setNamedPowerOn",i,"master",False);
-                result = pwrsub.synchCommand(20,"setNamedPowerOn %d master False" % i);
+#                result = pwrsub.synchCommand(20,"setNamedPowerOn %d master False" % i);
+                pwrsub.synchCommand(10,"sequencePower %d False" % (i)).getResult();
+
             except Exception, e:
 
                 print "%s: FAILED TO TURN POWER OFF! \r\r %s" % (rebname,e)
                 raise e
 
-            time.sleep(3.0)
+            time.sleep(5.0)
 
             pwron = ""
 # attempt to apply the REB power -- line by line

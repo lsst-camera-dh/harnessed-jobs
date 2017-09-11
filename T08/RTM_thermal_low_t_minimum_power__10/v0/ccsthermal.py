@@ -31,7 +31,8 @@ for id in rebdevs:
 
         stat = ts8sub.synchCommand(300,"R00.Reb%d setBackBias false" % idx).getResult()
         stat = ts8sub.synchCommand(300,"powerOff %d" % idx).getResult()
-        result = pwrsub.synchCommand(20,"setNamedPowerOn %d master False" % idx).getResult();
+#        result = pwrsub.synchCommand(20,"setNamedPowerOn %d master False" % idx).getResult();
+        result = pwrsub.synchCommand(20,"sequencePower %d False" % idx).getResult();
     except:
         pass
 
@@ -39,7 +40,7 @@ for id in rebdevs:
 
     idx = idx + 1
 
-target_temp = -130.
+target_temp = -126.
 
 cryosub.synchCommand(10,"setSetPoint 2 %f" % target_temp)
 ts8sub.synchCommand(10,"stopTempControl")

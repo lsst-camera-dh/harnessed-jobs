@@ -43,7 +43,7 @@ try:
 
 # set the scan range here:
     wlbegin = 300.
-    wlend   = 460.
+    wlend   = 1100.
 
     wlstep = 10.
     result = tssub.synchCommand(120,"setDoTestStandReadyCheck",False)
