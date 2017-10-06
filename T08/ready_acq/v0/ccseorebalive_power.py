@@ -35,15 +35,12 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
 
         print " ... stat = ",stat
     if (cur_ps < low_lim or cur_ps> high_lim) :
-        pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (rebid,pwr))
+        pwrsub.synchCommand(10,"sequencePower %d False" % (rebid)).getResult();
         stat = "%s: Current %s with value %f mA NOT in range %f mA to %f mA. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (rebname, pwr_chan,cur_ps,low_lim,high_lim)
         raise Exception(stat)
     if (abs(cur_ps)>0.0 and chkreb) :
         if (abs(cur_reb-cur_ps)/cur_ps > 0.10 and abs(cur_reb)>0.5) :
             stat = "%s: Current %s with value %f differs by > 10%% to current from reb channel %s with value %f!" % (rebname,pwr_chan,cur_ps,reb_chan,cur_reb)
-#            pwrsub.synchCommand(10,"setNamedPowerOn %d %s False" % (rebid,pwr))
-#            stat = "%s: Current %s with value %f differs by > 20%% to current from reb channel %s with value %f. POWER TO THIS CHANNEL HAS BEEN SHUT OFF!" % (rebname,pwr_chan,cur_ps,reb_chan,cur_reb)
-#            raise Exception(stat)
 
     print stat
 
@@ -135,10 +132,10 @@ else :
 
 
     print "setting tick and monitoring period to 0.5s"
-#    ts8sub.synchCommand(10,"change tickMillis 100");
-#    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 500");
-#    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
-#    ts8sub.synchCommand(10,"setTickMillis 100")
+
+    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 500");
+    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
+
 
 #    for rebid in rebids :
     for ids in idmap :
@@ -156,10 +153,6 @@ else :
 # verify that all power is OFF
             try:
                 stat = ts8sub.synchCommand(300,"R00.Reb%d setBackBias false" % rebid).getResult()
-#                stat = ts8sub.synchCommand(300,"powerOff %d" % rebid).getResult()
-
-#                result = pwrsub.synchCommand(10,"setNamedPowerOn",i,"master",False);
-#                result = pwrsub.synchCommand(20,"setNamedPowerOn %d master False" % i);
                 pwrsub.synchCommand(10,"sequencePower %d False" % (i)).getResult();
 
             except Exception, e:
@@ -170,73 +163,57 @@ else :
             time.sleep(5.0)
 
             pwron = ""
-# attempt to apply the REB power -- line by line
-            powers = ['master', 'digital', 'analog', 'clockhi', 'clocklo', 'heater', 'od']
             chkreb = False
             
-#            for pwr in powers :
-#                pwron = pwron + pwr + " "
-#                if 'clockhi' in pwr:
-#                    chkreb = True
-#                    print "Rebooting the RCE after a 5s wait"
-#                    time.sleep(5.0)
-#                    sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
-#                    print sout
-#                    time.sleep(3.0)
-#                try:
-#                    print "%s: turning on %s power at %s" % (rebname,pwr,time.ctime().split()[3])
-#                    pwrsub.synchCommand(10,"setNamedPowerOn %d %s True" % (i,pwr));
-#                except Exception, e:
-#                    print "%s: failed to turn on current %s!" % (rebname,pwr)
-#                    raise Exception(e)
-            if (True) :
-                try:
-                    print "%s: turning on REB power at %s" % (rebname,time.ctime().split()[3])
-                    pwrsub.synchCommand(10,"sequencePower %d true" % (i));
-                except Exception, e:
-                    print "%s: failed to turn on REB power!" % (rebname)
-                    raise Exception(e)
+
+            try:
+                print "%s: turning on REB power at %s" % (rebname,time.ctime().split()[3])
+                pwrsub.synchCommand(10,"sequencePower %d true" % (i));
+            except Exception, e:
+                print "%s: failed to turn on REB power!" % (rebname)
+                raise Exception(e)
 
 
-#                time.sleep(2.0)
-                print "Rebooting the RCE after a 5s wait"
-                time.sleep(5.0)
-                sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
-                print sout
-                time.sleep(3.0)
+#            time.sleep(2.0)
+            print "Rebooting the RCE after a 5s wait"
+            time.sleep(10.0)
+            sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
+            print sout
+            time.sleep(3.0)
     
-                try:
-#                    print "checking currents"
-                    
-                    if 'digital' in pwron :
-                        check_currents(i,"digital","DigI",6.,800.,chkreb)
-                    if 'analog' in pwron :
-                        check_currents(i,"analog","AnaI",6.,610.,chkreb)
-                    if 'od' in pwron :
-                        time.sleep(5.0)
-                        check_currents(i,"OD","ODI",6.,190.,chkreb)
-                    if 'clockhi' in pwron :
-                        check_currents(i,"clockhi","ClkHI",6.0,300.,chkreb)
-                    if 'clocklo' in pwron :
-                        time.sleep(5.0)
-                        check_currents(i,"clocklo","ClkLI",6.,300.,chkreb)
-#                    if 'digital' in pwron :
-#                        check_currents(i,"digital","DigI",500.,770.,chkreb)
-#                    if 'analog' in pwron :
-#                        check_currents(i,"analog","AnaI",400.,600.,chkreb)
-#                    if 'od' in pwron :
-#                        check_currents(i,"OD","ODI",60.,120.,chkreb)
-#                    if 'clockhi' in pwron :
-#                        check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
-#                    if 'clocklo' in pwron :
-#                        check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
-##                   check_currents(i,"heater","???",0.100,0.300,chkreb)
-                except Exception, e:
-                    print "%s: CURRENT CHECK FAILED! %s" % (rebname,e)
-                    status_value = False
-                    raise Exception
-                    break
-                time.sleep(2)
+            try:
+#                print "checking currents"
+                
+                if 'digital' in pwron :
+                    check_currents(i,"digital","DigI",6.,800.,chkreb)
+                if 'analog' in pwron :
+                    check_currents(i,"analog","AnaI",6.,610.,chkreb)
+                if 'od' in pwron :
+                    time.sleep(5.0)
+                    check_currents(i,"OD","ODI",6.,190.,chkreb)
+                if 'clockhi' in pwron :
+                    check_currents(i,"clockhi","ClkHI",6.0,300.,chkreb)
+                if 'clocklo' in pwron :
+                    time.sleep(5.0)
+                    check_currents(i,"clocklo","ClkLI",6.,300.,chkreb)
+#                if 'digital' in pwron :
+#                    check_currents(i,"digital","DigI",500.,770.,chkreb)
+#                if 'analog' in pwron :
+#                    check_currents(i,"analog","AnaI",400.,600.,chkreb)
+#                if 'od' in pwron :
+#                    check_currents(i,"OD","ODI",60.,120.,chkreb)
+#                if 'clockhi' in pwron :
+#                    check_currents(i,"clockhi","ClkI",100.0,300.,chkreb)
+#                if 'clocklo' in pwron :
+#                    check_currents(i,"clocklo","ClkI",100.,300.,chkreb)
+##               check_currents(i,"heater","???",0.100,0.300,chkreb)
+            except Exception, e:
+                print "%s: CURRENT CHECK FAILED! %s" % (rebname,e)
+                status_value = False
+                raise Exception
+                break
+            time.sleep(2)
+                
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
                 print "CCSCCDTYPE=",CCSCCDTYPE
@@ -282,16 +259,23 @@ else :
                 except RuntimeException, e:
                     print e
                     print "setting tick and monitoring period to 10s"
-#                    ts8sub.synchCommand(10,"change tickMillis 10000");
+
+                    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
+                    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
                     raise e
                 except Exception, e:
                     print e
                     print "setting tick and monitoring period to 10s"
-#                    ts8sub.synchCommand(10,"change tickMillis 10000");
+
+                    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
+                    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
+
                     raise e
 
     print "setting tick and monitoring period to 10s"
-    ts8sub.synchCommand(10,"change tickMillis 10000");
+
+    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
+    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
 
     if status_value :
         print "DONE with successful powering of"

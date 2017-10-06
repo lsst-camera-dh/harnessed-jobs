@@ -115,6 +115,13 @@ if (True) :
         time.sleep(2.0)
 
 
+    time.sleep(2.0)
+    ts8sub.synchCommand(10,"setTestType TS8")
+    ts8sub.synchCommand(10,"setImageType FLAT")
+    exptime=15.000
+    rply = ts8sub.synchCommand(100,"exposeAcquireAndSave",int(exptime*1000),False,False,"%s/${sensorLoc}_final_image.fits" % cdir).getResult()
+
+
 
 
 fp = open("%s/status.out" % (cdir),"w");

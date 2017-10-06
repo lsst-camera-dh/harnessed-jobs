@@ -102,6 +102,12 @@ if (True) :
         print ts8sub.synchCommand(10,seqcmnd).getResult();
         time.sleep(1.0)
 
+    time.sleep(2.0)
+    ts8sub.synchCommand(10,"setTestType TS8")
+    ts8sub.synchCommand(10,"setImageType BIAS")
+    rply = ts8sub.synchCommand(100,"exposeAcquireAndSave",0,False,False,"%s/${sensorLoc}_final_image.fits" % cdir).getResult()
+
+
 
 fp = open("%s/status.out" % (cdir),"w");
 fp.write(`istate`+"\n");

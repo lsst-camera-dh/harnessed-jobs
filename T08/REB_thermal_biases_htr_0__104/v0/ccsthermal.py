@@ -106,6 +106,13 @@ if (True) :
 
         time.sleep(2.0)
 
+    time.sleep(2.0)
+    ts8sub.synchCommand(10,"setTestType TS8")
+    ts8sub.synchCommand(10,"setImageType BIAS")
+    rply = ts8sub.synchCommand(100,"exposeAcquireAndSave",0,False,False,"%s/${sensorLoc}_final_image.fits" % cdir).getResult()
+
+
+
 ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
 ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
 

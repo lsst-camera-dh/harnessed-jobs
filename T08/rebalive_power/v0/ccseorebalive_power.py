@@ -273,7 +273,9 @@ else :
                     raise e
 
     print "setting tick and monitoring period to 10s"
-    ts8sub.synchCommand(10,"change tickMillis 10000");
+
+    ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
+    ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
 
     if status_value :
         print "DONE with successful powering of"
