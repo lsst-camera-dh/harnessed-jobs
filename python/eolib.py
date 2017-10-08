@@ -208,7 +208,7 @@ def EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames):
             rebid = int(line[linelen-2])
             ccdnum = int(line[linelen-1])
             if (len(manu_sn)>0) :
-                ts8sub.synchCommand(2,"setManufacturerSerialNumber %s %s" % (ccdid,manu_sn))
+                ts8sub.synchCommand(10,"setManufacturerSerialNumber %s %s" % (ccdid,manu_sn))
             ccdtemp  = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.CCDTemp%d"%(rebid,ccdnum)).getResult()
             print ccdid,": CCDTemp = ",ccdtemp
 
