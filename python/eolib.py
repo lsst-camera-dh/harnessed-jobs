@@ -197,6 +197,8 @@ def EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames):
 
 
     geo = ts8sub.synchCommand(2,"printGeometry 3").getResult();
+    bssflags = []
+    bssflags  = ts8sub.synchCommand(10,"isBackBiasOn").getResult()
     for line in geo.split('\n') :
         if len(line.split('.'))==3  :
             linelen = len(line)
@@ -205,15 +207,17 @@ def EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames):
             ccdid = line.split(' ')[1]
             ts8sub.synchCommand(2,"setLsstSerialNumber %s %s" % (ccdid,sn))
             manu_sn = ccdmanunames[slot]
-            rebid = int(line[linelen-2])
+            rebnum = int(line[linelen-2])
             ccdnum = int(line[linelen-1])
             if (len(manu_sn)>0) :
-                ts8sub.synchCommand(10,"setManufacturerSerialNumber %s %s" % (ccdid,manu_sn))
-            ccdtemp  = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.CCDTemp%d"%(rebid,ccdnum)).getResult()
+                ts8sub.synchCommand(5,"setManufacturerSerialNumber %s %s" % (ccdid,manu_sn))
+            ccdtemp  = ts8sub.synchCommand(10,"getChannelValue R00.Reb%d.CCDTemp%d"%(rebnum,ccdnum)).getResult()
             print ccdid,": CCDTemp = ",ccdtemp
 
             ts8sub.synchCommand(10,"setMeasuredCCDTemperature %s %f"%(ccdid,float(ccdtemp)))
-            hv = rebpssub.synchCommand(10,"getChannelValue REB%d.hvbias.VbefSwch"%(rebid)).getResult()
+            hv = rebpssub.synchCommand(10,"getChannelValue REB%d.hvbias.VbefSwch"%(rebnum)).getResult()
+            if not bssflags[rebnum] :
+                hv = 0.0
             print ccdid,": HVbias = ",hv
 
             ts8sub.synchCommand(10,"setMeasuredCCDBSS %s %f"%(ccdid,float(hv)))
