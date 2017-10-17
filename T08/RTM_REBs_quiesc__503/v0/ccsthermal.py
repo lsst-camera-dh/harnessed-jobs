@@ -31,7 +31,12 @@ for id in rebdevs:
 
 istate = tssub.synchCommand(10,"getstate").getResult()
 print "istate before = ",istate," : "
-istate = (istate & 0xffffff) | (int(jobname.split("__")[1]) << 24)
+
+ext = int(jobname.split("__")[1])
+if ext>400 :
+    ext= ext - 400
+istate = (istate & 0xffffff) | (ext << 24)
+
 print "istate after = ",istate
 tssub.synchCommand(10,"setstate",istate)
 
