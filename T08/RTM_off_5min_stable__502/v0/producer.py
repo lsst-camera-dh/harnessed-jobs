@@ -41,23 +41,3 @@ for section in config.sections():
     plotter.plot(title=title)
     plt.savefig('%s_%s_%s.png' % (section, raft_id, run_number))
     plotter.save_file('%s_%s_%s.txt' % (section, raft_id, run_number))
-
-
-
-
-ccs_subsystem = 'ts8'
-
-config_file = 'ts8_quantities.cfg'
-
-time_axis = ccs_trending.TimeAxis(start=start, end=end, nbins=1000)
-config = ccs_trending.ccs_trending_config(config_file)
-for section in config.sections():
-    plotter = ccs_trending.TrendingPlotter(ccs_subsystem, host,
-                                           time_axis=time_axis)
-    plotter.read_config(config, section)
-    title = "%s, %s, %s" % (raft_id, run_number, section)
-    plotter.plot(title=title)
-    plt.savefig('%s_%s_%s.png' % (section, raft_id, run_number))
-    plotter.save_file('%s_%s_%s.txt' % (section, raft_id, run_number))
-
-

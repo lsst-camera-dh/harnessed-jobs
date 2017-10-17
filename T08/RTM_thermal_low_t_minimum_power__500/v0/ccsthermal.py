@@ -40,7 +40,7 @@ for id in rebdevs:
 
     idx = idx + 1
 
-target_temp = -126.
+target_temp = -130.
 
 cryosub.synchCommand(10,"setSetPoint 2 %f" % target_temp)
 ts8sub.synchCommand(10,"stopTempControl")
@@ -55,11 +55,16 @@ while(True) :
     if (tdev < 2.0) :
         break
 
+
 istate = tssub.synchCommand(10,"getstate").getResult()
 print "istate before = ",istate," : "
-istate = (istate & 0xffffff) | (int(jobname.split("__")[1]) << 24)
+ext = int(jobname.split("__")[1])
+if ext>400 :
+    ext= ext - 400
+istate = (istate & 0xffffff) | (ext << 24)
 print "istate after = ",istate
 tssub.synchCommand(10,"setstate",istate)
+
 
 fp = open("%s/status.out" % (cdir),"w");
 

@@ -37,7 +37,7 @@ for iiter in range(10) :
 
     print "iiter = %d, delta_cold = %f, delta_cryo = %f, delta_ccd = %f" % (iiter,cold_temp-last_cold_temp,cryo_temp-last_cryo_temp,ccd_temp-last_ccd_temp)
 
-    if (abs(last_cold_temp-cold_temp)<0.1 && abs(last_cryo_temp-cryo_temp) < 0.1 && abs(last_ccd_temp-ccd_temp)<0.1) :
+    if (abs(last_cold_temp-cold_temp)<0.1 and abs(last_cryo_temp-cryo_temp) < 0.1 and abs(last_ccd_temp-ccd_temp)<0.1) :
         break
 
     time.sleep(180.0)
@@ -53,8 +53,8 @@ idx = 0
 istate = tssub.synchCommand(10,"getstate").getResult()
 print "istate before = ",istate," : "
 ext = int(jobname.split("__")[1])
-if ext>100 :
-    ext= ext - 100
+if ext>400 :
+    ext= ext - 400
 istate = (istate & 0xffffff) | (ext << 24)
 print "istate after = ",istate
 tssub.synchCommand(10,"setstate",istate)
