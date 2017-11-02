@@ -155,6 +155,8 @@ if (True):
         ts8sub.synchCommand(10,"setTestType CONN")
         ts8sub.synchCommand(10,"setImageType BIAS")
 
+        time.sleep(5.0)
+
 # <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
         rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",100,False,False,"${sensorLoc}_${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
