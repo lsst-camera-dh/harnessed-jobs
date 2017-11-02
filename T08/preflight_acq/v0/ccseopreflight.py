@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-from org.lsst.ccs.scripting import *
+from org.lsst.ccs.scripting import CCS
 from java.lang import Exception
 import sys
 import time
