@@ -39,7 +39,7 @@ last_cryo_temp = -999.
 last_ccd_temp = -999.
 
 
-for iiter in range(20) :
+for iiter in range(12) :
     cold_temp = cryosub.synchCommand(20,"getTemp B").getResult()
     cryo_temp = cryosub.synchCommand(20,"getTemp C").getResult()
     ccd_temp = ts8sub.synchCommand(20,"getChannelValue R00.Reb1.CCDTemp1").getResult()
@@ -49,7 +49,7 @@ for iiter in range(20) :
     if (abs(last_cold_temp-cold_temp)<0.1 and abs(last_cryo_temp-cryo_temp) < 0.1 and abs(last_ccd_temp-ccd_temp)<0.1) :
         break
 
-    time.sleep(180.0)
+    time.sleep(600.0)
     last_cold_temp = cold_temp
     last_cryo_temp = cryo_temp
     last_ccd_temp = ccd_temp

@@ -3,7 +3,7 @@
 #   - Homer
 ###############################################################################
 
-from org.lsst.ccs.scripting import *
+from org.lsst.ccs.scripting import CCS
 from java.lang import Exception
 import sys
 import time
@@ -102,6 +102,10 @@ seqcmnd = "setSequencerStart Clear"
 print ts8sub.synchCommand(10,seqcmnd).getResult();
 
 
+ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 500");
+ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
+
+
 ######################
 
 last_cold_temp = -999.
@@ -111,16 +115,19 @@ last_ccd_temp = -999.
 iiter = 0
 tstart = time.time()
 t_lap = time.time()
-while ((time.time()-tstart) < 1800.0) :
+while ((time.time()-tstart) < 3600.0) :
 
 
     ts8sub.synchCommand(10,"setTestStand","TS8")
     ts8sub.synchCommand(10,"setTestType","BIAS")
-
-
+    ts8sub.synchCommand(10,"setSequencerParameter ClearCount 10000")
     seqcmnd = "startSequencer"
     print "seqcmnd = (%s)" % seqcmnd
     print ts8sub.synchCommand(10,seqcmnd).getResult();
+    seqcmnd = "waitSequencerDone 320000"
+    print "seqcmnd = (%s)" % seqcmnd
+    print ts8sub.synchCommand(350,seqcmnd).getResult();
+
 
     if ((time.time()-t_lap) >300.0) :
         cold_temp = cryosub.synchCommand(20,"getTemp B").getResult()
@@ -129,8 +136,8 @@ while ((time.time()-tstart) < 1800.0) :
 
         print "iiter = %d, delta_cold = %f, delta_cryo = %f, delta_ccd = %f" % (iiter,cold_temp-last_cold_temp,cryo_temp-last_cryo_temp,ccd_temp-last_ccd_temp)
 
-        if (abs(last_cold_temp-cold_temp)<0.2 and abs(last_cryo_temp-cryo_temp) < 0.2 and abs(last_ccd_temp-ccd_temp)<0.2) :
-            break
+#        if (abs(last_cold_temp-cold_temp)<0.2 and abs(last_cryo_temp-cryo_temp) < 0.2 and abs(last_ccd_temp-ccd_temp)<0.2) :
+#            break
 
         last_cold_temp = cold_temp
         last_cryo_temp = cryo_temp
@@ -149,8 +156,11 @@ ts8sub.synchCommand(10,"setTestType TS8")
 ts8sub.synchCommand(10,"setImageType BIAS")
 rply = ts8sub.synchCommand(100,"exposeAcquireAndSave",0,False,False,"${sensorLoc}_final_image.fits").getResult()
 
+ts8sub.synchCommand(10,"setSequencerParameter ClearCount 1")
 
 
+ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");
+ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
 
 
 fp = open("%s/status.out" % (cdir),"w");

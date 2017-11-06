@@ -3,7 +3,7 @@
 #   - Homer
 ###############################################################################
 
-from org.lsst.ccs.scripting import *
+from org.lsst.ccs.scripting import CCS
 from java.lang import Exception
 import sys
 import time
@@ -102,13 +102,15 @@ last_ccd_temp = -999.
 
 
 
+ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 500");
+ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
 
 
 iiter = 0
 tstart = time.time()
 t_lap = time.time()
 
-while ((time.time()-tstart) < 1800.0) :
+while ((time.time()-tstart) < 3600.0) :
 
 
     ts8sub.synchCommand(10,"setTestStand","TS8")
@@ -118,15 +120,15 @@ while ((time.time()-tstart) < 1800.0) :
     rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",0,False,False,"").getResult()
 
 
-    if ((time.time()-t_lap) > 300.0) :
+    if ((time.time()-t_lap) > 600.0) :
         cold_temp = cryosub.synchCommand(20,"getTemp B").getResult()
         cryo_temp = cryosub.synchCommand(20,"getTemp C").getResult()
         ccd_temp = ts8sub.synchCommand(20,"getChannelValue R00.Reb1.CCDTemp1").getResult()
     
         print "iiter = %d, delta_cold = %f, delta_cryo = %f, delta_ccd = %f" % (iiter,cold_temp-last_cold_temp,cryo_temp-last_cryo_temp,ccd_temp-last_ccd_temp)
 
-        if (abs(last_cold_temp-cold_temp)<0.2 and abs(last_cryo_temp-cryo_temp) < 0.2 and abs(last_ccd_temp-ccd_temp)<0.2) :
-            break
+#        if (abs(last_cold_temp-cold_temp)<0.1 and abs(last_cryo_temp-cryo_temp) < 0.1 and abs(last_ccd_temp-ccd_temp)<0.1) :
+#            break
 
         last_cold_temp = cold_temp
         last_cryo_temp = cryo_temp
