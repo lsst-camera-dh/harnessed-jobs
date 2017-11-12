@@ -215,6 +215,7 @@ if (True):
                 exptime = float(tokens[1])
                 imcount = float(tokens[2])
                 if 'PPUMP' in acqname :
+                    doLight = True
                     nshifts  = float(tokens[3])
                 elif 'FE55' in acqname or 'STBL' in acqname :
                     doXED = True

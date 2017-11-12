@@ -131,6 +131,8 @@ if (True):
         expcmnd1 = 'exposeAcquireAndSave 100 True False ""'
         time.sleep(1.0)
             
+        ts8sub.synchCommand(10,"setImageType BIAS")
+
         print "PRE-exposure command: expcmnd1 = ",expcmnd1
         print ts8sub.synchCommand(1500,expcmnd1).getResult() 
 

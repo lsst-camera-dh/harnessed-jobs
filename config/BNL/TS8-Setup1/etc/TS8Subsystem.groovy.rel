@@ -46,7 +46,7 @@ CCSBuilder builder = ["ts8"]
 builder.
     "main" (TS8Subsystem, geometry:raftGeometry, clientFactory:mainClientFactory, nodeTags:taskConfig) { 
     
-//        GlobalVisualizationClient (GlobalVisualizationClient, clientHost:"lsst-vs01.slac.stanford.edu", clientPort:9999)
+        GlobalVisualizationClient (GlobalVisualizationClient, clientHost:"lsst-vs01.slac.stanford.edu", clientPort:9999)
     
 	TempCtrl   (TempControl, gain: 0.1, timeConst: 120.0, smoothTime: 20.0,
                 maxOutput: 5.6, awGain: 4.0, basePower: 0.0, tolerance: 0.05,

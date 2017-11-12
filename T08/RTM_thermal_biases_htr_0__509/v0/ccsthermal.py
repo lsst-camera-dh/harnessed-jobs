@@ -109,6 +109,10 @@ ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
 iiter = 0
 tstart = time.time()
 t_lap = time.time()
+seqcmnd = "setSequencerStart PseudoAcquisition"
+print ts8sub.synchCommand(10,seqcmnd).getResult();
+
+ts8sub.synchCommand(10,"setSequencerParameter ExposureTime 0")
 
 while ((time.time()-tstart) < 3600.0) :
 
@@ -117,7 +121,17 @@ while ((time.time()-tstart) < 3600.0) :
     ts8sub.synchCommand(10,"setTestType","BIAS")
 
 
-    rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",0,False,False,"").getResult()
+    seqcmnd = "startSequencer"
+    print "seqcmnd = (%s)" % seqcmnd
+    print ts8sub.synchCommand(10,seqcmnd).getResult();
+    seqcmnd = "waitSequencerDone 20000"
+    print "seqcmnd = (%s)" % seqcmnd
+
+    time.sleep(2.0)
+
+
+
+#    rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",0,False,False,"").getResult()
 
 
     if ((time.time()-t_lap) > 600.0) :
