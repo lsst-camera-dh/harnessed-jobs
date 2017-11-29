@@ -16,7 +16,7 @@ cdir = tsCWD
 rebsub = {}
 firmware_version = {}
 serial_number = {}
-ts8sub  = CCS.attachSubsystem("ts8");
+ts8sub  = CCS.attachSubsystem("%s" % ts8);
 rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 fpr = open("%s/REB_versions.txt" % (cdir),"w");

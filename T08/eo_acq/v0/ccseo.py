@@ -42,12 +42,16 @@ if (True):
     print "attaching PD subsystem"
     pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
-    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
+    domono = True
+    try:
+        monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
+    except:
+        domono = False
 #    print "attaching PDU subsystem"
 #    pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "Attaching ts8 subsystem"
 
-    ts8sub  = CCS.attachSubsystem("ts8");
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
     rebpssub  = CCS.attachSubsystem("ccs-rebps");
 
 
@@ -111,7 +115,8 @@ if (True):
 
 
 # opening monochromator shutter in case a previous test left it closed
-    result = monosub.synchCommand(20,"openShutter");
+    if domono :
+        result = monosub.synchCommand(20,"openShutter");
 
 
     rebs = ts8sub.synchCommand(10,"getREBDevices").getResult();
@@ -134,10 +139,11 @@ if (True):
     wl     = float(eolib.getCfgVal(acqcfgfile, '%s_WL' % acqname, default = "550.0"))
 
 # move to default wl
-    print "Setting monochromator wl to default value"
-    rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
-    print "Monochromator reports wl = ",rwl
-    result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
+    if domono :
+        print "Setting monochromator wl to default value"
+        rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
+        print "Monochromator reports wl = ",rwl
+        result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
 # bias image count
     bcount = int(eolib.getCfgVal(acqcfgfile, '%s_BCOUNT' % acqname, default='1'))
 # sequence number
@@ -288,18 +294,19 @@ if (True):
 ########################## Start of flux calib section #############################
             if (('FLAT' in acqname or 'LAMBDA' in acqname) and wl!=owl):
                                             
-                print "Setting monochromator lambda = %8.2f" % wl
-                for itry in range(3) :
-                    try:
-                        rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
-                        print "Monochromator reports wl = ",rwl
-#                        result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength %f true" % rwl)
-                        result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
-                        break
-                    except:
-                        time.sleep(5.0)
-                        print "trying again"
-                        pass
+                if domono :
+                    print "Setting monochromator lambda = %8.2f" % wl
+                    for itry in range(3) :
+                        try:
+                            rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
+                            print "Monochromator reports wl = ",rwl
+    #                        result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength %f true" % rwl)
+                            result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
+                            break
+                        except:
+                            time.sleep(5.0)
+                            print "trying again"
+                            pass
 
                 time.sleep(10.0)
                 print "publishing state"

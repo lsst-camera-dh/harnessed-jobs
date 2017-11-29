@@ -19,10 +19,10 @@ CCS.setThrowExceptions(True);
 
 if (True):
 #attach CCS subsystem Devices for scripting
-    ts8sub  = CCS.attachSubsystem("ts8");
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
     pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
-    tssub  = CCS.attachSubsystem("%s" % ts);
+#    tssub  = CCS.attachSubsystem("%s" % ts);
 
     print "Attaching teststand subsystems"
     tssub  = CCS.attachSubsystem("%s" % ts);
@@ -31,7 +31,11 @@ if (True):
 #    print "attaching PD subsystem"
 #    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
-    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
+    domono = True
+    try:
+        monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
+    except:
+        domono = False
 
     cdir = tsCWD
 
@@ -45,14 +49,15 @@ if (True):
     status_value = None
 
     wl = 500.
-    for itry in range(3) :
-        try:
-            rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
-            result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl)
-            rply = monosub.synchCommand(900,"openShutter").getResult();
-            break
-        except:
-            time.sleep(5.0)
+    if domono :
+        for itry in range(3) :
+            try:
+                rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
+                result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength",rwl,True)
+                rply = monosub.synchCommand(900,"openShutter").getResult();
+                break
+            except:
+                time.sleep(5.0)
 
 #  Verify data link integrity.
     rebs = ""
@@ -131,6 +136,8 @@ if (True):
         expcmnd1 = 'exposeAcquireAndSave 100 True False ""'
         time.sleep(1.0)
             
+        ts8sub.synchCommand(10,"setImageType BIAS")
+
         print "PRE-exposure command: expcmnd1 = ",expcmnd1
         print ts8sub.synchCommand(1500,expcmnd1).getResult() 
 

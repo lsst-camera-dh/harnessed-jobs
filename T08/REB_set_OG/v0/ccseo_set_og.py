@@ -47,7 +47,7 @@ time.sleep(1.0)
 print ts8sub.synchCommand(10,"loadDacs true").getResult()
 print ts8sub.synchCommand(10,"loadBiasDacs true").getResult()
 
-time.sleep(2.0)
+time.sleep(10.0)
 
 for id in rebdevs:
     for ii in range(3) :

@@ -34,6 +34,22 @@ class CcsSetup(OrderedDict):
         _read(...) method.
         """
         super(CcsSetup, self).__init__()
+        if os.environ.has_key('CCS_TS8'):
+            self['ts8']=_quote(os.getenv('CCS_TS8'))
+        else:
+            self['ts8'] = _quote('ts8')
+        if os.environ.has_key('CCS_JYTH'):
+            self['jyth']=_quote(os.getenv('CCS_JYTH'))
+        else:
+            self['jyth'] = _quote('JythonInterpreterConsole')
+        if os.environ.has_key('CCS_JSON_PORT'):
+            self['jsonport']=os.getenv('CCS_JSON_PORT')
+        else:
+            self['jsonport'] = 4444
+        if os.environ.has_key('CCS_PS'):
+            self['ps']=_quote(os.getenv('CCS_PS'))
+        else:
+            self['ps'] = _quote('ccs-rebps')
         if os.environ.has_key('CCS_TS'):
             self['ts']=_quote(os.getenv('CCS_TS'))
         else:
@@ -152,7 +168,11 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=False, verbose=True):
     if makeBiasDir:
         os.mkdir("bias")
 
-    ccs = CcsJythonInterpreter("ts")
+    jport = 4444
+    if os.environ.has_key('CCS_JSON_PORT'):
+        jport=os.getenv('CCS_JSON_PORT')
+
+    ccs = CcsJythonInterpreter("ts",jport)
 #    setup = CcsSetup('%s.cfg' % jobName)
 # change to using a single config from the main config directory
     configDir = siteUtils.configDir()
