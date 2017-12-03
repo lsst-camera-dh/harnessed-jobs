@@ -23,8 +23,15 @@ monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
 print "attaching PDU subsystem"
 pdusub = CCS.attachSubsystem("%s/PDU" % ts );
 print "Attaching teststand 8 subsystem"
-ts8sub  = CCS.attachSubsystem("ts8");
-rebpssub  = CCS.attachSubsystem("ccs-rebps");
+ts8sub = None
+rebpssub = None
+
+usets8 = True
+try:
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
+    rebpssub  = CCS.attachSubsystem("ccs-rebps");
+except:
+    usets8 = False
 
 ccdnames = {}
 ccdmanunames = {}
@@ -84,17 +91,19 @@ ts_version,ts8_version,power_version,ts_revision,ts8_revision,power_revision = e
 # prepare TS8: make sure temperature and vacuum are OK and load the sequencer                                                                
 rafttype = "ITL"
 
-usets8 = False
-try:
-#    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
-    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,cdir,sequence_file,vac_outlet)
+if usets8:
+    try:
+    #    eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,ccdnames,ccdmanunames,cdir,sequence_file,vac_outlet)
+        eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,cdir,sequence_file,vac_outlet)
+    
+        print "REBs appear to be attached and ready for exposure. Shutter control will be done via REBs"
+    except Exception, ex:
+        print "EOTS8Setup failed on %s" % str(ex)
+        usets8 = False
 
-    usets8 = True
-    print "REBs appear to be attached and ready for exposure. Shutter control will be done via REBs"
-except Exception, ex:
+if not usets8 :
     print "REBs appear not be be attached or ready for exposure. Perform test using mono shutter only."
-    print "EOTS8Setup failed on %s" % str(ex)
-#    raise Exception(ex)
+
 
 print "Setting the current range on the PD device"
 pdsub.synchCommand(10,"setCurrentRange",0.00002)

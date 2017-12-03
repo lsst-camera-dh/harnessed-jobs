@@ -14,7 +14,7 @@ import subprocess
 print "starting widget for checking and starting the CCS apps"
 
 os.system("pkill -f '\-\-app JythonConsole'")
-os.system("pkill -f '\-app RunTS8Subsystem'")
+#os.system("pkill -f '\-app RunTS8Subsystem'")
 os.system("pkill -f 'checktsappswidget'")
 
 time.sleep(10.0)
@@ -23,7 +23,7 @@ ccsdir = os.getenv("CCS_BIN_DIR");
 
 os.system("screen -d -m gnome-terminal --zoom=0.5 --title=JythonConsole --working-directory=%s --command=\"screen -S jython ./JythonConsole\" &" % ccsdir)
 time.sleep(10.0)
-os.system("screen -d -m gnome-terminal --zoom=0.5 --title=ts --working-directory=%s --command=\"screen -S ts8 ./RunTS8Subsystem\" &" % ccsdir)
+#os.system("screen -d -m gnome-terminal --zoom=0.5 --title=ts --working-directory=%s --command=\"screen -S ts8 ./RunTS8Subsystem\" &" % ccsdir)
 
 time.sleep(30.0)
 
@@ -41,11 +41,12 @@ for s in pstr :
         if app in s :
             foundjython = True
 
-        app = "-app RunTS8Subsystem"
-        if app in s :
-            foundts8 = True
+#        app = "-app RunTS8Subsystem"
+#        if app in s :
+#            foundts8 = True
 
-if (not (foundjython and foundts8)) :
+#if (not (foundjython and foundts8)) :
+if (not (foundjython)) :
     apptxt = "There are apps missing, please click on this button when\nyou have finished starting them using the widget"
     print apptxt
     top = Tkinter.Tk()
@@ -137,7 +138,7 @@ if (abs(mondiode1) > 1.e-10 and abs(mondiode2/mondiode1) > 2.0) :
     apptxt = "OK"
     diodecol = "green"
 
-apptxt = "The diode responses look -- %s -- . Their values are %f for exposure 1 and %f for exposure2." % (apptxt,mondiode1,mondiode2)
+apptxt = "The diode responses look -- %s -- . Their values are %11.3e for exposure 1 and %11.3e for exposure2." % (apptxt,mondiode1,mondiode2)
 print apptxt
 top = Tkinter.Tk()
 
