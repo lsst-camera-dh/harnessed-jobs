@@ -172,7 +172,8 @@ def ccsProducer(jobName, ccsScript, makeBiasDir=False, verbose=True):
     if os.environ.has_key('CCS_JSON_PORT'):
         jport=os.getenv('CCS_JSON_PORT')
 
-    ccs = CcsJythonInterpreter("ts",jport)
+    ccs = CcsJythonInterpreter("ts",None,jport)
+#    ccs = CcsJythonInterpreter("ts")
 #    setup = CcsSetup('%s.cfg' % jobName)
 # change to using a single config from the main config directory
     configDir = siteUtils.configDir()
