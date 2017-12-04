@@ -99,7 +99,9 @@ else :
     channames = result.getResult()
 
 #    print channames
-    rebids = ts8sub.synchCommand(10,"getREBIds").getResult()
+
+    rebnames = ts8sub.synchCommand(10,"getREBDeviceNames").getResult()
+
 
     idmap = []
 
@@ -120,9 +122,10 @@ else :
 
 # if nothing specified ... do it all
     if (len(idmap)==0) :
-        for rebid in rebids :
-            print "rebid = %s" % rebid
-            idmap.append("%d:%d" % (int(rebid),int(rebid)))
+        for rebid in rebnames :
+            rebnum = rebid[len(rebid)-1]
+            print "rebid = %s" % rebnum
+            idmap.append("%d:%d" % (int(rebnum),int(rebnum)))
 
     print "Will attempt to power on:"
     for ids in idmap :
@@ -137,7 +140,7 @@ else :
     ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
 
 
-#    for rebid in rebids :
+#    for rebid in rebnames :
     for ids in idmap :
         pwrid = int(ids.split(":")[0])
         rebid = int(ids.split(":")[1])
@@ -153,7 +156,7 @@ else :
 # verify that all power is OFF
             try:
                 stat = ts8sub.synchCommand(300,"R00.Reb%d setBackBias false" % rebid).getResult()
-                pwrsub.synchCommand(10,"sequencePower %d False" % (i)).getResult();
+#                pwrsub.synchCommand(10,"sequencePower %d False" % (i)).getResult();
 
             except Exception, e:
 
@@ -234,7 +237,7 @@ else :
                     raise Exception("UNABLE TO DETERMINING REQUIRED CONFIG CATEGORY!")
 
                 try:
-                    stat = ts8sub.synchCommand(300,"powerOn %d" % rebid).getResult()
+                    stat = ts8sub.synchCommand(600,"powerOn %d" % rebid).getResult()
                     print stat.replace("\n","\r\n")
                     print "---------------List of low current channels ------------------"
                     for ln in stat.split("\n"):
@@ -279,7 +282,7 @@ else :
 
     if status_value :
         print "DONE with successful powering of"
-        print rebids
+        print rebnames
     else :
         print "FAILED to turn on all requested rebs"
 

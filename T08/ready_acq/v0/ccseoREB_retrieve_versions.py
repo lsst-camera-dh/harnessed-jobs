@@ -21,7 +21,7 @@ rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 fpr = open("%s/REB_versions.txt" % (cdir),"w");
 for id in rebdevs:
-    rebsub[id]  = CCS.attachSubsystem("ts8/%s" % id);
+    rebsub[id]  = CCS.attachSubsystem("%s/%s" % (ts8,id));
     firmware_version[id] = rebsub[id].synchCommand(10,"getHwVersion").getResult()
     serial_number[id] = rebsub[id].synchCommand(10,"getSerialNumber").getResult()
     print "Firmware version for REB (S/N=%x) at address %s is %x" % (serial_number[id],id,firmware_version[id])
