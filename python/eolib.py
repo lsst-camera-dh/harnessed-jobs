@@ -198,7 +198,7 @@ def EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames):
 
     geo = ts8sub.synchCommand(2,"printGeometry 3").getResult();
     bssflags = []
-    bssflags  = ts8sub.synchCommand(10,"isBackBiasOn").getResult()
+    bssflags  = ts8sub.synchCommand(20,"isBackBiasOn").getResult()
     for line in geo.split('\n') :
         if len(line.split('.'))==3  :
             linelen = len(line)
@@ -215,7 +215,13 @@ def EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames):
             print ccdid,": CCDTemp = ",ccdtemp
 
             ts8sub.synchCommand(10,"setMeasuredCCDTemperature %s %f"%(ccdid,float(ccdtemp)))
-            hv = rebpssub.synchCommand(10,"getChannelValue REB%d.hvbias.VbefSwch"%(rebnum)).getResult()
+            hv = -1.0
+            try:
+                hv = rebpssub.synchCommand(30,"getChannelValue REB%d.hvbias.Vbe\
+fSwch"%(rebnum)).getResult()
+            except:
+                pass
+
             if not bssflags[rebnum] :
                 hv = 0.0
             print ccdid,": HVbias = ",hv
