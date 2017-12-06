@@ -241,8 +241,9 @@ if (True):
 # take bias images
 # ==================================================
 
+            time.sleep(5.0)
 # probably not needed any more 
-            for i in range(7):
+            for i in range(3):
                 timestamp = time.time()
                 print "Ready to take clearing bias image. time = %f" % time.time()
                 ts8sub.synchCommand(10,"setTestType",acqname.upper())
@@ -256,7 +257,7 @@ if (True):
                     print "Proceeding despite error: %s" % str(ex)
                     pass
                 print "after click click at %f" % time.time()
-                time.sleep(1.0)
+                time.sleep(7.0)
 
             ts8sub.synchCommand(10,"setFitsFileNamePattern",def_pat)
             time.sleep(3.0)
@@ -288,7 +289,7 @@ if (True):
                         raise Exception("EXCEEDED MAX RETRIES ON BIAS EXPOSURE: %s" % str(ex))
 
                 print "after click click at %f" % time.time()
-#                time.sleep(3.0)
+                time.sleep(5.0)
 
 
 ########################## Start of flux calib section #############################
@@ -444,7 +445,7 @@ if (True):
                             print "Proceeding despite error: %s" % str(ex)
                             pass
                         print "after click click at %f" % time.time()
-                        time.sleep(1)
+                        time.sleep(3.0)
                     print "done clearing"
                     if (doPD) :
                         print "calling accumBuffer to start IS photodiode recording at %f" % time.time()
