@@ -15,7 +15,7 @@ cdir = tsCWD
 
 rebsub = {}
 serial_number = {}
-ts8sub  = CCS.attachSubsystem("ts8");
+ts8sub  = CCS.attachSubsystem("%s" % ts8);
 tssub  = CCS.attachSubsystem("ts");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 pwrsub  = CCS.attachSubsystem("ccs-rebps");

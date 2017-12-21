@@ -15,7 +15,7 @@ cdir = tsCWD
 
 rebsub = {}
 serial_number = {}
-ts8sub  = CCS.attachSubsystem("ts8");
+ts8sub  = CCS.attachSubsystem("%s" % ts8);
 tssub  = CCS.attachSubsystem("ts");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 #pwrsub  = CCS.attachSubsystem("ccs-rebps");
@@ -30,10 +30,10 @@ last_cryo_temp = -999.
 last_ccd_temp = -999.
 
 starttim = time.time()
-for iiter in range(10) :
-    cold_temp = cryosub.synchCommand(20,"getTemp B").getResult()
-    cryo_temp = cryosub.synchCommand(20,"getTemp C").getResult()
-    ccd_temp = ts8sub.synchCommand(20,"getChannelValue R00.Reb1.CCDTemp1").getResult()
+for iiter in range(20) :
+    cold_temp = cryosub.synchCommand(60,"getTemp B").getResult()
+    cryo_temp = cryosub.synchCommand(60,"getTemp C").getResult()
+    ccd_temp = ts8sub.synchCommand(60,"getChannelValue R00.Reb1.CCDTemp1").getResult()
 
     print "iiter = %d, delta_cold = %f, delta_cryo = %f, delta_ccd = %f" % (iiter,cold_temp-last_cold_temp,cryo_temp-last_cryo_temp,ccd_temp-last_ccd_temp)
 

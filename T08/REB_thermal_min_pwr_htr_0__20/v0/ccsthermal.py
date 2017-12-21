@@ -15,7 +15,7 @@ cdir = tsCWD
 
 rebsub = {}
 serial_number = {}
-ts8sub  = CCS.attachSubsystem("ts8");
+ts8sub  = CCS.attachSubsystem("%s" % ts8);
 tssub  = CCS.attachSubsystem("ts");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 pwrsub  = CCS.attachSubsystem("ccs-rebps");
@@ -26,7 +26,7 @@ time.sleep(15.0)
 
 idx = 0
 for id in rebdevs:
-    rebsub[id]  = CCS.attachSubsystem("ts8/%s" % id);
+    rebsub[id]  = CCS.attachSubsystem("%s/%s" % (ts8,id));
     result = pwrsub.synchCommand(20,"setNamedPowerOn %d heater True" % idx).getResult();
 
     result = rebsub[id].synchCommand(10,"setHeaterPower 0 0.0").getResult();

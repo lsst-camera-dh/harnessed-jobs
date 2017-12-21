@@ -15,7 +15,7 @@ cdir = tsCWD
 
 rebsub = {}
 serial_number = {}
-ts8sub  = CCS.attachSubsystem("ts8");
+ts8sub  = CCS.attachSubsystem("%s" % ts8);
 tssub  = CCS.attachSubsystem("ts");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 #pwrsub  = CCS.attachSubsystem("ccs-rebps");
@@ -25,7 +25,8 @@ rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 idx = 0
 
 tstep = 10.0
-for itim in range(30):
+#for itim in range(30):
+for itim in range(1):
     time.sleep(tstep)
     print "waited %f seconds" % (itim*tstep)
 

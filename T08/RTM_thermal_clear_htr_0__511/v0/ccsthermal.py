@@ -18,7 +18,7 @@ rebsub = {}
 serial_number = {}
 tssub  = CCS.attachSubsystem("ts");
 monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
-ts8sub  = CCS.attachSubsystem("ts8");
+ts8sub  = CCS.attachSubsystem("%s" % ts8);
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 pwrsub  = CCS.attachSubsystem("ccs-rebps");
 pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
@@ -115,7 +115,7 @@ last_ccd_temp = -999.
 iiter = 0
 tstart = time.time()
 t_lap = time.time()
-while ((time.time()-tstart) < 3600.0) :
+while ((time.time()-tstart) < 5400.0) :
 
 
     ts8sub.synchCommand(10,"setTestStand","TS8")

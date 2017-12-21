@@ -26,7 +26,6 @@ def expoprep() :
 
 
 doPD = True
-domono = True
 runnum = "no-eTrav"
 try:
     runnum = RUNNUM
@@ -41,23 +40,14 @@ if (True):
     print "attaching Bias subsystem"
     biassub   = CCS.attachSubsystem("%s/Bias" % ts);
     print "attaching PD subsystem"
-    try:
-        pdsub  = CCS.attachSubsystem("%s/PhotoDiode" % ts);
-        result = pdsub.synchCommand(20,"readCurrent");
-    except:
-        doPD = False
+    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
     print "attaching Mono subsystem"
-    try:
-        monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
-# opening monochromator shutter in case a previous test left it closed
-        result = monosub.synchCommand(20,"openShutter");
-    except:
-        domono = False
+#    monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
 #    print "attaching PDU subsystem"
 #    pdusub = CCS.attachSubsystem("%s/PDU" % ts );
     print "Attaching ts8 subsystem"
 
-    ts8sub  = CCS.attachSubsystem("%s" % ts8);
+    ts8sub  = CCS.attachSubsystem("ts8-otm1");
     rebpssub  = CCS.attachSubsystem("ccs-rebps");
 
 
@@ -120,6 +110,10 @@ if (True):
     eolib.EOTS8Setup(tssub,ts8sub,rebpssub,raft,rafttype,cdir,sequence_file,vac_outlet)
 
 
+# opening monochromator shutter in case a previous test left it closed
+#    result = monosub.synchCommand(20,"openShutter");
+
+
     rebs = ts8sub.synchCommand(10,"getREBDevices").getResult();
 
 # Note about testing LVDS signal control:
@@ -140,11 +134,11 @@ if (True):
     wl     = float(eolib.getCfgVal(acqcfgfile, '%s_WL' % acqname, default = "550.0"))
 
 # move to default wl
-    if domono :
-        print "Setting monochromator wl to default value"
-        rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
-        print "Monochromator reports wl = ",rwl
-        result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
+    print "Setting monochromator wl to default value"
+    rwl = 500.0
+#    rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
+#    print "Monochromator reports wl = ",rwl
+    result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
 # bias image count
     bcount = int(eolib.getCfgVal(acqcfgfile, '%s_BCOUNT' % acqname, default='1'))
 # sequence number
@@ -242,9 +236,8 @@ if (True):
 # take bias images
 # ==================================================
 
-            time.sleep(5.0)
 # probably not needed any more 
-            for i in range(3):
+            for i in range(7):
                 timestamp = time.time()
                 print "Ready to take clearing bias image. time = %f" % time.time()
                 ts8sub.synchCommand(10,"setTestType",acqname.upper())
@@ -258,7 +251,7 @@ if (True):
                     print "Proceeding despite error: %s" % str(ex)
                     pass
                 print "after click click at %f" % time.time()
-                time.sleep(7.0)
+                time.sleep(1.0)
 
             ts8sub.synchCommand(10,"setFitsFileNamePattern",def_pat)
             time.sleep(3.0)
@@ -290,25 +283,24 @@ if (True):
                         raise Exception("EXCEEDED MAX RETRIES ON BIAS EXPOSURE: %s" % str(ex))
 
                 print "after click click at %f" % time.time()
-                time.sleep(5.0)
+#                time.sleep(3.0)
 
 
 ########################## Start of flux calib section #############################
             if (('FLAT' in acqname or 'LAMBDA' in acqname) and wl!=owl):
                                             
-                if domono :
-                    print "Setting monochromator lambda = %8.2f" % wl
-                    for itry in range(3) :
-                        try:
-                            rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
-                            print "Monochromator reports wl = ",rwl
-    #                        result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength %f true" % rwl)
-                            result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
-                            break
-                        except:
-                            time.sleep(5.0)
-                            print "trying again"
-                            pass
+                print "Setting monochromator lambda = %8.2f" % wl
+                for itry in range(3) :
+                    try:
+#                        rwl = monosub.synchCommand(60,"setWaveAndFilter",wl).getResult();
+                        print "Monochromator reports wl = ",rwl
+#                        result = ts8sub.synchCommand(10,"setHeader","MonochromatorWavelength %f true" % rwl)
+                        result = ts8sub.synchCommand(10,"setMonoWavelength %f" % rwl)
+                        break
+                    except:
+                        time.sleep(5.0)
+                        print "trying again"
+                        pass
 
                 time.sleep(10.0)
                 print "publishing state"
@@ -446,7 +438,7 @@ if (True):
                             print "Proceeding despite error: %s" % str(ex)
                             pass
                         print "after click click at %f" % time.time()
-                        time.sleep(3.0)
+                        time.sleep(1)
                     print "done clearing"
                     if (doPD) :
                         print "calling accumBuffer to start IS photodiode recording at %f" % time.time()

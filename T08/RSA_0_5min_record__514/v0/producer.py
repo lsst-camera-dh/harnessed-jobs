@@ -45,7 +45,7 @@ for section in config.sections():
 
 
 
-ccs_subsystem = 'ts8'
+ccs_subsystem = os.getenv('CCS_TS8')
 
 config_file = 'ts8_quantities.cfg'
 
