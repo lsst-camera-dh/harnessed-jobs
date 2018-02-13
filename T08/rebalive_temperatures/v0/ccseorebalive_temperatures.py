@@ -19,7 +19,7 @@ CCS.setThrowExceptions(True);
 
 if (True):
 #attach CCS subsystem Devices for scripting
-    ts8sub  = CCS.attachSubsystem("ts8");
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
     pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
 

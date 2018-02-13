@@ -8,7 +8,7 @@ echo "generate plot data for $i"
 set selection = 'select id from datadesc where name='\"$i\"';'
 echo "selection=("$selection")"
 
-set getid = 'mysql CCSTrending4 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst --execute='\'"$selection"\'''
+set getid = 'mysql CCSTrending2 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst --execute='\'"$selection"\'''
 echo getid = $getid
 
 set id = `eval $getid | tail -1`
@@ -26,7 +26,7 @@ set selection = 'set @tstart='$tstart'*1000;set @tstop='$tstop'*1000;select tsta
 echo "selection=($selection)"
 set outfl = `echo $i | awk -F '/' '{print $2}'`
 echo "title time "$i >! $outfl.dat
-eval mysql CCSTrending4 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst --execute=\'"$selection"\'  >> $outfl.dat
+eval mysql CCSTrending2 -h lsstdb2.rcf.bnl.gov -u ccs -s -r --password=vst4lsst --execute=\'"$selection"\'  >> $outfl.dat
 
 
 end

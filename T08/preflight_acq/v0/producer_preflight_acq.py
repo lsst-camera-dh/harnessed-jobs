@@ -13,21 +13,21 @@ import subprocess
 
 print "starting widget for checking and starting the CCS apps"
 
-os.system("pkill -f '\-\-app JythonConsole'")
+#os.system("pkill -f '\-\-app JythonConsole'")
 #os.system("pkill -f '\-app RunTS8Subsystem'")
-os.system("pkill -f 'checktsappswidget'")
+#os.system("pkill -f 'checktsappswidget'")
 
-time.sleep(10.0)
+#time.sleep(10.0)
 
 ccsdir = os.getenv("CCS_BIN_DIR");
 
-os.system("screen -d -m gnome-terminal --zoom=0.5 --title=JythonConsole --working-directory=%s --command=\"screen -S jython ./JythonConsole\" &" % ccsdir)
-time.sleep(10.0)
+#os.system("screen -d -m gnome-terminal --zoom=0.5 --title=JythonConsole --working-directory=%s --command=\"screen -S jython ./JythonConsole\" &" % ccsdir)
+#time.sleep(10.0)
 #os.system("screen -d -m gnome-terminal --zoom=0.5 --title=ts --working-directory=%s --command=\"screen -S ts8 ./RunTS8Subsystem\" &" % ccsdir)
 
-time.sleep(30.0)
+#time.sleep(30.0)
 
-os.system("screen -d -m gnome-terminal --geometry=1x1 --working-directory=$CCS_BIN_DIR --command=/usr/bin/ccsapps &")
+#os.system("screen -d -m gnome-terminal --geometry=1x1 --working-directory=$CCS_BIN_DIR --command=/usr/bin/ccsapps &")
 
 
 foundjython = False

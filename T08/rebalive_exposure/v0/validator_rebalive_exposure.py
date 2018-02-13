@@ -49,6 +49,7 @@ slots = []
 for f in fl0:
     slots.append([f[:2]] * 16)
 slots = slots[0] + slots[1] + slots[2] + slots[3] + slots[4] + slots[5] + slots[6] + slots[7] + slots[8]
+#slots = slots[0] + slots[1] + slots[2]
 
 segments = ['10','11','12','13','14','15','16','17','07','06','05','04','03','02','01','00'] * 9
 
