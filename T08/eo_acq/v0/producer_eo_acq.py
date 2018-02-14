@@ -26,10 +26,10 @@ except :
     pass
 if ('/Prod' in limsurl) :
     print "Connecting to eTraveler Prod"
-    conn = Connection('homer', 'Prod', prodServer=False)
+    conn = Connection('homer', 'Prod', prodServer=True)
 else :
     print "Connecting to eTraveler Dev"
-    conn = Connection('homer', 'Dev', prodServer=False)
+    conn = Connection('homer', 'Dev', prodServer=True)
 
 
 if not conn:
