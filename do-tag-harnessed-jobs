@@ -1,2 +1,2 @@
-git tag -a $1 -m '$1 tag for EO testing of sensors'
+git tag -a $1 -m '$1 tag of improvements for EO RAFT and single sensor data acquisition scripts' 
 git push origin $1

@@ -197,8 +197,12 @@ def EOTS8SetupCCDInfo(ts8sub,rebpssub,ccdnames,ccdmanunames):
 
 
     geo = ts8sub.synchCommand(2,"printGeometry 3").getResult();
-    bssflags = []
+
     bssflags  = ts8sub.synchCommand(20,"isBackBiasOn").getResult()
+    rebdevs  = ts8sub.synchCommand(20,"getREBDevices").getResult()
+    rebbss = zip(rebdevs,bssflags) 
+
+    ibs = 0
     for line in geo.split('\n') :
         if len(line.split('.'))==3  :
             linelen = len(line)
@@ -222,11 +226,23 @@ fSwch"%(rebnum)).getResult()
             except:
                 pass
 
-            if not bssflags[rebnum] :
+            bssflag = False
+            bssflagfound = False
+            for irebbss in rebbss:
+                rebnm = "Reb" + str(rebnum)
+                if rebnm in irebbss[0]:
+                    bssflagfound = True
+                    if irebbss[1] :
+                        bssflag = True
+            if not bssflagfound :
+                print "REB HV bias switch setting not found!"
+            if not bssflag :
                 hv = 0.0
             print ccdid,": HVbias = ",hv
 
             ts8sub.synchCommand(10,"setMeasuredCCDBSS %s %f"%(ccdid,float(hv)))
+
+            ibs = ibs + 1
 
 ###############################################################################
 # EOTS8Setup: perform setup needed for running standard EO TS8 jobs

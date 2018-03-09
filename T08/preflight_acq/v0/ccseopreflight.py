@@ -106,7 +106,7 @@ if not usets8 :
 
 
 print "Setting the current range on the PD device"
-pdsub.synchCommand(10,"setCurrentRange",0.00002)
+pdsub.synchCommand(10,"setCurrentRange",0.000002)
 
 imcount = 1
 seq = 0
@@ -255,6 +255,9 @@ try:
 
     rply = monosub.synchCommand(900,"openShutter").getResult();
     fp = open("%s/status.out" % (cdir),"w");
+# leave in a safe and ready state
+    result = monosub.synchCommand(240,"setWaveAndFilter",500.0);
+    pdsub.synchCommand(10,"setCurrentRange",0.0000002)
 
     istate=0;
     result = tssub.synchCommandLine(10,"getstate");
