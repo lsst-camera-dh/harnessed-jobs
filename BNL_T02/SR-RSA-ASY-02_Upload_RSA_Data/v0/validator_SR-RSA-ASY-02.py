@@ -19,8 +19,8 @@ os.system("cp -r /%s RSA/" % theogprsadir.strip("/"))
 
 print "looking for link to absolute height files in %s" % (theogprsadir)
 
-os.system("chmod 644 */*/*.*")
-rsafiles = glob.glob("RSA/*/*.*")
+os.system("chmod -R 644 .")
+rsafiles = [os.path.join(dp, f) for dp, dn, filenames in os.walk("RSA/") for f in filenames]
 
 os.system("rm -rf /cygdrive/c/DATA/Image\ files\ old")
 os.system("mv /cygdrive/c/DATA/Image\ files /cygdrive/c/DATA/Image\ files\ old")
