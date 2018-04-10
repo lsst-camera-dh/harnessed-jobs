@@ -34,9 +34,9 @@ results.extend(data_products)
 statusAssignments = {}
 
 
-print "jobName = %s" % jobName
-lcatr.schema.load("%s/%s_runtime.schema"%(jobDir,jobName))
-print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
+#print "jobName = %s" % jobName
+#lcatr.schema.load("%s/%s_runtime.schema"%(jobDir,jobName))
+#print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
 
 
 #results.append(lcatr.schema.valid(lcatr.schema.get("%s_runtime"%jobName),
