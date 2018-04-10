@@ -30,11 +30,11 @@ statusAssignments = {}
 
 
 print "jobName = %s" % jobName
-lcatr.schema.load("%s/%s_runtime.schema"%(jobDir,jobName))
-print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
+
+
+#lcatr.schema.load("%s/%s_runtime.schema"%(jobDir,jobName))
+#print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
 
 
 lcatr.schema.write_file(results)
 lcatr.schema.validate_file()
-
-

@@ -1,11 +1,7 @@
-###############################################################################
-# REB aliveness exposure test
+##############################################################################
+# REB scan mode acquisition jobs
 #
-# Ex:
-# source ts8setup-test
-# [jh-test ts8prod@ts8-raft1 workdir]$ lcatr-harness --unit-type RTM --unit-id alive-test-1 --job rebalive_exposure --version v0
-#
-# author: homer    5/2016
+# author: homer    4/2018
 #
 ###############################################################################
 
@@ -21,15 +17,10 @@ if (True):
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("%s" % ts8);
     pwrsub  = CCS.attachSubsystem("ccs-rebps");
-    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
-#    tssub  = CCS.attachSubsystem("%s" % ts);
 
     print "Attaching teststand subsystems"
     tssub  = CCS.attachSubsystem("%s" % ts);
-#    print "attaching Bias subsystem"
-#    biassub   = CCS.attachSubsystem("%s/Bias" % ts);
-#    print "attaching PD subsystem"
-#    pdsub   = CCS.attachSubsystem("%s/PhotoDiode" % ts);
+
     print "attaching Mono subsystem"
     domono = True
     try:
@@ -44,7 +35,7 @@ if (True):
     ts_revision = "NA"
     ts8_revision = "NA"
 
-    fp = open("%s/rebalive_results_exposures.txt" % (cdir),"w");
+    fp = open("%s/scan_results_exposures.txt" % (cdir),"w");
 
     status_value = None
 
@@ -72,9 +63,7 @@ if (True):
         status_value = "failed"
     fp.write("%s| %s\n" % (test_name,status_value));
 
-# load the sequencer redimensioned for scan mode
-    result = ts8sub.synchCommand(90,"enableScan true");
-    result = ts8sub.synchCommand(90,"loadSequencerAndReDimension %s 48 1000 1000 100 256 220",sequence_file);
+    result = ts8sub.synchCommand(90,"enableScan false");
 
 
 
@@ -128,56 +117,62 @@ if (True):
 # clearing
         seqcmnd = "setSequencerStart Clear"
         print ts8sub.synchCommand(10,seqcmnd).getResult();
-        for iclear in range(10):
+        for iclear in range(0):
             seqcmnd = "startSequencer"
             print "seqcmnd = (%s)" % seqcmnd
             print ts8sub.synchCommand(10,seqcmnd).getResult();
             time.sleep(1.0)
-        expcmnd1 = 'exposeAcquireAndSave 0 True False ""'
-        time.sleep(1.0)
+        expcmnd1 = 'exposeAcquireAndSave 0 False False ""'
         ts8sub.synchCommand(10,"setImageType BIAS")
         print "PRE-exposure command: expcmnd1 = ",expcmnd1
         print ts8sub.synchCommand(1500,expcmnd1).getResult() 
+        time.sleep(30.0)
 
 # --------
-        ts8sub.synchCommand(10,"setTestStand","TS6")
+        ts8sub.synchCommand(30,"setTestStand","TS6")
         raft = CCDID
         exptime=1.0
 
+# load the sequencer redimensioned for scan mode
+        result = ts8sub.synchCommand(90,"enableScan true").getResult();
+        result = ts8sub.synchCommand(90,"loadSequencerAndReDimension %s 48 1000 1000 100 256 220" % sequence_file).getResult();
+
 # TM mode
         print "setting transparent mode(tm) for ASPICs"
-        ts8asp = [0,0,0,0,0,0,0,0]
-        for i in range(6) :
-            ts8asp[i] = CCS.attachSubsystem("%s/%s.ASPIC%d" % (ts8,rebid,i))
-            result = ts8asp[i].synchCommand(10,"change tm 1")
+        for rebid in ts8sub.synchCommand(10,"getREBDevices").getResult() :
+            ts8asp = [0,0,0,0,0,0,0,0]
+            for i in range(6) :
+                ts8asp[i] = CCS.attachSubsystem("%s/%s.ASPIC%d" % (ts8,rebid,i))
+                result = ts8asp[i].synchCommand(30,"change tm 1").getResult()
 
         print "loading ASPICS"
 
         try:
-            result = ts8sub.synchCommand(10,"loadAspics true");
-            status_value = result.getResult();
+            status_value = ts8sub.synchCommand(10,"loadAspics true").getResult();
         except:
             print "command failure!"
             status_value = "failed"
         fp.write("%s|%s\n" % (test_name,status_value));
 # exposure
+        time.sleep(30.0)
         tm_start = time.time()
         print "Ready to take image with exptime = %f at time = %f" % (0,tm_start)
-        ts8sub.synchCommand(10,"setTestType SCAN_TM")
+        ts8sub.synchCommand(10,"setTestType SCAN")
         ts8sub.synchCommand(10,"setImageType FLAT")
-# <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",int(exptime*1000.0),False,False,"${sensorLoc}_${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}_scan_mode_tm.fits").getResult()
-        time.sleep(15.0)
+
+        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",int(exptime*1000.0),False,False,"${sensorLoc}_${sensorId}_${testType}_${timestamp}_TM.fits").getResult()
+        time.sleep(260.0)
 
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (exptime,tm_end)
 
 # DSI mode
         print "setting transparent mode(tm) for ASPICs"
-        ts8asp = [0,0,0,0,0,0,0,0]
-        for i in range(6) :
-            ts8asp[i] = CCS.attachSubsystem("%s/%s.ASPIC%d" % (ts8,rebid,i))
-            result = ts8asp[i].synchCommand(10,"change tm 0")
+        for rebid in ts8sub.synchCommand(10,"getREBDevices").getResult() :
+            ts8asp = [0,0,0,0,0,0,0,0]
+            for i in range(6) :
+                ts8asp[i] = CCS.attachSubsystem("%s/%s.ASPIC%d" % (ts8,rebid,i))
+                result = ts8asp[i].synchCommand(30,"change tm 0")
 
         print "loading ASPICS"
 
@@ -191,22 +186,19 @@ if (True):
 # exposure
         tm_start = time.time()
         print "Ready to take image with exptime = %f at time = %f" % (0,tm_start)
-        ts8sub.synchCommand(10,"setTestType SCAN_DSI")
+        ts8sub.synchCommand(10,"setTestType SCAN")
         ts8sub.synchCommand(10,"setImageType FLAT")
-# <CCD id>_<test type>_<image type>_<seq. #>_<run_ID>_<time stamp>.fits
-        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",int(exptime*1000.0),False,False,"${sensorLoc}_${sensorId}_${test_type}_${image_type}_${seq_info}_${timestamp}_scan_mode_dsi.fits").getResult()
-        time.sleep(15.0)
+        rply = ts8sub.synchCommand(700,"exposeAcquireAndSave",int(exptime*1000.0),False,False,"${sensorLoc}_${sensorId}_${testType}_${timestamp}_DSI.fits").getResult()
+# these long waits are to wait for the CCS plotting to terminate
+        time.sleep(200.0)
 
         tm_end = time.time()
         print "done taking image with exptime = %f at time = %f" % (exptime,tm_end)
-        
-
-
 
     fp.close();
 
     result = ts8sub.synchCommand(90,"enableScan false");
-    result = ts8sub.synchCommand(90,"loadSequencer %s",sequence_file);
+    result = ts8sub.synchCommand(90,"loadSequencer %s" % sequence_file);
 
 # satisfy the expectations of ccsTools
     istate=0;
@@ -219,7 +211,7 @@ if (True):
     fp.close();
 
 
-print "rebalive_functionalty test END"
+print "scan mode acquisitions END"
 
 
 ###############################################################################               
