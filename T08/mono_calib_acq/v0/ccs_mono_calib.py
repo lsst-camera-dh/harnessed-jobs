@@ -114,9 +114,9 @@ try:
 #    print "set filter position"
 #    result = monosub.synchCommand(60,"setFilter",3);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",1,2000);
+    result = monosub.synchCommand(60,"setSlitSize",1,1000);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",2,2000);
+    result = monosub.synchCommand(60,"setSlitSize",2,1000);
     rply = result.getResult()
 
 # go through config file looking for 'qe' instructions
