@@ -120,7 +120,7 @@ while ((time.time()-tstart) < 5400.0) :
 
     ts8sub.synchCommand(10,"setTestStand","TS8")
     ts8sub.synchCommand(10,"setTestType","BIAS")
-    ts8sub.synchCommand(10,"setSequencerParameter ClearCount 10000")
+    ts8sub.synchCommand(10,"setSequencerParameter ClearCount 2000")
     seqcmnd = "startSequencer"
     print "seqcmnd = (%s)" % seqcmnd
     print ts8sub.synchCommand(10,seqcmnd).getResult();
