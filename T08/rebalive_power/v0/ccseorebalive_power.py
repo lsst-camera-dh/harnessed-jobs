@@ -237,7 +237,7 @@ else :
                     raise Exception("UNABLE TO DETERMINING REQUIRED CONFIG CATEGORY!")
 
                 try:
-                    stat = ts8sub.synchCommand(600,"powerOn %d" % rebid).getResult()
+                    stat = ts8sub.synchCommand(1000,"powerOn %d" % rebid).getResult()
                     print stat.replace("\n","\r\n")
                     print "---------------List of low current channels ------------------"
                     for ln in stat.split("\n"):

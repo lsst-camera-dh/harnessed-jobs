@@ -106,7 +106,9 @@ except Exception,msg:
 #dictArray = conn.getHardwareHierarchy(noBatched='true')
 #print dictArray
 
+os.system('ts7VQMoff')
 ccsProducer('eo_acq', 'ccseo.py')
+os.system('ts7VQMon')
 
 try:
     os.system("cp -p %s ." % sequence_file)

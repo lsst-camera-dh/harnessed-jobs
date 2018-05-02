@@ -23,7 +23,9 @@ answer = raw_input("\n\nThis EXPOSURES test may be skipped if you have the autho
 if "y" in answer.lower() :
      print "Operator requested to skip the EXPOSURES part of the step."
 else :
+    os.system('ts7VQMoff')
     ccsProducer('ready_acq', 'ccseorebalive_exposure.py')
+    os.system('ts7VQMon')
     sys.stdout.flush()
 
 
