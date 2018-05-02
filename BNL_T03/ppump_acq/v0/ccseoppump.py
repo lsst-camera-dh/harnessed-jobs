@@ -135,7 +135,7 @@ try:
 
 # take light exposures
             arcsub.synchCommand(10,"setParameter","Light","1");
-            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(exptime)));
+            arcsub.synchCommand(10,"setParameter","ExpTime",str(int(float(exptime)*1000.0)));
             print "setting location of fits exposure directory"
             arcsub.synchCommand(10,"setFitsDirectory","%s" % (cdir));
 
