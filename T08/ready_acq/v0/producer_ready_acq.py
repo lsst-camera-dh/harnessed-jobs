@@ -6,9 +6,9 @@ import os
 import sys
 
 for i in range(20):
-     print "This POWER ON test may be skipped if the REB(s) is(are) already fully powered and you have the authorization. \n *** THE HV BIAS MUST BE OFF TO PROCEED! *** \n Skip this part of the step (Y (default)/n)?"
+     print "This POWER ON test may be skipped if the sensors are already fully powered and you have the authorization. \n *** THE HV BIAS MUST BE OFF TO PROCEED! *** \n Skip this part of the step (Y (default)/n)?"
 sys.stdout.flush()
-answer = raw_input("\n\nThis POWER ON test may be skipped if the REB(s) is(are) already fully powered and you have the authorization. \n *** THE HV BIAS MUST BE OFF TO PROCEED! *** \n Skip this part of the step (Y (default)/n)? \n\n")
+answer = raw_input("\n\nThis POWER ON test may be skipped if the sensors are already fully powered and you have the authorization. \n *** THE HV BIAS MUST BE OFF TO PROCEED! *** \n Skip this part of the step (Y (default)/n)? \n\n")
 if "n" not in answer.lower() :
      print "Operator requested to skip this part (POWER ON) of the  step."
 else :

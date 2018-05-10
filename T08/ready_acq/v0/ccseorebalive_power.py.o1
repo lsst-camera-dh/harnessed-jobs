@@ -163,7 +163,7 @@ else :
                 print "%s: FAILED TO TURN POWER OFF! \r\r %s" % (rebname,e)
                 raise e
 
-            time.sleep(1.0)
+            time.sleep(5.0)
 
             pwron = ""
             chkreb = False
@@ -178,7 +178,7 @@ else :
 
 
 #            time.sleep(2.0)
-            print "Rebooting the RCE after a 10s wait"
+            print "Rebooting the RCE after a 5s wait"
             time.sleep(10.0)
             sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
             print sout
@@ -220,37 +220,22 @@ else :
             if status_value :
                 print "PROCEED TO TURN ON REB CLOCK AND RAIL VOLTAGES"
                 print "CCSCCDTYPE=",CCSCCDTYPE
-                print "dropping all changes to insure that the base configuration is in use"
-                ts8sub.synchCommand(10,"dropAllChanges")
-                ts8sub.synchCommand(10,"showREBCfg %d" % rebid)
-
+#    load default configuration
                 if 'e2v' in CCSCCDTYPE.lower() :
-                    if not 'e2v' in ts8sub.synchCommand(10,"getCcdType").getResult():
-                        for iwrn in range(20):
-                            print "Inconsistent sensor and RTM type ABORTING!!!"
-                        raise Exception("Inconsistent sensor and RTM type ABORTING!!!")
-
                     for iwrn in range(20):
-                        print "USING CONFIGURATION CATEGORY ***** E2V *****   ABORT IF THIS IS NOT OK!"
-#                    ts8sub.synchCommand(10,"loadCategories Rafts:e2v")
-#                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:e2v")
+                        print "LOADING CONFIGURATION CATEGORY ***** E2V *****   ABORT IF THIS IS NOT OK!"
+                    ts8sub.synchCommand(10,"loadCategories Rafts:e2v")
+                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:e2v")
                 elif 'itl' in CCSCCDTYPE.lower() :
-                    if not 'itl' in ts8sub.synchCommand(10,"getCcdType").getResult():
-                        for iwrn in range(20):
-                            print "Inconsistent sensor and RTM type ABORTING!!!"
-                        raise Exception("Inconsistent sensor and RTM type ABORTING!!!")
                     for iwrn in range(20):
-                        print "USING CONFIGURATION CATEGORY ***** ITL *****   ABORT IF THIS IS NOT OK!"
-#                    ts8sub.synchCommand(10,"loadCategories Rafts:itl")
-#                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
+                        print "LOADING CONFIGURATION CATEGORY ***** ITL *****   ABORT IF THIS IS NOT OK!"
+                    ts8sub.synchCommand(10,"loadCategories Rafts:itl")
+                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
                 else :
                     for iwrn in range(20):
                         print "UNABLE TO DETERMINE REQUIRED CONFIG CATEGORY ... ABORT!!!"
                     raise Exception("UNABLE TO DETERMINING REQUIRED CONFIG CATEGORY!")
 
-                print "Waiting for 3 seconds to give time to abort (kill interpreter) if necessary"
-
-                time.sleep(3.0)
                 try:
                     stat = ts8sub.synchCommand(1000,"powerOn %d" % rebid).getResult()
                     print stat.replace("\n","\r\n")
