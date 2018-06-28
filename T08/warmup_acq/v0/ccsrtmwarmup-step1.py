@@ -11,18 +11,24 @@ import time
 CCS.setThrowExceptions(True);
 
 #cdir = tsCWD
-ts8 = "ts8-otm0"
+
+try:
+    ts8 = "ts8-otm0"
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
+    rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
+except:
+    ts8 = "ts8-otm2"
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
+    rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 rebsub = {}
 serial_number = {}
-ts8sub  = CCS.attachSubsystem("%s" % ts8);
 tssub  = CCS.attachSubsystem("ts");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 vacsub = CCS.attachSubsystem("ts/VQMonitor");
 
 pwrsub  = CCS.attachSubsystem("ccs-rebps");
 pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
-rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 
 print "powering off sensors"
@@ -58,8 +64,13 @@ for id in rebdevs:
     rebsub[id]  = CCS.attachSubsystem("%s/%s" % (ts8,id));
     result = rebsub[id].synchCommand(10,"setHeaterPower 0 0.8").getResult();
 
+# make sure the heaters are powered
 result = pwrsub.synchCommand(20,"setNamedPowerOn 0 heater True").getResult();
 result = pwrsub.synchCommand(20,"setNamedPowerOn 2 heater True").getResult();
+
+# make sure the plate heaters are set to the correct range
+result = cryosub.synchCommand(20,"setHeaterRange 1 \"Hi\"").getResult()
+result = cryosub.synchCommand(20,"setHeaterRange 2 \"Hi\"").getResult()
 
 
 last_cold_temp = -999.
@@ -69,7 +80,10 @@ last_ccd_temp = -999.
 tstep = 1.0
 safetymargin = 7
 
-#for iiter in range(12) :
+print "temperature step (C) = ",tstep
+print "safety margin (i.e. min CCD temperature w.r.t. cryo plate) (C) = ",safetymargin
+
+# start raising the temperature in steps while monitoring for any reason to pause
 while (True) :
     try:
         cold_tempa = cryosub.synchCommand(20,"getTemp A").getResult()

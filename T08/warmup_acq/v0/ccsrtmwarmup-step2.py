@@ -11,18 +11,23 @@ import time
 CCS.setThrowExceptions(True);
 
 #cdir = tsCWD
-ts8 = "ts8-otm0"
+try:
+    ts8 = "ts8-otm0"
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
+    rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
+except:
+    ts8 = "ts8-otm2"
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
+    rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 rebsub = {}
 serial_number = {}
-ts8sub  = CCS.attachSubsystem("%s" % ts8);
 tssub  = CCS.attachSubsystem("ts");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 vacsub = CCS.attachSubsystem("ts/VQMonitor");
 
 pwrsub  = CCS.attachSubsystem("ccs-rebps");
 pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
-rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 
 print "powering off sensors"
@@ -68,6 +73,7 @@ last_ccd_temp = -999.
 
 tstep = 1.0
 safetymargin = 7
+endsafetymargin = 3
 
 #for iiter in range(12) :
 while (True) :
@@ -97,8 +103,11 @@ while (True) :
             time.sleep(30.0)
             continue
 
+# when nearly warm, reduce the safety margin or we will never finish
+    if (ccd_temp > 15.) :
+        safetymargin = endsafetymargin
 
-
+# check if conditions are OK to increment the set point
     if ((ccd_temp-cryo_temp-tstep) > safetymargin and pressure < .00005 and (ccd_temp+tstep)<20.0) :
         print "updating setpoint"
         cryosub.synchCommand(20,"setSetPoint",2,cryo_temp+tstep).getResult()
@@ -120,7 +129,7 @@ while (True) :
             idx = int(id[len(id)-1])
 
             rebsub[id]  = CCS.attachSubsystem("%s/%s" % (ts8,id));
-            result = pwrsub.synchCommand(20,"setNamedPowerOn %d heater True" % idx).getResult();
+#            result = pwrsub.synchCommand(20,"setNamedPowerOn %d heater True" % idx).getResult();
             result = rebsub[id].synchCommand(10,"setHeaterPower 0 0.0").getResult();
             idx = idx + 1
         print "warming step 2 is now complete .... proceed to turn off the NF-55s"

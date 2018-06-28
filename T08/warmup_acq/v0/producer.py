@@ -16,7 +16,14 @@ answer = raw_input("")
 if not 'n' in answer:
      print "executing ccsrtmwarmup-step1.py"
      if (doit) :
-          os.system("$CCS_BIN_DIR/ScriptExecutor $VIRTUAL_ENV/share/RTM-warmup/v0/ccsrtmwarmup-step1.py")
+          while (True):
+               os.system("$CCS_BIN_DIR/ScriptExecutor $VIRTUAL_ENV/share/warmup_acq/v0/ccsrtmwarmup-step1.py")
+               print "Repeat this warmup stage (N/y)?"
+               sys.stdout.flush()
+               subanswr = raw_input("")
+               if not "y" in subanswr:
+                    break
+
 #     ccsProducer('RTM_warmup', 'ccsrtmwarmup-step1.py')
 
 #for i in range(20):
@@ -30,7 +37,13 @@ if (doit) :
 if not 'n' in answer:
      print "executing ccsrtmwarmup-step2.py"
      if (doit) :
-          os.system("$CCS_BIN_DIR/ScriptExecutor $VIRTUAL_ENV/share/RTM-warmup/v0/ccsrtmwarmup-step2.py")
+          while (True):
+               os.system("$CCS_BIN_DIR/ScriptExecutor $VIRTUAL_ENV/share/warmup_acq/v0/ccsrtmwarmup-step2.py")
+               print "Repeat this warmup stage (N/y)?"
+               sys.stdout.flush()
+               subanswr = raw_input("")
+               if not "y" in subanswr:
+                    break
 #     ccsProducer('RTM_warmup', 'ccsrtmwarmup-step2.py')
 
 
@@ -78,5 +91,12 @@ if not 'n' in answer:
 
      print "executing ccsrtmwarmup-step3.py"
      if (doit) :
-          os.system("$CCS_BIN_DIR/ScriptExecutor $VIRTUAL_ENV/share/RTM-warmup/v0/ccsrtmwarmup-step3.py")
+          while (True):
+               os.system("$CCS_BIN_DIR/ScriptExecutor $VIRTUAL_ENV/share/warmup_acq/v0/ccsrtmwarmup-step3.py")
+               print "Repeat this warmup stage (N/y)?"
+               sys.stdout.flush()
+               subanswr = raw_input("")
+               if not "y" in subanswr:
+                    break
+
 #     ccsProducer('RTM_warmup', 'ccsrtmwarmup-step3.py')

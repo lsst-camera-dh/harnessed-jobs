@@ -11,18 +11,23 @@ import time
 CCS.setThrowExceptions(True);
 
 #cdir = tsCWD
-ts8 = "ts8-otm0"
+try:
+    ts8 = "ts8-otm0"
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
+    rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
+except:
+    ts8 = "ts8-otm2"
+    ts8sub  = CCS.attachSubsystem("%s" % ts8);
+    rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 rebsub = {}
 serial_number = {}
-ts8sub  = CCS.attachSubsystem("%s" % ts8);
 tssub  = CCS.attachSubsystem("ts");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 vacsub = CCS.attachSubsystem("ts/VQMonitor");
 
 pwrsub  = CCS.attachSubsystem("ccs-rebps");
 pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
-rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 
 print "powering off REBs:"
@@ -30,19 +35,19 @@ print "powering off REBs:"
 
 
 print "powering off REB0"
-print pwrsub.synchCommand(20,"setquencePower 0 False").getResult();
+print pwrsub.synchCommand(20,"sequencePower 0 False").getResult();
 
 print "powering off REB1"
-print pwrsub.synchCommand(20,"setquencePower 1 False").getResult();
+print pwrsub.synchCommand(20,"sequencePower 1 False").getResult();
 
 print "powering off REB2"
-print pwrsub.synchCommand(20,"setquencePower 2 False").getResult();
+print pwrsub.synchCommand(20,"sequencePower 2 False").getResult();
 
 
 
 last_cold_temp = -999.
 last_cryo_temp = -999.
-last_ccd_temp = -999.
+
 
 tstep = 1.0
 safetymargin = 7
@@ -62,34 +67,34 @@ while (True) :
         continue
 
 
-    if (cryo_temp < -273. or cold_tempa < -273. or cold_tempb < 273. or d_temp < -273. or cryosetpt < -273. or pressure < 1.0e-10) :
-            print "time = %d, ccd_temp = %f, cryo_temp  %f, cryosetpt = %f, pressure = %11.3e" % (time.time(),ccd_temp,cryo_temp,cryosetpt,pressure)
-            print "bad thermal status data received"
-            print "retrying in 30 seconds"
-            time.sleep(30.0)
-            continue
+    if ((cryo_temp < -273.) or (cold_tempa < -273.) or (cold_tempb < -273.)  or (pressure < 1.0e-10)) :
+        print "time = %d, cold_tempa = %f, cold_tempb = %f, coldsetpt = %f, pressure = %11.3e" % (time.time(),cold_tempa,cold_tempb,coldsetpt,pressure)
+        print "bad thermal status data received"
+        print "retrying in 30 seconds"
+        time.sleep(30.0)
+        continue
 
 
 
-    if (pressure < .00005 and (cold_tempb+tstep)<20.0) :
+    if (pressure < .0002 and (cold_tempb+tstep)<20.0) :
         print "updating setpoint"
         cryosub.synchCommand(20,"setSetPoint",1,cold_tempb+tstep).getResult()
     else:
-        print "pressure < .00005 : ",pressure < .00005
-        print " (cold_tempb+tstep)<20.0) : ",(cold_temp+tstep)<20.0
+        print "pressure < .0002 : ",pressure < .0002
+        print " (cold_tempb+tstep)<20.0) : ",(cold_tempb+tstep)<20.0
 
     coldsetpt = cryosub.synchCommand(20,"getSetPoint 1").getResult()
 
-    print "time = %d, ccd_temp = %f, cryo_temp  %f, cryosetpt = %f, pressure = %11.3e" % (time.time(),ccd_temp,cryo_temp,cryosetpt,pressure)
+    print "time = %d, cold_tempa = %f, cold_tempb = %f, coldsetpt = %f, pressure = %11.3e" % (time.time(),cold_tempa,cold_tempb,coldsetpt,pressure)
 
-#    if (ccd_temp > cold_tempa and ccd_temp > cold_tempb) :
-#        print "warming step 1 is now complete .... proceed to turn off the PT-30"
-#        break
+    if ((cold_tempb+tstep)>20.) :
+        print "The final warming step is now complete. The RTM is warm but one should still wait the necessary time for equilibrium before opening the cryostat."
+        break
 
     time.sleep(60.0)
     last_cold_temp = cold_tempb
     last_cryo_temp = cryo_temp
-    last_ccd_temp = ccd_temp
+
 
 
 istate = 1

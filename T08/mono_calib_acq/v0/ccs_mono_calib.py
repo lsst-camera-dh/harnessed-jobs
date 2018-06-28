@@ -94,7 +94,7 @@ try:
     biassub.synchCommand(10,"setCurrentRange",0.00000002)
 #    pdsub.synchCommand(10,"setCurrentRange",  0.0000002)
 # the following was only used for the 980 nm line
-    pdsub.synchCommand(10,"setCurrentRange", 0.000002)
+    pdsub.synchCommand(10,"setCurrentRange", 0.0000002)
 
     print "set current ranges"
 
@@ -114,9 +114,9 @@ try:
 #    print "set filter position"
 #    result = monosub.synchCommand(60,"setFilter",3);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",1,1000);
+    result = monosub.synchCommand(60,"setSlitSize",1,2000);
     rply = result.getResult()
-    result = monosub.synchCommand(60,"setSlitSize",2,1000);
+    result = monosub.synchCommand(60,"setSlitSize",2,2000);
     rply = result.getResult()
 
 # go through config file looking for 'qe' instructions
