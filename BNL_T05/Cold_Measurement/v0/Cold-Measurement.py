@@ -7,9 +7,10 @@
 
 from org.lsst.ccs.scripting import *
 from java.lang import Exception
+import os
 import sys
 import time
-import eolib
+#import eolib
 
 CCS.setThrowExceptions(True);
 
@@ -22,14 +23,18 @@ cryosub = CCS.attachSubsystem("ts/Cryo" );
 vacsub = CCS.attachSubsystem("ts/VQMonitor");
 pdusub = CCS.attachSubsystem("ts/PDU");
 
+
 runnum = "no-eTrav"
 try:
+    RUNNUM = os.environ['LCATR_RUN_NUMBER']
     runnum = RUNNUM
 except:
     pass
 
 
-cdir = tsCWD
+#cdir = tsCWD
+cdir = os.getcwd()
+UNITID = os.environ['LCATR_UNIT_ID']
 
 target_temp = -100. 
 

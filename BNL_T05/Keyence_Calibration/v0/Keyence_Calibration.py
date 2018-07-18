@@ -7,9 +7,10 @@
 
 from org.lsst.ccs.scripting import *
 from java.lang import Exception
+import os
 import sys
 import time
-import eolib
+#import eolib
 
 CCS.setThrowExceptions(True);
 
@@ -21,7 +22,8 @@ print "Attaching CRYO subystems"
 cryosub = CCS.attachSubsystem("ts/Cryo" );
 
 
-cdir = tsCWD
+#cdir = tsCWD
+cdir = os.getcwd()
 
 ts5sub.synchCommand(30,"setCfgStateByName RTM_calib")
 

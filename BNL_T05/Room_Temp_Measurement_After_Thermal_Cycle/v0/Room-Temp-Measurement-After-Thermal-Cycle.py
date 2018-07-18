@@ -7,9 +7,10 @@
 
 from org.lsst.ccs.scripting import *
 from java.lang import Exception
+import os
 import sys
 import time
-import eolib
+#import eolib
 
 CCS.setThrowExceptions(True);
 
@@ -22,9 +23,18 @@ cryosub = CCS.attachSubsystem("ts/Cryo" );
 vacsub = CCS.attachSubsystem("ts/VQMonitor");
 pdusub = CCS.attachSubsystem("ts/PDU");
 
+runnum = "no-eTrav"
+try:
+    RUNNUM = os.environ['LCATR_RUN_NUMBER']
+    runnum = RUNNUM
+except:
+    pass
 
 
-cdir = tsCWD
+#cdir = tsCWD
+cdir = os.getcwd()
+UNITID = os.environ['LCATR_UNIT_ID']
+
 
 target_temp = 20. 
 
@@ -44,7 +54,7 @@ nsteps = abs(target_temp - cur_temp)
 ###################################################################
 # Once at a safe pressure, begin cooling the device
 starttim = time.time()
-if (True):
+if (False):
     while True:
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
@@ -56,14 +66,14 @@ if (True):
 
 #    pdusub.synchCommand(120,"setOutletState",cryo_outlet,False).getResult()
 
-    cryosub.synchCommand(40000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
+        cryosub.synchCommand(40000,"rampTemp %f %f %d" % (period,target_temp,nsteps)).getResult()
 
-    while (True) :
-        now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
-        if (abs(target_temp-now_temp)<2.0) :
-            break
-        time.sleep(5.0)
-        print "waiting for target temp to be reached. current temp = %fC" % now_temp
+        while (True) :
+            now_temp = cryosub.synchCommand(20,"getTemp B").getResult()
+            if (abs(target_temp-now_temp)<2.0) :
+                break
+            time.sleep(5.0)
+            print "waiting for target temp to be reached. current temp = %fC" % now_temp
 
 ts5sub.synchCommand(30,"setCfgStateByName BASEPLATE")
 
@@ -71,7 +81,7 @@ tstart = time.time()
 
 aa=time.ctime().split(" ")
 tstart_human = (aa[4]+aa[1]+aa[2]+"-"+aa[3]).replace(":","")
-fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,RUNNUM,tstart_human,target_temp)
+fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,runnum,tstart_human,target_temp)
 
 start_temp = {}
 

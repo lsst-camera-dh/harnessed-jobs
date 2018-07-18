@@ -7,9 +7,10 @@
 
 from org.lsst.ccs.scripting import *
 from java.lang import Exception
+import os
 import sys
 import time
-import eolib
+#import eolib
 
 CCS.setThrowExceptions(True);
 
@@ -23,8 +24,18 @@ vacsub = CCS.attachSubsystem("ts/VQMonitor");
 pdusub = CCS.attachSubsystem("ts/PDU");
 
 
+runnum = "no-eTrav"
+try:
+    RUNNUM = os.environ['LCATR_RUN_NUMBER']
+    runnum = RUNNUM
+except:
+    pass
 
-cdir = tsCWD
+
+#cdir = tsCWD
+
+cdir = os.getcwd()
+UNITID = os.environ['LCATR_UNIT_ID']
 
 target_temp = -60. 
 
@@ -73,7 +84,7 @@ tstart = time.time()
 
 aa=time.ctime().split(" ")
 tstart_human = (aa[4]+aa[1]+aa[2]+"-"+aa[3]).replace(":","")
-fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,RUNNUM,tstart_human,target_temp)
+fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,runnum,tstart_human,target_temp)
 
 start_temp = {}
 

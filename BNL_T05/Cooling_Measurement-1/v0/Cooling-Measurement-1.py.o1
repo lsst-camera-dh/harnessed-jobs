@@ -7,10 +7,9 @@
 
 from org.lsst.ccs.scripting import *
 from java.lang import Exception
-import os
 import sys
 import time
-#import eolib
+import eolib
 
 CCS.setThrowExceptions(True);
 
@@ -24,19 +23,8 @@ vacsub = CCS.attachSubsystem("ts/VQMonitor");
 pdusub = CCS.attachSubsystem("ts/PDU");
 
 
-runnum = "no-eTrav"
-try:
-    RUNNUM = os.environ['LCATR_RUN_NUMBER']
-    runnum = RUNNUM
-except:
-    pass
 
-
-#cdir = tsCWD
-
-cdir = os.getcwd()
-UNITID = os.environ['LCATR_UNIT_ID']
-
+cdir = tsCWD
 
 target_temp = -30. 
 
@@ -56,7 +44,7 @@ nsteps = abs(target_temp - cur_temp)
 ###################################################################
 # Once at a safe pressure, begin cooling the device
 starttim = time.time()
-if (False):
+if (True):
     while True:
         result = vacsub.synchCommand(20,"readPressure");
         pres = result.getResult();
@@ -77,13 +65,13 @@ if (False):
         time.sleep(5.0)
         print "waiting for target temp to be reached. current temp = %fC" % now_temp
 
-ts5sub.synchCommand(30,"setCfgStateByName BASEPLATE")
+ts5sub.synchCommand(30,"setCfgStateByName RTM")
 
 tstart = time.time()
 
 aa=time.ctime().split(" ")
 tstart_human = (aa[4]+aa[1]+aa[2]+"-"+aa[3]).replace(":","")
-fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,runnum,tstart_human,target_temp)
+fln = "%s_WarmColdMet_%s_%s_%dC.csv" % (UNITID,RUNNUM,tstart_human,target_temp)
 
 start_temp = {}
 
@@ -92,7 +80,7 @@ for temp in ["A","B","C","D"]:
 #    start_temp[temp]=20.0
 
 #ts5sub.synchCommand(3000,"scanfl %s/Cooling-Measurement-1.dat" % cdir)
-ts5sub.synchCommand(5000,"scanfl %s/%s" % (cdir,fln))
+ts5sub.synchCommand(3000,"scanfl %s/%s" % (cdir,fln))
 
 tstop = time.time()
 stop_temp = {}
