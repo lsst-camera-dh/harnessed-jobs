@@ -1,0 +1,280 @@
+import static org.lsst.gruth.jutils.MapArgs.*;
+import org.lsst.ccs.description.groovy.CCSBuilder;
+import org.lsst.ccs.subsystem.teststand.data.TSConfig;
+import org.lsst.ccs.subsystem.teststand.TSSubSys;
+import org.lsst.ccs.subsystem.teststand.TSConfigurable;
+import org.lsst.ccs.subsystem.teststand.TSSetDevTypes;
+import org.lsst.ccs.subsystem.teststand.KeithleyDevice;
+import org.lsst.ccs.subsystem.teststand.CryoCon24cDevice;
+import org.lsst.ccs.subsystem.teststand.MicroIonDevice;
+import org.lsst.ccs.subsystem.teststand.GPVacMon835Device;
+import org.lsst.ccs.subsystem.teststand.NewportLampDevice;
+import org.lsst.ccs.subsystem.teststand.OrielShutterDevice;
+import org.lsst.ccs.subsystem.teststand.Cornerstone260Device;
+import org.lsst.ccs.subsystem.teststand.NetBotzDevice;
+import org.lsst.ccs.subsystem.teststand.AP7900Device;
+import org.lsst.ccs.subsystem.teststand.XEDDevice;
+
+import org.lsst.ccs.subsystem.monitor.Alarm;
+import org.lsst.ccs.subsystem.monitor.Line;
+import org.lsst.ccs.subsystem.monitor.Channel;
+
+
+CCSBuilder builder = ["ts"]
+
+builder.
+    main (TSSubSys, argMap("main", 10000, "bnlts8")) {
+
+    Bias  (KeithleyDevice, argMap(
+            "PH",
+            57600))
+
+    PhotoDiode  (KeithleyDevice, argMap(
+            "PJ",
+            57600))
+
+    Cryo   (CryoCon24cDevice, argMap(1, "AI02TEPF", 19200))
+  
+//    VacuumGauge (MicroIonDevice, argMap(1, "DB93", 19200, 1))
+    
+    VQMonitor (GPVacMon835Device, argMap("/dev/ttyACM0", 9600))
+    
+    Enviro (NetBotzDevice,argMap("/home/homer/bnlenviro.dat"))
+
+    Lamp (NewportLampDevice, argMap(1, "PF", 9600))
+    
+//    Shutter (OrielShutterDevice, argMap("?", 9600, 0))
+    
+//    PDU (AP7900Device, argMap("130.199.47.???", 23))
+
+    Monochromator (Cornerstone260Device, argMap("PG", 9600))
+    
+//    Fe55 (XEDDevice, argMap("A603EP00",4800))
+
+    "TSCFG" (TSSetDevTypes, argMap(
+            'empty','275CutOn','550CutOn',' ',' ',' ',
+            0.0,275.0,560.0,0.0,0.0,0.0,
+            'KEITHLEY-INSTRUMENTS-INC.,MODEL-6487',
+            'KEITHLEY-INSTRUMENTS-INC.,MODEL-6487',
+            'Newport-Xenon-Arc-Lamp',
+            'Cornerstone260'))
+        
+    "IDLE"(TSConfigurable, argMap('IDLE', 500.0, 0.0, 200.0, 0.0, 1000.0, -125.0) )
+ 
+    "READY"(TSConfigurable, argMap('READY', 500.0, 198.0, 2.0, 0.0, 1.0e-3, -125.0) )
+ 
+    "TEST"(TSConfigurable, argMap('TEST', 500.0, 0.0, 2.0, -25.0, 1.0e-5, -125.0) )
+ 
+    "ACQ1"(TSConfigurable, argMap('ACQ1', 500.0, 198.0, 2.0, -25.0, 1.0e-5, -125.0) )
+ 
+    "WARM"(TSConfigurable, argMap('WARM', 500.0, 0.0, 10.0, -25.0, 1000.0, 20.0) )
+ 
+
+    
+    //    AlarmHDW  (TSSubSys, argMap("OV", 0))
+    AlarmHDW  (Alarm, argMap(null, TSConfig.EVENT_ID.BIAS.ordinal()))
+
+    AlarmHDWC  (Alarm, argMap(null, TSConfig.EVENT_ID.CRYO.ordinal()))
+
+    AlarmHDWV  (Alarm, argMap(null, TSConfig.EVENT_ID.VAC.ordinal()))
+
+    AlarmHDWPD (Alarm, argMap(null, TSConfig.EVENT_ID.PD.ordinal()))
+
+    AlarmHDWLMP (Alarm, argMap(null, TSConfig.EVENT_ID.LMP.ordinal()))
+
+
+
+     /*
+         Its name, used to identify it in databases, plots, etc.
+    Its longer, more descriptive, name.
+    The units the value is expressed in, e.g. "Volts".
+    The device used for obtaining its value.
+    The hardware channel number on the device.
+    The channel type, e.g. temperature, pressure, etc, which is needed by some devices.
+    The subtype, which supplies hardware configuration information.
+    The offset and scale values needed for converting a raw hardware value to a physical one.
+    Parameters used for checking the value against a limit.  There is one set for the low limit and one for the high one:
+        The checking option: NONE, FLAG or ALARM
+        The limit value.
+        The alarm to be activated upon status transitions when ALARM is specified.
+        The deadband value which delays a potential alarm action during a transition back to good status.
+    Its id, which is its index in the list of all channels.
+
+The limit values are maintained by the configuration system and can be changed while running.  Any such change causes a status message to be broadcast, which can be used to update the trending database or to update any console displays.
+*/
+        ccdtemperature  (Channel,
+                    argMap("Cryogenics temperature", "C",
+                           "Cryo", 0, "TEMP", "T", 0.0, 1.0,
+                           "flag", -110.0, 0.0, null,
+                           "alarm", 28.0, 0.0, "AlarmHDWC"))
+
+        temp_a  (Channel,
+                    argMap("Cryogenics temperature A", "C",
+                           "Cryo", 5, "TEMP", "T", 0.0, 1.0,
+                           "flag", -110.0, 0.0, null,
+                           "alarm", 28.0, 0.0, "AlarmHDWC"))
+
+        temp_b  (Channel,
+                    argMap("Cryogenics temperature B", "C",
+                           "Cryo", 6, "TEMP", "T", 0.0, 1.0,
+                           "flag", -110.0, 0.0, null,
+                           "alarm", 28.0, 0.0, "AlarmHDWC"))
+
+        temp_c  (Channel,
+                    argMap("Cryogenics temperature C", "C",
+                           "Cryo", 7, "TEMP", "T", 0.0, 1.0,
+                           "flag", -110.0, 0.0, null,
+                           "alarm", 28.0, 0.0, "AlarmHDWC"))
+
+        temp_d  (Channel,
+                    argMap("Cryogenics temperature D", "C",
+                           "Cryo", 8, "TEMP", "T", 0.0, 1.0,
+                           "flag", -110.0, 0.0, null,
+                           "alarm", 28.0, 0.0, "AlarmHDWC"))
+
+        htrread1  (Channel,
+                    argMap("Cryogenics heater loop 1 % power", "C",
+                           "Cryo", 3, "TEMP", "P", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "alarm", 100.0, 0.0, "AlarmHDWC"))
+
+        htrread2  (Channel,
+                    argMap("Cryogenics heater loop 2 % power", "C",
+                           "Cryo", 4, "TEMP", "P", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "alarm", 100.0, 0.0, "AlarmHDWC"))
+
+
+        ccdtempstddev  (Channel,
+                    argMap("Cryogenics temperature Std Dev", "C",
+                           "Cryo", 2, "TEMP", "T", 0.0, 1.0,
+                           "flag", -2.0, 0.0, null,
+                           "flag", 2.0, 0.0, null))
+
+        ccdtempsetpoint  (Channel,
+                    argMap("CCD temp setpoint", "C",
+                           "Cryo", -1, "TEMP", "T", 0.0, 1.0,
+                           "flag", -110.0, 0.0, null,
+                           "flag", 28.0, 0.0, null))
+
+        ccdbiasvoltage  (Channel,
+                    argMap("CCD bias supply voltage", "V",
+                           "Bias", 0, "VOLTS", "V", 0.0, 1.0,
+                           "alarm", -74.0, 0.0, "AlarmHDW",
+                           "alarm", 2.0, 0.0, "AlarmHDW"))
+
+        ccdbiascurrent  (Channel,
+                    argMap("CCD bias supply current", "I",
+                           "Bias", 0, "CURR", "I", 0.0, 1.0,
+                           "alarm", -1.0e6, 0.0, "AlarmHDW",
+                           "alarm", 1.0e6, 0.0, "AlarmHDW"))
+
+        photodiodevoltage  (Channel,
+                    argMap("photodiode supply voltage", "V",
+                           "PhotoDiode", 0, "VOLTS", "V", 0.0, 1.0,
+                           "alarm", -74.0, 0.0, "AlarmHDWPD",
+                           "alarm",   2.0, 0.0, "AlarmHDWPD"))
+
+        photodiodecurrent  (Channel,
+                    argMap("photodiode supply current", "I",
+                           "PhotoDiode", 0, "CURR", "I", 0.0, 1.0,
+                           "alarm", -1.0e6, 0.0, "AlarmHDWPD",
+                           "alarm",  1.0e6, 0.0, "AlarmHDWPD"))
+
+        dewarpressure  (Channel,
+                    argMap("Dewar Vacuum Reading", "T",
+                           "VacuumGauge", 0, "PRESSURE", "T", 0.0, 1.0,
+                           "flag",  0.0, 0.0, null,
+                           "alarm", 1000.0, 0.0, "AlarmHDWV"))
+
+        vqmpressure  (Channel,
+                    argMap("VQM Pressure Reading", "T",
+                           "VQMonitor", 0, "PRESSURE", "T", 0.0, 1.0,
+                           "flag",  0.0, 0.0, null,
+                           "alarm", 1000.0, 0.0, "AlarmHDWV"))
+
+
+        lamppower  (Channel,
+                    argMap("Xenon Lamp Power", "W",
+                           "Lamp", 0, "Watts", "W", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "alarm", 300.0, 0.0, "AlarmHDWLMP"))
+
+        monochromatordefaultwavelength  (Channel,
+                    argMap("Wavelength", "A",
+                           "Monochromator", -1, "UNKNOWN", "A", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 2000.0, 0.0, null))
+
+        monochromatorwavelength  (Channel,
+                    argMap("Wavelength", "A",
+                           "Monochromator", 0, "UNKNOWN", "A", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 2000.0, 0.0, null))
+
+        monochromatorslit1  (Channel,
+                    argMap("slit 1 width", "nm",
+                           "Monochromator", 3, "UNKNOWN", "nm", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 2000.0, 0.0, null))
+
+        monochromatorslit2  (Channel,
+                    argMap("slit 2 width", "nm",
+                           "Monochromator", 4, "UNKNOWN", "nm", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 2000.0, 0.0, null))
+
+        monochromgrating  (Channel,
+                    argMap("Grating Position", "1",
+                           "Monochromator", 5, "UNKNOWN", "1", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 4.0, 0.0, null))
+
+        monochromstep  (Channel,
+                    argMap("Grating Steps", "1",
+                           "Monochromator", 7, "UNKNOWN", "1", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 2000.0, 0.0, null))
+
+        monochromband  (Channel,
+                    argMap("bandwidth", "1",
+                           "Monochromator", 6, "UNKNOWN", "1", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 2000.0, 0.0, null))
+
+        shutteropen  (Channel,
+                    argMap("Shutter Open/Closed", "S",
+                           "Monochromator", 1, "UNKNOWN", "S", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 2.0, 0.0, null))
+
+        filter1position  (Channel,
+                    argMap("Filter Position", "F",
+                           "Monochromator", 2, "UNKNOWN", "F", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 7.0, 0.0, null))
+
+        cleanroomhumidity  (Channel,
+                    argMap("Humidity", "P",
+                           "Enviro", 0, "UNKNOWN", "P", 0.0, 1.0,
+                           "flag", 0.4, 0.0, null,
+                           "flag", 0.8, 0.0, null))
+
+        roomtemperature  (Channel,
+                    argMap("Temperature", "C",
+                           "Enviro", 1, "UNKNOWN", "C", 0.0, 1.0,
+                           "flag", 65.0, 0.0, null,
+                           "flag", 75.0, 0.0, null))
+
+        dewpoint  (Channel,
+                    argMap("Dew Point", "D",
+                           "Enviro", 2, "UNKNOWN", "C", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 1.0, 0.0, null))
+
+        partcounter  (Channel,
+                    argMap("Particle Count", "1",
+                           "Enviro", 3, "UNKNOWN", "1", 0.0, 1.0,
+                           "flag", 0.0, 0.0, null,
+                           "flag", 10.0, 0.0, null))
+}

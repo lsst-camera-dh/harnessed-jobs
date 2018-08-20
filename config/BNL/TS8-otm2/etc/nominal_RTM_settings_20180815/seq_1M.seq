@@ -1,0 +1,48 @@
+[constants]
+    Slices: 1000000 # Number of slices
+
+[clocks]
+    P0: 8 # Parallel clock 0
+    P1: 9 # Parallel clock 1
+    P2: 10 # Parallel clock 2
+    P3: 11 # Parallel clock 3
+    S0: 4 # Serial clock 0
+    S1: 5 # Serial clock 1
+    S2: 6 # Serial clock 2
+    RG: 7 # reset gate
+    CL: 3 # ASPIC clamp
+    RST: 2 # ASPIC integrator reset
+    RD: 1 # ASPIC ramp-down integration
+    RU: 0 # ASPIC ramp-up integration
+    TRG: 12 # ADC trigger
+    SOI: 13 # Start of image
+    EOI: 14 # End of image
+
+[pointers]
+
+[functions]
+    Default: # Default state when not operating
+
+    ReadSlice:
+      clocks:   TRG
+      slices:
+        100 ns   = 1
+        1500 ns  = 0
+
+    StartImage:
+      clocks:   SOI
+      slices:
+      100 ns   = 1
+      100 ns   = 0
+    
+    EndImage:
+      clocks:   EOI
+      slices:
+      100 ns   = 1
+      100 ns   = 0
+    
+[mains]
+    Run:
+      CALL    StartImage  repeat(1)
+      CALL    ReadSlice   repeat(Slices)
+      CALL    EndImage    repeat(1)

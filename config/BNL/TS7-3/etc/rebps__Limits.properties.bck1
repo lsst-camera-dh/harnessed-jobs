@@ -1,0 +1,1470 @@
+#********  BoardTemp//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+BoardTemp//limitHi = 30.0
+
+#********  MainCurrent//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+MainCurrent//limitHi = 2.0
+
+#********  MainVoltage//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+MainVoltage//limitHi = 49.0
+
+#********  REB0.OD.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.OD.IaftLDO//limitHi = 100.0
+
+#********  REB0.OD.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.OD.IbefLDO//limitHi = 100.0
+
+#********  REB0.OD.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.OD.VaftLDO//limitHi = 45.0
+
+#********  REB0.OD.VaftLDO2//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.OD.VaftLDO2//limitHi = 45.0
+
+#********  REB0.OD.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.OD.VaftSwch//limitHi = 45.0
+
+#********  REB0.OD.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.OD.VbefLDO//limitHi = 45.0
+
+#********  REB0.analog.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.analog.IaftLDO//limitHi = 600.0
+
+#********  REB0.analog.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.analog.IbefLDO//limitHi = 600.0
+
+#********  REB0.analog.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.analog.VaftLDO//limitHi = 8.0
+
+#********  REB0.analog.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.analog.VaftSwch//limitHi = 8.0
+
+#********  REB0.analog.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.analog.VbefLDO//limitHi = 8.5
+
+#********  REB0.clockhi.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clockhi.IaftLDO//limitHi = 160.0
+
+#********  REB0.clockhi.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clockhi.IbefLDO//limitHi = 200.0
+
+#********  REB0.clockhi.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clockhi.VaftLDO//limitHi = 16.0
+
+#********  REB0.clockhi.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clockhi.VaftSwch//limitHi = 16.0
+
+#********  REB0.clockhi.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clockhi.VbefLDO//limitHi = 20.0
+
+#********  REB0.clocklo.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clocklo.IaftLDO//limitHi = 60.0
+
+#********  REB0.clocklo.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clocklo.IbefLDO//limitHi = 60.0
+
+#********  REB0.clocklo.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clocklo.VaftLDO//limitHi = 2.0
+
+#********  REB0.clocklo.VaftLDO2//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clocklo.VaftLDO2//limitHi = 16.0
+
+#********  REB0.clocklo.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clocklo.VaftSwch//limitHi = 16.0
+
+#********  REB0.clocklo.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.clocklo.VbefLDO//limitHi = 20.0
+
+#********  REB0.digital.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.digital.IaftLDO//limitHi = 550.0
+
+#********  REB0.digital.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.digital.IbefLDO//limitHi = 500.0
+
+#********  REB0.digital.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.digital.VaftLDO//limitHi = 6.5
+
+#********  REB0.digital.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.digital.VaftSwch//limitHi = 6.5
+
+#********  REB0.digital.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.digital.VbefLDO//limitHi = 6.5
+
+#********  REB0.heater.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.heater.IaftLDO//limitHi = 20.0
+
+#********  REB0.heater.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.heater.IbefLDO//limitHi = 6.0
+
+#********  REB0.heater.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.heater.VaftLDO//limitHi = 10.0
+
+#********  REB0.heater.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.heater.VaftSwch//limitHi = 10.0
+
+#********  REB0.heater.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB0.heater.VbefLDO//limitHi = 20.0
+
+#********  REB1.OD.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.OD.IaftLDO//limitHi = 15.0
+
+#********  REB1.OD.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.OD.IbefLDO//limitHi = 20.0
+
+#********  REB1.OD.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.OD.VaftLDO//limitHi = 45.0
+
+#********  REB1.OD.VaftLDO2//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.OD.VaftLDO2//limitHi = 45.0
+
+#********  REB1.OD.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.OD.VaftSwch//limitHi = 45.0
+
+#********  REB1.OD.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.OD.VbefLDO//limitHi = 45.0
+
+#********  REB1.analog.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.analog.IaftLDO//limitHi = 600.0
+
+#********  REB1.analog.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.analog.IbefLDO//limitHi = 600.0
+
+#********  REB1.analog.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.analog.VaftLDO//limitHi = 8.0
+
+#********  REB1.analog.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.analog.VaftSwch//limitHi = 8.0
+
+#********  REB1.analog.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.analog.VbefLDO//limitHi = 10.0
+
+#********  REB1.clockhi.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clockhi.IaftLDO//limitHi = 150.0
+
+#********  REB1.clockhi.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clockhi.IbefLDO//limitHi = 150.0
+
+#********  REB1.clockhi.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clockhi.VaftLDO//limitHi = 20.0
+
+#********  REB1.clockhi.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clockhi.VaftSwch//limitHi = 20.0
+
+#********  REB1.clockhi.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clockhi.VbefLDO//limitHi = 20.0
+
+#********  REB1.clocklo.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clocklo.IaftLDO//limitHi = 50.0
+
+#********  REB1.clocklo.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clocklo.IbefLDO//limitHi = 60.0
+
+#********  REB1.clocklo.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clocklo.VaftLDO//limitHi = 1.0
+
+#********  REB1.clocklo.VaftLDO2//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clocklo.VaftLDO2//limitHi = 20.0
+
+#********  REB1.clocklo.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clocklo.VaftSwch//limitHi = 20.0
+
+#********  REB1.clocklo.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.clocklo.VbefLDO//limitHi = 20.0
+
+#********  REB1.digital.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.digital.IaftLDO//limitHi = 600.0
+
+#********  REB1.digital.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.digital.IbefLDO//limitHi = 500.0
+
+#********  REB1.digital.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.digital.VaftLDO//limitHi = 6.0
+
+#********  REB1.digital.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.digital.VaftSwch//limitHi = 6.0
+
+#********  REB1.digital.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB1.digital.VbefLDO//limitHi = 10.0
+
+#********  REB2.OD.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.OD.IaftLDO//limitHi = 20.0
+
+#********  REB2.OD.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.OD.IbefLDO//limitHi = 20.0
+
+#********  REB2.OD.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.OD.VaftLDO//limitHi = 45.0
+
+#********  REB2.OD.VaftLDO2//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.OD.VaftLDO2//limitHi = 45.0
+
+#********  REB2.OD.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.OD.VaftSwch//limitHi = 45.0
+
+#********  REB2.OD.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.OD.VbefLDO//limitHi = 45.0
+
+#********  REB2.analog.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.analog.IaftLDO//limitHi = 600.0
+
+#********  REB2.analog.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.analog.IbefLDO//limitHi = 600.0
+
+#********  REB2.analog.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.analog.VaftLDO//limitHi = 8.0
+
+#********  REB2.analog.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.analog.VaftSwch//limitHi = 8.0
+
+#********  REB2.analog.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.analog.VbefLDO//limitHi = 10.0
+
+#********  REB2.clockhi.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clockhi.IaftLDO//limitHi = 200.0
+
+#********  REB2.clockhi.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clockhi.IbefLDO//limitHi = 200.0
+
+#********  REB2.clockhi.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clockhi.VaftLDO//limitHi = 20.0
+
+#********  REB2.clockhi.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clockhi.VaftSwch//limitHi = 20.0
+
+#********  REB2.clockhi.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clockhi.VbefLDO//limitHi = 20.0
+
+#********  REB2.clocklo.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clocklo.IaftLDO//limitHi = 100.0
+
+#********  REB2.clocklo.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clocklo.IbefLDO//limitHi = 100.0
+
+#********  REB2.clocklo.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clocklo.VaftLDO//limitHi = 1.5
+
+#********  REB2.clocklo.VaftLDO2//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clocklo.VaftLDO2//limitHi = 20.0
+
+#********  REB2.clocklo.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clocklo.VaftSwch//limitHi = 20.0
+
+#********  REB2.clocklo.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.clocklo.VbefLDO//limitHi = 20.0
+
+#********  REB2.digital.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.digital.IaftLDO//limitHi = 500.0
+
+#********  REB2.digital.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.digital.IbefLDO//limitHi = 500.0
+
+#********  REB2.digital.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.digital.VaftLDO//limitHi = 10.0
+
+#********  REB2.digital.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.digital.VaftSwch//limitHi = 10.0
+
+#********  REB2.digital.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.digital.VbefLDO//limitHi = 10.0
+
+#********  REB2.heater.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.heater.IaftLDO//limitHi = 150.0
+
+#********  REB2.heater.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.heater.IbefLDO//limitHi = 6.0
+
+#********  REB2.heater.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.heater.VaftLDO//limitHi = 10.0
+
+#********  REB2.heater.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.heater.VaftSwch//limitHi = 10.0
+
+#********  REB2.heater.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+REB2.heater.VbefLDO//limitHi = 20.0
+
+#********  BoardTemp//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#BoardTemp//limitLo = 0.0
+
+#********  MainCurrent//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#MainCurrent//limitLo = 0.0
+
+#********  MainVoltage//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#MainVoltage//limitLo = 0.0
+
+#********  REB0.OD.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.OD.IaftLDO//limitLo = 0.0
+
+#********  REB0.OD.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.OD.IbefLDO//limitLo = 0.0
+
+#********  REB0.OD.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.OD.VaftLDO//limitLo = 0.0
+
+#********  REB0.OD.VaftLDO2//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.OD.VaftLDO2//limitLo = 0.0
+
+#********  REB0.OD.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.OD.VaftSwch//limitLo = 0.0
+
+#********  REB0.OD.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.OD.VbefLDO//limitLo = 0.0
+
+#********  REB0.analog.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.analog.IaftLDO//limitLo = 0.0
+
+#********  REB0.analog.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.analog.IbefLDO//limitLo = 0.0
+
+#********  REB0.analog.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.analog.VaftLDO//limitLo = 0.0
+
+#********  REB0.analog.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.analog.VaftSwch//limitLo = 0.0
+
+#********  REB0.analog.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.analog.VbefLDO//limitLo = 0.0
+
+#********  REB0.clockhi.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clockhi.IaftLDO//limitLo = 0.0
+
+#********  REB0.clockhi.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clockhi.IbefLDO//limitLo = 0.0
+
+#********  REB0.clockhi.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clockhi.VaftLDO//limitLo = 0.0
+
+#********  REB0.clockhi.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clockhi.VaftSwch//limitLo = 0.0
+
+#********  REB0.clockhi.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clockhi.VbefLDO//limitLo = 0.0
+
+#********  REB0.clocklo.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clocklo.IaftLDO//limitLo = 0.0
+
+#********  REB0.clocklo.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clocklo.IbefLDO//limitLo = 0.0
+
+#********  REB0.clocklo.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clocklo.VaftLDO//limitLo = 0.0
+
+#********  REB0.clocklo.VaftLDO2//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clocklo.VaftLDO2//limitLo = 0.0
+
+#********  REB0.clocklo.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clocklo.VaftSwch//limitLo = 0.0
+
+#********  REB0.clocklo.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.clocklo.VbefLDO//limitLo = 0.0
+
+#********  REB0.digital.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.digital.IaftLDO//limitLo = 0.0
+
+#********  REB0.digital.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.digital.IbefLDO//limitLo = 0.0
+
+#********  REB0.digital.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.digital.VaftLDO//limitLo = 0.0
+
+#********  REB0.digital.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.digital.VaftSwch//limitLo = 0.0
+
+#********  REB0.digital.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.digital.VbefLDO//limitLo = 0.0
+
+#********  REB0.heater.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.heater.IaftLDO//limitLo = 0.0
+
+#********  REB0.heater.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.heater.IbefLDO//limitLo = 0.0
+
+#********  REB0.heater.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.heater.VaftLDO//limitLo = 0.0
+
+#********  REB0.heater.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.heater.VaftSwch//limitLo = 0.0
+
+#********  REB0.heater.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.heater.VbefLDO//limitLo = 0.0
+
+#********  REB0.hvbias.IbefSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.hvbias.IbefSwch//limitHi = 0.0
+
+#********  REB0.hvbias.IbefSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.hvbias.IbefSwch//limitLo = 0.0
+
+#********  REB0.hvbias.VbefSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.hvbias.VbefSwch//limitHi = 0.0
+
+#********  REB0.hvbias.VbefSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB0.hvbias.VbefSwch//limitLo = 0.0
+
+#********  REB1.OD.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.OD.IaftLDO//limitLo = 0.0
+
+#********  REB1.OD.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.OD.IbefLDO//limitLo = 0.0
+
+#********  REB1.OD.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.OD.VaftLDO//limitLo = 0.0
+
+#********  REB1.OD.VaftLDO2//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.OD.VaftLDO2//limitLo = 0.0
+
+#********  REB1.OD.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.OD.VaftSwch//limitLo = 0.0
+
+#********  REB1.OD.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.OD.VbefLDO//limitLo = 0.0
+
+#********  REB1.analog.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.analog.IaftLDO//limitLo = 0.0
+
+#********  REB1.analog.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.analog.IbefLDO//limitLo = 0.0
+
+#********  REB1.analog.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.analog.VaftLDO//limitLo = 0.0
+
+#********  REB1.analog.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.analog.VaftSwch//limitLo = 0.0
+
+#********  REB1.analog.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.analog.VbefLDO//limitLo = 0.0
+
+#********  REB1.clockhi.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clockhi.IaftLDO//limitLo = 0.0
+
+#********  REB1.clockhi.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clockhi.IbefLDO//limitLo = 0.0
+
+#********  REB1.clockhi.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clockhi.VaftLDO//limitLo = 0.0
+
+#********  REB1.clockhi.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clockhi.VaftSwch//limitLo = 0.0
+
+#********  REB1.clockhi.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clockhi.VbefLDO//limitLo = 0.0
+
+#********  REB1.clocklo.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clocklo.IaftLDO//limitLo = 0.0
+
+#********  REB1.clocklo.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clocklo.IbefLDO//limitLo = 0.0
+
+#********  REB1.clocklo.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clocklo.VaftLDO//limitLo = 0.0
+
+#********  REB1.clocklo.VaftLDO2//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clocklo.VaftLDO2//limitLo = 0.0
+
+#********  REB1.clocklo.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clocklo.VaftSwch//limitLo = 0.0
+
+#********  REB1.clocklo.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.clocklo.VbefLDO//limitLo = 0.0
+
+#********  REB1.digital.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.digital.IaftLDO//limitLo = 0.0
+
+#********  REB1.digital.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.digital.IbefLDO//limitLo = 0.0
+
+#********  REB1.digital.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.digital.VaftLDO//limitLo = 0.0
+
+#********  REB1.digital.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.digital.VaftSwch//limitLo = 0.0
+
+#********  REB1.digital.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.digital.VbefLDO//limitLo = 0.0
+
+#********  REB1.heater.IaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.IaftLDO//limitHi = 0.0
+
+#********  REB1.heater.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.IaftLDO//limitLo = 0.0
+
+#********  REB1.heater.IbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.IbefLDO//limitHi = 0.0
+
+#********  REB1.heater.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.IbefLDO//limitLo = 0.0
+
+#********  REB1.heater.VaftLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.VaftLDO//limitHi = 0.0
+
+#********  REB1.heater.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.VaftLDO//limitLo = 0.0
+
+#********  REB1.heater.VaftSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.VaftSwch//limitHi = 0.0
+
+#********  REB1.heater.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.VaftSwch//limitLo = 0.0
+
+#********  REB1.heater.VbefLDO//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.VbefLDO//limitHi = 0.0
+
+#********  REB1.heater.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.heater.VbefLDO//limitLo = 0.0
+
+#********  REB1.hvbias.IbefSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.hvbias.IbefSwch//limitHi = 0.0
+
+#********  REB1.hvbias.IbefSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.hvbias.IbefSwch//limitLo = 0.0
+
+#********  REB1.hvbias.VbefSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.hvbias.VbefSwch//limitHi = 0.0
+
+#********  REB1.hvbias.VbefSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB1.hvbias.VbefSwch//limitLo = 0.0
+
+#********  REB2.OD.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.OD.IaftLDO//limitLo = 0.0
+
+#********  REB2.OD.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.OD.IbefLDO//limitLo = 0.0
+
+#********  REB2.OD.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.OD.VaftLDO//limitLo = 0.0
+
+#********  REB2.OD.VaftLDO2//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.OD.VaftLDO2//limitLo = 0.0
+
+#********  REB2.OD.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.OD.VaftSwch//limitLo = 0.0
+
+#********  REB2.OD.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.OD.VbefLDO//limitLo = 0.0
+
+#********  REB2.analog.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.analog.IaftLDO//limitLo = 0.0
+
+#********  REB2.analog.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.analog.IbefLDO//limitLo = 0.0
+
+#********  REB2.analog.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.analog.VaftLDO//limitLo = 0.0
+
+#********  REB2.analog.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.analog.VaftSwch//limitLo = 0.0
+
+#********  REB2.analog.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.analog.VbefLDO//limitLo = 0.0
+
+#********  REB2.clockhi.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clockhi.IaftLDO//limitLo = 0.0
+
+#********  REB2.clockhi.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clockhi.IbefLDO//limitLo = 0.0
+
+#********  REB2.clockhi.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clockhi.VaftLDO//limitLo = 0.0
+
+#********  REB2.clockhi.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clockhi.VaftSwch//limitLo = 0.0
+
+#********  REB2.clockhi.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clockhi.VbefLDO//limitLo = 0.0
+
+#********  REB2.clocklo.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clocklo.IaftLDO//limitLo = 0.0
+
+#********  REB2.clocklo.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clocklo.IbefLDO//limitLo = 0.0
+
+#********  REB2.clocklo.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clocklo.VaftLDO//limitLo = 0.0
+
+#********  REB2.clocklo.VaftLDO2//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clocklo.VaftLDO2//limitLo = 0.0
+
+#********  REB2.clocklo.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clocklo.VaftSwch//limitLo = 0.0
+
+#********  REB2.clocklo.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.clocklo.VbefLDO//limitLo = 0.0
+
+#********  REB2.digital.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.digital.IaftLDO//limitLo = 0.0
+
+#********  REB2.digital.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.digital.IbefLDO//limitLo = 0.0
+
+#********  REB2.digital.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.digital.VaftLDO//limitLo = 0.0
+
+#********  REB2.digital.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.digital.VaftSwch//limitLo = 0.0
+
+#********  REB2.digital.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.digital.VbefLDO//limitLo = 0.0
+
+#********  REB2.heater.IaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.heater.IaftLDO//limitLo = 0.0
+
+#********  REB2.heater.IbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.heater.IbefLDO//limitLo = 0.0
+
+#********  REB2.heater.VaftLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.heater.VaftLDO//limitLo = 0.0
+
+#********  REB2.heater.VaftSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.heater.VaftSwch//limitLo = 0.0
+
+#********  REB2.heater.VbefLDO//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.heater.VbefLDO//limitLo = 0.0
+
+#********  REB2.hvbias.IbefSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.hvbias.IbefSwch//limitHi = 0.0
+
+#********  REB2.hvbias.IbefSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.hvbias.IbefSwch//limitLo = 0.0
+
+#********  REB2.hvbias.VbefSwch//limitHi
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.hvbias.VbefSwch//limitHi = 0.0
+
+#********  REB2.hvbias.VbefSwch//limitLo
+#** 
+#** type : double
+#** category : Limits
+#********
+#REB2.hvbias.VbefSwch//limitLo = 0.0
+
