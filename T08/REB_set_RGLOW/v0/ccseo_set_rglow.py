@@ -1,5 +1,5 @@
 ###############################################################################
-# For use with the harnessed job for setting og 
+# For use with the harnessed job for setting rgLOW 
 #
 ###############################################################################
 
@@ -16,43 +16,39 @@ cdir = tsCWD
 #rebsub = {}
 firmware_version = {}
 serial_number = {}
-ts8sub  = CCS.attachSubsystem(ts8);
+ts8sub  = CCS.attachSubsystem("%s" % ts8);
 rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
-fpsettings = open("%s/og_settings.txt" % (cdir),"r");
+fpsettings = open("%s/rglow_settings.txt" % (cdir),"r");
 for line in fpsettings:
-    if "OG" in line :
-        setOG = line.split()[1]
+    if "RGLOW" in line :
+        setRGLOW = line.split()[1]
 fpsettings.close()
 
 
 
-fpr = open("%s/REB_og.txt" % (cdir),"w");
+fpr = open("%s/REB_rglow.txt" % (cdir),"w");
 for id in rebdevs:
 #    rebsub[id]  = CCS.attachSubsystem("ts8/%s" % id);
 
-    for ii in range(3) :
+    subsys = "%s/%s.DAC" % (ts8,id)
+    print "Attaching %s" % subsys
+    rebdacsub  = CCS.attachSubsystem(subsys);
+    print "new RGLOW = ",setRGLOW
+    print rebdacsub.synchCommand(10,"change rgLowP %s" % setRGLOW).getResult()
 
-        
-        subsys = "%s/%s.Bias%d" % (ts8,id,ii)
-        print "Attaching %s" % subsys
-        rebbiassub  = CCS.attachSubsystem(subsys);
-        print "new OG = ",setOG
-        print rebbiassub.synchCommand(10,"change ogP %s" % setOG).getResult()
-
-        print "New parameters for %s_%d : " % (id,ii),rebbiassub.synchCommand(10,"printConfigurableParameters []").getResult()
+    print "New parameters for %s : " % (id),rebdacsub.synchCommand(10,"printConfigurableParameters []").getResult()
 
 time.sleep(1.0)
 
 print ts8sub.synchCommand(10,"loadDacs true").getResult()
 print ts8sub.synchCommand(10,"loadBiasDacs true").getResult()
 
-time.sleep(10.0)
+time.sleep(2.0)
 
 for id in rebdevs:
-    for ii in range(3) :
-        OG = ts8sub.synchCommand(10,"getChannelValue %s.OG%dV" % (id,ii)).getResult()
-        fpr.write("%s %f\n" % (str(id)+"_"+str(ii),OG));
+    RGLOW = ts8sub.synchCommand(10,"getChannelValue %s.RGL" % id).getResult()
+    fpr.write("%s %f\n" % (str(id),RGLOW));
 
 
 fpr.close()

@@ -1,0 +1,9 @@
+# -*- python -*-
+{
+    'schema_name' : 'REB_RGLOW',
+    'schema_version' : 0,
+    'RGLOW0' : str,
+    'RGLOW1' : str,
+    'RGLOW2' : str,
+}
+

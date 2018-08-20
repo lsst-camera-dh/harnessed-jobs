@@ -40,8 +40,8 @@ for id in rebdevs:
 
     idx = idx + 1
 
-target_temp = -126.
-#target_temp = -114.
+#target_temp = -126.
+target_temp = -114.
 
 cryosub.synchCommand(10,"setSetPoint 2 %f" % target_temp)
 ts8sub.synchCommand(10,"stopTempControl")

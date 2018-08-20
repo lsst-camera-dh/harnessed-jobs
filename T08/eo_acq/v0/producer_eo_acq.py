@@ -24,12 +24,12 @@ try:
     limsurl = os.environ['LCATR_LIMS_URL']
 except :
     pass
-if ('/Prod' in limsurl) :
-    print "Connecting to eTraveler Prod"
-    conn = Connection('homer', 'Prod', prodServer=True)
-else :
+if ('/Dev' in limsurl) :
     print "Connecting to eTraveler Dev"
     conn = Connection('homer', 'Dev', prodServer=True)
+else :
+    print "Connecting to eTraveler Prod"
+    conn = Connection('homer', 'Prod', prodServer=True)
 
 
 if not conn:

@@ -22,6 +22,7 @@ scanfiles = scanfiles + glob.glob("*summary*")
 scanfiles = scanfiles + glob.glob("*png")
 scanfiles = scanfiles + glob.glob("*log*")
 scanfiles = scanfiles + glob.glob("*fits")
+scanfiles = scanfiles + glob.glob("*seq")
 
 data_products = [lcatr.schema.fileref.make(item) for item in scanfiles]
 results.extend(data_products)

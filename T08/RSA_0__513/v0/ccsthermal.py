@@ -46,8 +46,8 @@ for iiter in range(12) :
 
     print "iiter = %d, delta_cold = %f, delta_cryo = %f, delta_ccd = %f" % (iiter,cold_temp-last_cold_temp,cryo_temp-last_cryo_temp,ccd_temp-last_ccd_temp)
 
-    if (abs(last_cold_temp-cold_temp)<0.1 and abs(last_cryo_temp-cryo_temp) < 0.1 and abs(last_ccd_temp-ccd_temp)<0.1) :
-        break
+#    if (abs(last_cold_temp-cold_temp)<0.1 and abs(last_cryo_temp-cryo_temp) < 0.1 and abs(last_ccd_temp-ccd_temp)<0.1) :
+#        break
 
     time.sleep(600.0)
     last_cold_temp = cold_temp

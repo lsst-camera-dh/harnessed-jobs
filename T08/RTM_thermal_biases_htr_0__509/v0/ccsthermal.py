@@ -102,8 +102,8 @@ last_ccd_temp = -999.
 
 
 
-ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 500");
-ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 500");
+ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 5000");
+ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 5000");
 
 
 iiter = 0
