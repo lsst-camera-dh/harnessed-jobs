@@ -89,8 +89,8 @@ if not dorun :
 else :
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("%s" % ts8);
-    pwrsub  = CCS.attachSubsystem("ccs-rebps");
-    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
+    pwrsub  = CCS.attachSubsystem("rebps");
+    pwrmainsub  = CCS.attachSubsystem("rebps/MainCtrl");
 
 
     status_value = True
@@ -179,9 +179,9 @@ else :
 
 #            time.sleep(2.0)
             print "Rebooting the RCE after a 10s wait"
-            time.sleep(10.0)
-            sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
-            print sout
+#            time.sleep(10.0)
+#            sout = subprocess.check_output("$HOME/rebootrce.sh", shell=True)
+#            print sout
             time.sleep(3.0)
     
             try:
@@ -226,25 +226,25 @@ else :
 
                 if 'e2v' in CCSCCDTYPE.lower() :
                     if not 'e2v' in ts8sub.synchCommand(10,"getCcdType").getResult():
-                        for iwrn in range(20):
+                        for iwrn in range(2):
                             print "Inconsistent sensor and RTM type ABORTING!!!"
                         raise Exception("Inconsistent sensor and RTM type ABORTING!!!")
 
-                    for iwrn in range(20):
+                    for iwrn in range(2):
                         print "USING CONFIGURATION CATEGORY ***** E2V *****   ABORT IF THIS IS NOT OK!"
 #                    ts8sub.synchCommand(10,"loadCategories Rafts:e2v")
 #                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:e2v")
                 elif 'itl' in CCSCCDTYPE.lower() :
                     if not 'itl' in ts8sub.synchCommand(10,"getCcdType").getResult():
-                        for iwrn in range(20):
+                        for iwrn in range(2):
                             print "Inconsistent sensor and RTM type ABORTING!!!"
                         raise Exception("Inconsistent sensor and RTM type ABORTING!!!")
-                    for iwrn in range(20):
+                    for iwrn in range(2):
                         print "USING CONFIGURATION CATEGORY ***** ITL *****   ABORT IF THIS IS NOT OK!"
 #                    ts8sub.synchCommand(10,"loadCategories Rafts:itl")
 #                    ts8sub.synchCommand(10,"loadCategories RaftsLimits:itl")
                 else :
-                    for iwrn in range(20):
+                    for iwrn in range(2):
                         print "UNABLE TO DETERMINE REQUIRED CONFIG CATEGORY ... ABORT!!!"
                     raise Exception("UNABLE TO DETERMINING REQUIRED CONFIG CATEGORY!")
 
@@ -252,12 +252,19 @@ else :
 
                 time.sleep(3.0)
                 try:
-                    stat = ts8sub.synchCommand(1000,"powerOn %d" % rebid).getResult()
-                    print stat.replace("\n","\r\n")
+#                    stat = ts8sub.synchCommand(1000,"powerOn %d" % rebid).getResult()
+                    stat = ts8sub.synchCommand(300,"R00.Reb%d powerCCDsOn" % rebid).getResult()
+                    try:
+                        print stat.replace("\n","\r\n")
+                    except:
+                        pass
                     print "---------------List of low current channels ------------------"
-                    for ln in stat.split("\n"):
-                        if "LOW CURRENT" in ln.upper() :
-                            print ln
+                    try:
+                        for ln in stat.split("\n"):
+                            if "LOW CURRENT" in ln.upper() :
+                                print ln
+                    except:
+                        pass
                     print "---------------End of list of low current channels ------------"
                     print "---------------CCD Temperatures as retrieved from getChannelValue are -----"
                     for ccdnum in range(3) :
@@ -296,9 +303,9 @@ else :
     ts8sub.synchCommand(10,"monitor-publish change taskPeriodMillis 10000");
 
     if status_value :
-        print "DONE with successful powering of"
-        print rebnames
+        print "SUCCESSFUL"
+#        print rebnames
     else :
-        print "FAILED to turn on all requested rebs"
+        print "FAILED!"
 
 print "stop tstamp: %f" % time.time()
