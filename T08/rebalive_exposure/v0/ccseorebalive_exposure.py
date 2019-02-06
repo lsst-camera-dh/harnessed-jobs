@@ -14,14 +14,20 @@ from java.lang import Exception
 import sys
 import time
 import eolib
+import logging
 
 CCS.setThrowExceptions(True);
+
+logging.basicConfig(format="%(message)s",
+                    level=logging.INFO,
+                    stream=sys.stdout)
+logger = logging.getLogger()
 
 if (True):
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("%s" % ts8);
-    pwrsub  = CCS.attachSubsystem("ccs-rebps");
-    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
+    pwrsub  = CCS.attachSubsystem("rebps");
+    pwrmainsub  = CCS.attachSubsystem("rebps/MainCtrl");
 #    tssub  = CCS.attachSubsystem("%s" % ts);
 
     print "Attaching teststand subsystems"
@@ -193,6 +199,43 @@ if (True):
 #
 #        rply = ts8sub.synchCommand(280,"exposeAcquireAndSave",int(exptime*1000),True,True,"${sensorLoc}_${sensorId}_${test_type}_20000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
+# now do SLAC style exposures as well
+
+        test_type = 'CONN'
+        command = "setTestType %s" % test_type
+        ts8sub.synchCommand(10, command)
+    
+        openShutter = False
+        actuateXED = False
+        filename_format = "${CCDSerialLSST}_${testType}_${imageType}_%04d_${RunNumber}_${timestamp}.fits"
+    
+        # Take 5 bias frames to clear the CCDs and enable a noise
+        # measurement.
+        image_type = 'BIAS'
+        command = "setImageType %s" % image_type
+        ts8sub.synchCommand(10, command)
+        exptime = 0
+        for i in range(5):
+            filename = filename_format % i
+            command = 'exposeAcquireAndSave %i %s %s "%s"' % \
+                      (exptime, openShutter, actuateXED, filename)
+            ts8sub.synchCommand(100, command)
+            print("%s taken with exptime %i ms", image_type, exptime)
+    
+        # Take the flats for the 3 exposure times used at BNL.
+        image_type = 'FLAT'
+        command = "setImageType %s" % image_type
+        ts8sub.synchCommand(10, command)
+    
+        # Take frames for three different exposure times.
+        exptimes = (100, 1000, 4000)
+        for exptime in exptimes:
+            filename = filename_format % exptime
+            command = 'exposeAcquireAndSave %i %s %s "%s"' % \
+                      (exptime, openShutter, actuateXED, filename)
+            ts8sub.synchCommand(100, command)
+            print("%s taken with exptime %i ms", image_type, exptime)
+
 
     fp.close();
 
@@ -230,20 +273,20 @@ def TS8getCCSVersions(ts8sub,cdir):
         if (len(tokens)>2) :
             if ("ts8" in tokens[2]) :
                 ssys = "ts8"
-            if ("ccs-rebps" in tokens[2]) :
-                ssys = "ccs-rebps"
+            if ("rebps" in tokens[2]) :
+                ssys = "rebps"
             if (tokens[1] == "Version:") :
                 print "%s - version = %s" % (ssys,tokens[2])
                 if (ssys == "ts8") :
                     ts8_version = tokens[2]
-                if (ssys == "ccs-rebps") :
+                if (ssys == "rebps") :
                     ccsrebps_version = tokens[2]
             if (len(tokens)>3) :
                 if (tokens[2] == "Rev:") :
                     print "%s - revision = %s" % (ssys,tokens[3])
                     if (ssys == "ts8") :
                         ts8_revision = tokens[3]
-                    if (ssys == "ccs-rebps") :
+                    if (ssys == "rebps") :
                         ccsrebps_revision = tokens[3]
 
     return(ts8_version,ccsrebps_version,ts8_revision,ccsrebps_revision)

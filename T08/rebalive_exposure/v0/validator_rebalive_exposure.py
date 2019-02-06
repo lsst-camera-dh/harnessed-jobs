@@ -17,7 +17,7 @@ shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
 
-os.system("./rebalive_plots.sh 2>&1 logpl")
+#os.system("./rebalive_plots.sh 2>&1 logpl")
 
 jobName = "rebalive_exposure"
 
@@ -94,7 +94,7 @@ os.system('cat /tmp/conntest >> rebalive_results_exposures.txt')
 
 
 if (not "ready" in jobDir) :
-    for i in range(20):
+    for i in range(2):
          print "This image viewing may be skipped. Skip the step (N/y)?"
     sys.stdout.flush()
     answer = raw_input("\n\nThis image viewing may be skipped. Skip the step (N/y)? \n\n")
@@ -122,7 +122,7 @@ if (not "ready" in jobDir) :
 
 
 
-for i in range(20) :
+for i in range(2) :
      print "RETEST (N/y)?"
 sys.stdout.flush()
 answer = raw_input("RETEST (N/y)?")
@@ -153,7 +153,7 @@ schemaFile.write("    \'schema_version\' : 0,\n")
 statusFile = open("rebalive_results_exposures.txt")
 lnum = 0
 for line in statusFile:
-    print "line = %s" % line
+#    print "line = %s" % line
 
 #    line = line.replace('OK','<font color="green">OK</font>').replace('FAILED','<font color="red">FAILED</font>')
 
