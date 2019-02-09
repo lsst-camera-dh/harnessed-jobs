@@ -27,13 +27,19 @@ sectionlist = [
 
 
 
-tm = time.time()
-start = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm-180))
-end = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm))
+#tm = time.time()
+#start = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm-180))
+#end = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm))
 #start= '2019-02-05T21:45:51'
 #end= '2019-02-05T21:50:51'
 #start= '2019-02-05T23:15:18'
 #end= '2019-02-05T23:15:25'
+
+gettimecmnd = 'ls -rt /home/ts8prod/jobHarness/jh_stage/LCA-11021_RTM/%s/*/connectivity0_2/v0/*/2*.log | tail -1 | xargs -n 1 grep "Starting power ON" | head -1 | awk -F "," \'{print $1}\'' % 'LCA-11021_RTM-004'
+rawstart = os.popen(gettimecmnd).readline()
+tm = time.mktime(time.strptime(rawstart.strip(),'%Y-%m-%d %H:%M:%S'))
+start = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm-500))
+end = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm+300))
 
 print "start=",start
 print "end=",end

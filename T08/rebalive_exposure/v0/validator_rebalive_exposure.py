@@ -48,9 +48,14 @@ fl4=sorted(glob.glob('*4000ms*fits'))
 slots = []
 for f in fl0:
     slots.append([f[:2]] * 16)
-slots = slots[0] + slots[1] + slots[2] + slots[3] + slots[4] + slots[5] + slots[6] + slots[7] + slots[8]
+#slots = slots[0] + slots[1] + slots[2] + slots[3] + slots[4] + slots[5] + slots[6] + slots[7] + slots[8]
 #slots = slots[0] + slots[1] + slots[2]
 #slots = sum(slots)
+slotssum = slots[0] * 0
+for slt in slots :
+    slotssum = slotssum + slt
+
+slots = slotssum
 
 segments = ['10','11','12','13','14','15','16','17','07','06','05','04','03','02','01','00'] * 9
 
@@ -80,14 +85,24 @@ bad0 = numpy.where(sig0 < numpy.median(sig0)/10.)[0]
 bad1 = numpy.where(sig1 < numpy.median(sig1)/10.)[0]
 bad4 = numpy.where(sig4 < numpy.median(sig4)/10.)[0]
 
-print("0 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad0], sig0[bad0])
-print("1 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad1], sig1[bad1])
-print("4 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad4], sig4[bad4])
+#print("0 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad0], sig0[bad0])
+#print("1 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad1], sig1[bad1])
+#print("4 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad4], sig4[bad4])
 
 ofile = open('/tmp/conntest', 'w')
-print >> ofile, ("0 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad0], sig0[bad0])
-print >> ofile, ("1 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad1], sig1[bad1])
-print >> ofile, ("4 sec: (bad slot,bad segment, bad amp), signal " , [(slots[x],segments[x],amps[x])  for x in bad4], sig4[bad4])
+print >> ofile, ("List of bad segments:" )
+print "List of bad segments:"
+print >> ofile, ("0 sec: \nslot, segment, amp, signal " )
+for x in bad0:
+    print >> ofile, (slots[x],segments[x],amps[x],sig0[x])
+print >> ofile, ("1 sec: \nslot, segment, amp, signal " )
+print "1 sec: \nslot, segment, amp, signal "
+for x in bad1:
+    print >> ofile, (slots[x],segments[x],amps[x],sig1[x])
+    print slots[x],segments[x],amps[x],sig1[x]
+print >> ofile, ("4 sec: \nslot, segment, amp, signal " )
+for x in bad4:
+    print >> ofile, (slots[x],segments[x],amps[x],sig4[x])
 ofile.close()
 
 os.system('cat /tmp/conntest >> rebalive_results_exposures.txt')
@@ -174,11 +189,11 @@ while (lnum<240):
 schemaFile.write("}\n")
 schemaFile.close()
 
-print "statusAssignments = %s" % statusAssignments
+#print "statusAssignments = %s" % statusAssignments
 
 print "jobName = %s" % jobName
 lcatr.schema.load("%s/%s_runtime.schema"%(jobDir,jobName))
-print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
+#print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
 
 #results.append(lcatr.schema.valid(lcatr.schema.get(jobName),
 #                                      **statusAssignments))

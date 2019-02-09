@@ -12,8 +12,12 @@ jobDir = siteUtils.getJobDir()
 shutil.copy("%s/rebalive_plots.gp" % jobDir ,os.getcwd())
 shutil.copy("%s/rebalive_plots.sh" % jobDir ,os.getcwd())
 shutil.copy("%s/plotchans.list" % jobDir ,os.getcwd())
+shutil.copy("%s/getrebdetails.py" % jobDir ,os.getcwd())
 
-for i in range(20) :
+print os.popen("$CCS_BIN_DIR/ccs-script getrebdetails.py").readline()
+print os.popen("$CCS_BIN_DIR/ccs-script getrebdetails.py >> rebalive_results.txt").readline()
+
+for i in range(2) :
      print "RETEST (N/y)?"
 sys.stdout.flush()
 answer = raw_input("RETEST (N/y)?")
@@ -45,7 +49,7 @@ schemaFile.write("    \'schema_version\' : 0,\n")
 statusFile = open("rebalive_results.txt")
 lnum = 0
 for line in statusFile:
-    print "line = %s" % line
+#    print "line = %s" % line
 
 #    line = line.replace('OK','<font color="green">OK</font>').replace('FAILED','<font color="red">FAILED</font>')
 
@@ -66,11 +70,11 @@ while (lnum<240):
 schemaFile.write("}\n")
 schemaFile.close()
 
-print "statusAssignments = %s" % statusAssignments
+#print "statusAssignments = %s" % statusAssignments
 
 print "jobName = %s" % jobName
 lcatr.schema.load("%s/%s_runtime.schema"%(jobDir,jobName))
-print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
+#print "schema = %s" % str(lcatr.schema.get("%s_runtime"%jobName))
 
 #results.append(lcatr.schema.valid(lcatr.schema.get(jobName),
 #                                      **statusAssignments))
