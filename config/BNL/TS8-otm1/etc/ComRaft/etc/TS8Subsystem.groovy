@@ -13,13 +13,14 @@ import org.lsst.ccs.utilities.image.*;
 import org.lsst.ccs.subsystem.ts8.TS8Subsystem;
 import org.lsst.ccs.subsystem.ts8.TS8AlertHandler;
 import org.lsst.ccs.subsystem.ts8.sim.*;
-import org.lsst.ccs.subsystem.ts8.sim.TS8ClientFactorySimulation
-import org.lsst.ccs.description.groovy.CCSBuilder
-import org.lsst.ccs.monitor.Page
-import org.lsst.ccs.drivers.reb.ClientFactory
-import org.lsst.ccs.drivers.reb.SlowAdcs
-import org.lsst.ccs.subsystem.rafts.GlobalVisualizationClient
+import org.lsst.ccs.subsystem.ts8.sim.TS8ClientFactorySimulation;
+import org.lsst.ccs.description.groovy.CCSBuilder;
+import org.lsst.ccs.monitor.Page;
+import org.lsst.ccs.drivers.reb.ClientFactory;
+import org.lsst.ccs.drivers.reb.SlowAdcs;
+import org.lsst.ccs.subsystem.rafts.GlobalVisualizationClient;
 import org.lsst.ccs.bootstrap.BootstrapResourceUtils;
+import org.lsst.ccs.daq.utilities.FitsService;
 
 CCDType type = new ITLCCDType();
 
@@ -61,6 +62,8 @@ builder.
 //                updateTime: 30000, rebs: ["R00.Reb0", "R00.Reb2"], tempChans: ["R00.Reb0.CCDTemp1", "R00.Reb1.CCDTemp1", "R00.Reb2.CCDTemp1"])
 
         TS8AlertHandler (TS8AlertHandler)
+
+
         
         RebAspicTemperatureLowLimit  (Alarm, description:"Alarm for Aspic low temperature limit", eventParm:RaftAlert.ASPICS_TEMPERATURE_TOO_LOW.ordinal())
         RebAspicTemperatureHighLimit  (Alarm, description:"Alarm for Aspic high temperature limit", eventParm:RaftAlert.ASPICS_TEMPERATURE_TOO_HIGH.ordinal())
@@ -77,6 +80,11 @@ builder.
             innerClientFactory = runMode.equals("simulation") ? new TS8ClientFactorySimulation(rebGeometry) : null;
 
         "$reb" (REBDevice, hdwType:"daq2", id:rebCount, ifcName:partition, ccdMask:7, clientFactory:innerClientFactory) {
+
+            fitsService (FitsService,
+                headerFilesList:["primary:primary", "extended", "reb_cond", "test_cond"],
+                replacements:["$reb".toString()+":REB"]
+            )
 
             //"${reb}.DAC" (DacControl, raw: true, version: 2)   // Science raft REBs, raw DAC values
             "${reb}.DAC" (DacControl)    // All REBs, physical values
