@@ -253,7 +253,12 @@ else :
                 time.sleep(3.0)
                 try:
 #                    stat = ts8sub.synchCommand(1000,"powerOn %d" % rebid).getResult()
+                    print "calling powerCCDsOn now ..."
                     stat = ts8sub.synchCommand(300,"R00.Reb%d powerCCDsOn" % rebid).getResult()
+                    print "powerCCDsOn execution completed. Now loading ASPICS"
+                    stat = ts8sub.synchCommand(300,"R00.Reb%d loadAspics true" % rebid).getResult()
+                    print "Now pausing 5s."
+                    time.sleep(5.0)
                     try:
                         print stat.replace("\n","\r\n")
                     except:
@@ -261,7 +266,7 @@ else :
                     print "---------------List of low current channels ------------------"
                     try:
                         for ln in stat.split("\n"):
-                            if "LOW CURRENT" in ln.upper() :
+                            if "BELOW LOW" in ln.upper() :
                                 print ln
                     except:
                         pass
@@ -282,7 +287,11 @@ else :
                 
                     print "------ %s Complete ------\n" % rebname
                 except RuntimeException, e:
+                    print "There was an Exception. Sleeping 5s to give operator chance to read output."
+                    time.sleep(5.0)
+                    print "\n\n\n The exception \n\n\n"
                     print e
+                    print "\n\n\n"
                     print "setting tick and monitoring period to 10s"
 
                     ts8sub.synchCommand(10,"monitor-update change taskPeriodMillis 10000");

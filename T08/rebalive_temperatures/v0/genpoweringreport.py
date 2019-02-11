@@ -13,7 +13,7 @@ host = 'localhost'
 run_number = 0
 cdir = os.getcwd()
 
-test_id = str(int(time.time()))
+#test_id = str(int(time.time()))
 
 
 sectionlist = [
@@ -35,14 +35,42 @@ sectionlist = [
 #start= '2019-02-05T23:15:18'
 #end= '2019-02-05T23:15:25'
 
-gettimecmnd = 'ls -rt /home/ts8prod/jobHarness/jh_stage/LCA-11021_RTM/%s/*/connectivity0_2/v0/*/2*.log | tail -1 | xargs -n 1 grep "Starting power ON" | head -1 | awk -F "," \'{print $1}\'' % 'LCA-11021_RTM-004'
-rawstart = os.popen(gettimecmnd).readline()
-tm = time.mktime(time.strptime(rawstart.strip(),'%Y-%m-%d %H:%M:%S'))
-start = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm-500))
-end = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm+300))
+cwd = os.getcwd()
+print "cwd = ",cwd
+parts = cwd.split("_")
+test_num = parts[len(parts)-1][0]
+print "test_num = ",test_num
+parts = cwd.split("/")
+basedir = ""
+for i in range(len(parts)-3) :
+    basedir = basedir + parts[i] + "/"
+print "basedir = ",basedir
 
-print "start=",start
-print "end=",end
+for rebnum in range(3):
+#    gettimecmnd = 'ls -rt %s/connectivity%d_%s/v0/*/2*.log | tail -1 | xargs -n 1 grep "Starting power ON" | head -1 | awk -F "," \'{print $1}\'' % (basedir,rebnum,test_num)
+#    rawstart = os.popen(gettimecmnd).readline()
+#    tm = time.mktime(time.strptime(rawstart.strip(),'%Y-%m-%d %H:%M:%S'))
+#    start = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm))
+#    end = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(tm+2700))
+
+    test_id = "REB_Number_%d_Connectivity_Test_%s" % (rebnum,test_num)
+
+    gettimecmnd = 'ls -rt %s/connectivity%d_%s/v0/*/rebalive_results.txt | tail -1 | xargs -n 1 grep "start tstamp" | head -1 | awk -F " " \'{print $3}\'' % (basedir,rebnum,test_num)
+    rawstart = os.popen(gettimecmnd).readline()
+    print "rawstart = ",rawstart
+#    tm = time.mktime(float(rawstart))
+    start = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(float(rawstart)))
+
+
+    gettimecmnd = 'ls -rt %s/connectivity%d_%s/v0/*/rebalive_results.txt | tail -1 | xargs -n 1 grep "stop tstamp" | head -1 | awk -F " " \'{print $3}\'' % (basedir,rebnum,test_num)
+    rawstop = os.popen(gettimecmnd).readline()
+#    tm = time.mktime(float(rawstop))
+    end = time.strftime('%Y-%m-%dT%H:%M:%S',time.localtime(float(rawstop)))
+
+    print "start=",start
+    print "end=",end
+#exit
+#kshflahlhl
 
 #    ristart = time.strptime(rstart.strip(),'%Y-%m-%d %H:%M:%S')
 #    ristop = time.strptime(rstop.strip(),'%Y-%m-%d %H:%M:%S')
@@ -54,7 +82,7 @@ print "end=",end
 #    milestones = ('2017-10-06T00:00:00', '2017-10-06T23:59:59')
     
     
-if True :
+#if True :
     ccs_subsystem = 'ts8-otm1'
     
     config_file = 'ts8power_quantities.cfg'
@@ -62,15 +90,16 @@ if True :
     time_axis = ccs_trending.TimeAxis(start=start, end=end, nbins=600)
     config = ccs_trending.ccs_trending_config(config_file)
     for section in config.sections():
-        print "doing section ",section
-        plotter = ccs_trending.TrendingPlotter(ccs_subsystem, host,
+        if "REB%d" % rebnum in section.upper() : 
+            print "doing section ",section
+            plotter = ccs_trending.TrendingPlotter(ccs_subsystem, host,
                                                time_axis=time_axis)
-        plotter.read_config(config, section)
-        title = "%s, %s, %s" % (test_id, run_number, section)
-        plotter.plot(title=title)
+            plotter.read_config(config, section)
+            title = "%s, %s, %s" % (test_id, run_number, section)
+            plotter.plot(title=title)
 #        os.mkdir('out_%s' % test_id)
-        plt.savefig('out_%s_%s_%s_%s.png' % (test_id, section, test_id, run_number))
-        plotter.save_file('out_%s_%s_%s_%s.txt' % (test_id, section, test_id, run_number))
+            plt.savefig('%s_%s.png' % (test_id, section))
+            plotter.save_file('%s_%s.txt' % (test_id, section))
 
 
 print
