@@ -42,8 +42,8 @@ def check_currents(rebid,pwr_chan,reb_chan,low_lim,high_lim,chkreb):
 if (True):
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("ts8");
-    pwrsub  = CCS.attachSubsystem("ccs-rebps");
-    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
+    pwrsub  = CCS.attachSubsystem("rebps");
+    pwrmainsub  = CCS.attachSubsystem("rebps/MainCtrl");
 
 
     status_value = None

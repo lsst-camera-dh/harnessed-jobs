@@ -20,8 +20,8 @@ CCS.setThrowExceptions(True);
 if (True):
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("%s" % ts8);
-    pwrsub  = CCS.attachSubsystem("ccs-rebps");
-    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
+    pwrsub  = CCS.attachSubsystem("rebps");
+    pwrmainsub  = CCS.attachSubsystem("rebps/MainCtrl");
 #    tssub  = CCS.attachSubsystem("%s" % ts);
 
     print "Attaching teststand subsystems"
@@ -184,10 +184,10 @@ if (True):
 
         rply = ts8sub.synchCommand(120,"exposeAcquireAndSave",int(exptime*1000),True,False,"${sensorLoc}_${sensorId}_${test_type}_flat_1000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
-        exptime=4.000
-        print "Doing 4s Fe55 exposure"
+        exptime=40.000
+        print "Doing 40s Fe55 exposure"
 
-        rply = ts8sub.synchCommand(280,"exposeAcquireAndSave",int(exptime*1000),False,True,"${sensorLoc}_${sensorId}_${test_type}_fe55_4000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
+        rply = ts8sub.synchCommand(280,"exposeAcquireAndSave",int(exptime*1000),False,True,"${sensorLoc}_${sensorId}_${test_type}_fe55_40000ms_${image_type}_${seq_info}_${timestamp}.fits").getResult()
 
 #        exptime=20.000
 #
@@ -230,20 +230,20 @@ def TS8getCCSVersions(ts8sub,cdir):
         if (len(tokens)>2) :
             if ("ts8" in tokens[2]) :
                 ssys = "ts8"
-            if ("ccs-rebps" in tokens[2]) :
-                ssys = "ccs-rebps"
+            if ("rebps" in tokens[2]) :
+                ssys = "rebps"
             if (tokens[1] == "Version:") :
                 print "%s - version = %s" % (ssys,tokens[2])
                 if (ssys == "ts8") :
                     ts8_version = tokens[2]
-                if (ssys == "ccs-rebps") :
+                if (ssys == "rebps") :
                     ccsrebps_version = tokens[2]
             if (len(tokens)>3) :
                 if (tokens[2] == "Rev:") :
                     print "%s - revision = %s" % (ssys,tokens[3])
                     if (ssys == "ts8") :
                         ts8_revision = tokens[3]
-                    if (ssys == "ccs-rebps") :
+                    if (ssys == "rebps") :
                         ccsrebps_revision = tokens[3]
 
     return(ts8_version,ccsrebps_version,ts8_revision,ccsrebps_revision)

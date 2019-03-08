@@ -58,7 +58,7 @@ if (True):
     print "Attaching ts8 subsystem"
 
     ts8sub  = CCS.attachSubsystem("%s" % ts8);
-    rebpssub  = CCS.attachSubsystem("ccs-rebps");
+    rebpssub  = CCS.attachSubsystem("rebps");
 
 
     acqname = jobname.split("_")[0].upper()

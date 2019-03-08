@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 # Displays a scope-like view of the CCD output waveforms for the whole raft.
 #
@@ -23,9 +23,23 @@ from matplotlib import colors as mplcol
 import scope
 import pyfits
 import glob
+import lsst.eotest.sensor as sensorTest
 import siteUtils
+from multiprocessor_execution import sensor_analyses
+import camera_components
 
+# not currently in use ...
+#def run_scan_task(sensor_id):
+def run_scan_task(slot):
+#    itm = siteUtils.dependency_glob('00%s_TM.fits' % sensor_id, description='scan mode TM files')
+    itm = siteUtils.dependency_glob('%s*_TM.fits' % slot, description='scan mode TM files')[0]
+    raft_display_allchans(itm)
 
+#    itm = siteUtils.dependency_glob('00%s_DSI.fits' % sensor_id, description='scan mode TM files')
+    itm = siteUtils.dependency_glob('%s*_DSI.fits' % slot, description='scan mode TM files')[0]
+    raft_display_allchans(itm)
+
+# not currently in use ...
 def get_scandata_raft(inputfile, datadir=''):
     """
     Builds up list of data arrays from all raft files (one array per CCD), plus list of segment names.
@@ -33,6 +47,7 @@ def get_scandata_raft(inputfile, datadir=''):
     :param inputfile: the first file (for Reb0 or S00). Full path if datadir is not given
     :return:
     """
+
     raftarrays = []
     if os.path.splitext(inputfile)[1] in [".fits", ".fz"]:
         # starts with 00 through 22
@@ -42,7 +57,7 @@ def get_scandata_raft(inputfile, datadir=''):
 
         #raftfits = [inputfile.replace("00", s) for s in seglist]
         # if there is "00" elsewhere in the file name, modify as appropriate
-        raftfits = [inputfile.replace("00_", s + '_') for s in seglist]
+        raftfits = [inputfile.replace("00_", s + '_' + s[1] +  '_') for s in seglist]
         for f in raftfits:
             raftarrays.append(scope.get_scandata_fromfile(f, datadir))
     else:
@@ -57,7 +72,18 @@ def get_scandata_raft(inputfile, datadir=''):
 
     return raftarrays, seglist
 
-def raft_display_allchans(inputfile, datadir='', suptitle=''):
+#def raft_display_allchans(inputfile, datadir='', suptitle=''):
+#    print "inputfile = ",inputfile
+#    """
+#    Builds up data from all raft files and display scans.
+#    :param datadir: optional, directory where data is stored
+#    :param inputfile: the first file (for Reb0 or S00). Full path if datadir is not given
+#    :param suptitle: personalized title
+#    :return:
+#    """
+#    raftarrays, seglist = get_scandata_raft(inputfile, datadir)
+def raft_display_allchans(inputfiles, datadir='', suptitle=''):
+    print "inputfiles = ",inputfiles
     """
     Builds up data from all raft files and display scans.
     :param datadir: optional, directory where data is stored
@@ -65,7 +91,11 @@ def raft_display_allchans(inputfile, datadir='', suptitle=''):
     :param suptitle: personalized title
     :return:
     """
-    raftarrays, seglist = get_scandata_raft(inputfile, datadir)
+#    raftarrays, seglist = get_scandata_raft(inputfile, datadir)
+    raftarrays = []
+    for f in inputfiles:
+            raftarrays.append(scope.get_scandata_fromfile(f, datadir))
+    seglist = ["%d%d" % (i, j) for i in range(3) for j in range(3)]
 
     fig, axes = plt.subplots(nrows = 3, ncols = 3, figsize=(15, 9))
     # when REB2 data is missing
@@ -101,11 +131,13 @@ def raft_display_allchans(inputfile, datadir='', suptitle=''):
     for num in range(len(raftarrays)):
         ax = axes[num / 3, num % 3]
         # common scale for all subplots
-        ax.set_ylim(0, maxplot * 1.02)
+#        ax.set_ylim(0, maxplot * 1.02)
+        ax.set_ylim(0,65000)
         #ax.set_ylim(minplot * 0.95, maxplot * 1.02)
 
     ax.legend(bbox_to_anchor=(1.05, 0), loc='lower left', borderaxespad=0.)
 
+    inputfile = inputfiles[0]
     dataname = scope.get_rootfile(inputfile)
     if suptitle:
         plt.suptitle(suptitle, fontsize='x-large')
@@ -298,14 +330,19 @@ def plot_corrcoef_raftscope(raftsfits, ROIrows, ROIcols, xylabels=None, title=''
     plt.show()
 
 
-
 if __name__ == '__main__':
-
 #    itm = sys.argv[1]
-    itm = siteUtils.dependency_glob('00*_TM.fits' % sensor_id,
-                                           description='scan mode TM files')
+    raft_id = siteUtils.getUnitId()
+    print "unit ID = ",raft_id
+    raft = camera_components.Raft.create_from_etrav(raft_id)
+    print "raft sensors = ",raft.sensor_names
+#    sensor_analyses(run_scan_task)
+#    for slot in ['00','11'] :
+#        run_scan_task(slot)
+
+    itm = siteUtils.dependency_glob('*_TM.fits', description='scan mode TM files')
+    raft_display_allchans(itm)
+    itm = siteUtils.dependency_glob('*_DSI.fits', description='scan mode TM files')
     raft_display_allchans(itm)
 
-    itm = siteUtils.dependency_glob('00*_DSI.fits' % sensor_id,
-                                           description='scan mode TM files')
-    raft_display_allchans(itm)
+

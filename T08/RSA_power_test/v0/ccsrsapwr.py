@@ -14,7 +14,7 @@ import time
 CCS.setThrowExceptions(True);
 
 ts8sub  = CCS.attachSubsystem("ts8");
-pwrsub = CCS.attachSubsystem("ccs-rebps")
+pwrsub = CCS.attachSubsystem("rebps")
 testtype = "FE55"
 light = "False"
 xed = "True"

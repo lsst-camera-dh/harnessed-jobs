@@ -29,7 +29,7 @@ rebpssub = None
 usets8 = True
 try:
     ts8sub  = CCS.attachSubsystem("%s" % ts8);
-    rebpssub  = CCS.attachSubsystem("ccs-rebps");
+    rebpssub  = CCS.attachSubsystem("rebps");
 except:
     usets8 = False
 

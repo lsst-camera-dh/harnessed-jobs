@@ -266,7 +266,7 @@ else :
                     print "---------------List of low current channels ------------------"
                     try:
                         for ln in stat.split("\n"):
-                            if "LOW CURRENT" in ln.upper() :
+                            if "BELOW LOW" in ln.upper() :
                                 print ln
                     except:
                         pass

@@ -26,8 +26,8 @@ tssub  = CCS.attachSubsystem("ts");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
 vacsub = CCS.attachSubsystem("ts/VQMonitor");
 
-pwrsub  = CCS.attachSubsystem("ccs-rebps");
-pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
+pwrsub  = CCS.attachSubsystem("rebps");
+pwrmainsub  = CCS.attachSubsystem("rebps/MainCtrl");
 
 
 print "powering off REBs:"

@@ -92,8 +92,8 @@ if not dorun :
 else :
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("ts8");
-    pwrsub  = CCS.attachSubsystem("ccs-rebps");
-    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
+    pwrsub  = CCS.attachSubsystem("rebps");
+    pwrmainsub  = CCS.attachSubsystem("rebps/MainCtrl");
 
 
     status_value = True

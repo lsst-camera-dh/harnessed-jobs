@@ -199,7 +199,10 @@ def hdrsummary(filename,outfile):
     except:
         outfl.write("CCD temperature     = N/A\n")
     outfl.write("Photodiode reading  = %f\n" % phdr['MONDIODE'])
-    outfl.write("Filter position     = %d\n" % phdr['FILTPOS'])
+    try:
+        outfl.write("Filter position     = %d\n" % phdr['FILTPOS'])
+    except:
+        outfl.write("CCD temperature     = N/A\n")
     try:
         outfl.write("Exposure time       = %f\n" % phdr['EXPTIME'])
     except:

@@ -208,8 +208,8 @@ if (True):
         openShutter = False
         actuateXED = False
 #        filename_format = "S${sensorLoc}/${sensorId}_${testType}_${imageType}_%04d_${RunNumber}_${timestamp}.fits"
-        filename_format = "S${sensorLoc}/${sensorId}_${testType}_${imageType}_%04d_${timestamp}.fits"
-    
+#        filename_format = "S${sensorLoc}/${sensorId}_${testType}_${imageType}_%04d_${timestamp}.fits"
+        filename_format = "S${sensorLoc}/${CCDSerialLSST}_${testType}_${imageType}_${SequenceInfo}_${RunNumber}_${timestamp}.fits"
         # Take 5 bias frames to clear the CCDs and enable a noise
         # measurement.
         image_type = 'BIAS'

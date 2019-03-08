@@ -20,8 +20,8 @@ CCS.setThrowExceptions(True);
 if (True):
 #attach CCS subsystem Devices for scripting
     ts8sub  = CCS.attachSubsystem("ts8");
-    pwrsub  = CCS.attachSubsystem("ccs-rebps");
-    pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
+    pwrsub  = CCS.attachSubsystem("rebps");
+    pwrmainsub  = CCS.attachSubsystem("rebps/MainCtrl");
 
 
     cdir = tsCWD
@@ -234,7 +234,7 @@ if (True):
 # Apply the CCD bias voltages and set the CCD clock rails (to E2V levels).
         result = ts8sub.synchCommand(90,"loadSequencer","seq_1M.xml");
 
-#ccs-rebps/setBiasDac ?  ccs-rafts loadNamedConfig, ccs-rafts loadDacs, ccs-rafts loadBiasDacs
+#rebps/setBiasDac ?  ccs-rafts loadNamedConfig, ccs-rafts loadDacs, ccs-rafts loadBiasDacs
 
 #12. Re-check supply currents and verify they do not exceed expected values.
 
@@ -319,20 +319,20 @@ def TS8getCCSVersions(ts8sub,cdir):
         if (len(tokens)>2) :
             if ("ts8" in tokens[2]) :
                 ssys = "ts8"
-            if ("ccs-rebps" in tokens[2]) :
-                ssys = "ccs-rebps"
+            if ("rebps" in tokens[2]) :
+                ssys = "rebps"
             if (tokens[1] == "Version:") :
                 print "%s - version = %s" % (ssys,tokens[2])
                 if (ssys == "ts8") :
                     ts8_version = tokens[2]
-                if (ssys == "ccs-rebps") :
+                if (ssys == "rebps") :
                     ccsrebps_version = tokens[2]
             if (len(tokens)>3) :
                 if (tokens[2] == "Rev:") :
                     print "%s - revision = %s" % (ssys,tokens[3])
                     if (ssys == "ts8") :
                         ts8_revision = tokens[3]
-                    if (ssys == "ccs-rebps") :
+                    if (ssys == "rebps") :
                         ccsrebps_revision = tokens[3]
 
     return(ts8_version,ccsrebps_version,ts8_revision,ccsrebps_revision)

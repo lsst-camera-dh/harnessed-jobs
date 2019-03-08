@@ -17,8 +17,8 @@ tssub  = CCS.attachSubsystem("ts");
 monosub = CCS.attachSubsystem("%s/Monochromator" % ts );
 ts8sub  = CCS.attachSubsystem("ts8");
 cryosub  = CCS.attachSubsystem("ts/Cryo");
-pwrsub  = CCS.attachSubsystem("ccs-rebps");
-pwrmainsub  = CCS.attachSubsystem("ccs-rebps/MainCtrl");
+pwrsub  = CCS.attachSubsystem("rebps");
+pwrmainsub  = CCS.attachSubsystem("rebps/MainCtrl");
 rebdevs = ts8sub.synchCommand(10,"getREBDevices").getResult()
 
 testtype = "flat"
