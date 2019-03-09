@@ -1,0 +1,6 @@
+gnome-terminal: Fatal IO error 104 (Connection reset by peer) on X server localhost:25.0.
+Xlib:  extension "RANDR" missing on display "localhost:10.0".
+Xlib:  extension "RANDR" missing on display "localhost:10.0".
+Xlib:  extension "RANDR" missing on display "localhost:10.0".
+Xlib:  extension "RANDR" missing on display "localhost:10.0".
+Failed to parse arguments: Cannot open display: 

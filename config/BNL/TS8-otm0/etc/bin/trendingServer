@@ -1,0 +1,1 @@
+../org-lsst-ccs-localdb-main/bin/trendingServer.sh ../etc/ccsdb.properties
