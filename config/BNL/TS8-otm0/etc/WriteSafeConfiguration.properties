@@ -1,2 +1,0 @@
-org.lsst.ccs.application.mainClass=org.lsst.ccs.config.SafeConfigurationPropertiesFileWriter
-org.lsst.ccs.application.description=Write the safe configuration properties files corresponding to a subsystem description
