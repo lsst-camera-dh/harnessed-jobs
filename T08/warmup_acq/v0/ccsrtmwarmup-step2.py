@@ -48,7 +48,7 @@ for id in rebdevs:
         serial_number[id] = rebsub[id].synchCommand(10,"getSerialNumber").getResult()
         print "serial number = ",serial_number[id]
         print "powering off sensors"
-        print ts8sub.synchCommand(300,"powerOff %d" % idx).getResult()
+        print rebsub[id].synchCommand(300,"powerCCDsOff").getResult()
 
     except:
         pass

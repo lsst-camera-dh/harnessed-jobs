@@ -30,8 +30,8 @@ for id in rebdevs:
         serial_number[id] = rebsub[id].synchCommand(10,"getSerialNumber").getResult()
 
         stat = ts8sub.synchCommand(300,"R00.Reb%d setBackBias false" % idx).getResult()
-        stat = ts8sub.synchCommand(300,"powerOff %d" % idx).getResult()
-#        result = pwrsub.synchCommand(20,"setNamedPowerOn %d master False" % idx).getResult();
+        stat = rebsub[id].synchCommand(300,"powerCCDsOff %d").getResult()
+
         result = pwrsub.synchCommand(20,"sequencePower %d False" % idx).getResult();
     except:
         pass
