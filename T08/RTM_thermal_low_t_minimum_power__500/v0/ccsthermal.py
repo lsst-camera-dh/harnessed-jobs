@@ -30,7 +30,7 @@ for id in rebdevs:
         serial_number[id] = rebsub[id].synchCommand(10,"getSerialNumber").getResult()
 
         stat = ts8sub.synchCommand(300,"R00.Reb%d setBackBias false" % idx).getResult()
-        stat = rebsub[id].synchCommand(300,"powerCCDsOff" % idx).getResult()
+        stat = rebsub[id].synchCommand(300,"powerCCDsOff").getResult()
         result = pwrsub.synchCommand(20,"sequencePower %d False" % idx).getResult();
     except:
         pass
@@ -39,8 +39,8 @@ for id in rebdevs:
 
     idx = idx + 1
 
-#target_temp = -126.
-target_temp = -114.
+target_temp = -126.
+#target_temp = -114.
 
 cryosub.synchCommand(10,"setSetPoint 2 %f" % target_temp)
 ts8sub.synchCommand(10,"stopTempControl")

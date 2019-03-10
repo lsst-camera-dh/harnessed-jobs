@@ -173,10 +173,12 @@ class TrendingPlotter(object):
         """
         items = OrderedDict(config.items(section))
         self.y_label = '%s (%s)' % (section, items.pop('units'))
+        print("items=",items.values())
         self._read_histories(items.values())
 
     def _read_histories(self, quantities):
         for quantity in quantities:
+            print("quantity=",quantity)
             self.histories[quantity] = TrendingHistory(self.rest_url(quantity))
 
     def save_file(self, outfile):
@@ -205,8 +207,10 @@ class TrendingPlotter(object):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         for quantity, history in self.histories.items():
+#            ebar = ax.errorbar(mds.date2num(history.x_values), history.y_values,
+#                               yerr=history.y_errors, fmt='.')
             ebar = ax.errorbar(mds.date2num(history.x_values), history.y_values,
-                               yerr=history.y_errors, fmt='.')
+                               yerr=None , fmt='.-')
             ax.plot(mds.date2num(history.x_values), history.y_values, '.',
                     color=ebar[0].get_color(), label=quantity)
         frame = plt.gca()
@@ -249,7 +253,9 @@ class TrendingPlotter(object):
 
 class TrendingHistory(object):
     def __init__(self, url):
-        doc = minidom.parseString(requests.get(url).text)
+#        print("url = ",url)
+#        print("req url = ",requests.get(url).text)
+        doc = minidom.parseString(requests.get(url).text.encode('utf-8'))
         self.history = [TrendingPoint(x) for x in
                         doc.getElementsByTagName('trendingdata')]
         try:
